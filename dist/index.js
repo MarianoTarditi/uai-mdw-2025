@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
-    res.send("Server is ON");
+    res.send("Server is OnN");
 });
 app.listen(3000, () => {
-    console.log("Server is running on port: " + PORT);
+    console.log("Server is running on portr: " + PORT);
 });
