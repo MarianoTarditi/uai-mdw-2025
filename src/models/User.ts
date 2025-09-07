@@ -26,5 +26,5 @@ const userSchema = new Schema(
 );
 
 type UserType = InferSchemaType<typeof userSchema>;
-const User = model<UserType>("User", userSchema);
+const User = model<UserType>("User", userSchema); // ffdsfs
 export default User;

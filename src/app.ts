@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./database";
+import connectDB from "./config/database";
 import router from "./routes";
 
 dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 app.use("/api", router);
 
 try {
-  app.listen(3000, () => {
+  app.listen(PORT, () => {
     console.log("Server is running on port: " + PORT);
   });
 } catch (error) {

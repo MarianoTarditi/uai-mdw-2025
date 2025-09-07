@@ -1,11 +1,11 @@
 {
   "name": "uai-mdw-2025---copia-para-aprender",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/app.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
     "mongoose": "^8.18.0"
   },
   "devDependencies": {

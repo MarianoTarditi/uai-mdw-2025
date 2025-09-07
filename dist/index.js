@@ -6,14 +6,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const database_1 = __importDefault(require("./database"));
+const routes_1 = __importDefault(require("./routes"));
 dotenv_1.default.config();
+(0, database_1.default)();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
-    res.send("Server is OnN");
+    res.send("Server is ON");
 });
-app.listen(3000, () => {
-    console.log("Server is running on portr: " + PORT);
-});
+app.use("/api", routes_1.default);
+try {
+    app.listen(3000, () => {
+        console.log("Server is running on port: " + PORT);
+    });
+}
+catch (error) {
+    console.log("Error starting server: ", error);
+}
