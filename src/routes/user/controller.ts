@@ -3,6 +3,7 @@ import User from "../../models/User";
 import handleHttpError from "../../utils/handleError";
 import { matchedData } from "express-validator";
 
+/*
 const createUser = async (req: Request, res: Response) => {
   try {
     const body = matchedData(req);
@@ -24,14 +25,20 @@ const createUser = async (req: Request, res: Response) => {
     handleHttpError(res, "Error creating user", 500, error);
   }
 };
+*/
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const includeInactive = req.query.includeInactive === "true"; // Verifica si el query param es 'true'
-    const filter = includeInactive ? {} : { isActive: true }; // Si includeInactive es true, devuelve todos los usuarios, si es false, solo los activos.
+    const { isActive } = req.query;
+    let filter = {}; // Filtro vacío por defecto "todos los usuarios".
 
-    const users = await User.find(/*{ isActive: true }*/ filter); // Solo usuarios activos
-    res.status(200).json(users);
+    if (isActive !== undefined) {
+      // Verificamos si el query param 'isActive' está definido.
+      filter = { isActive: isActive === "true" }; // si es true
+    } // cualquier otra cosa que no sea "true", filtra inactivos
+
+    const users = await User.find(filter); // si existe un filtro, es decir, "isActive: true", lo aplicamos en la consulta find.
+    res.status(200).json({ userRequesting: users, data: users });
   } catch (error) {
     handleHttpError(res, "Error getting users", 500, error);
   }
@@ -42,7 +49,8 @@ const getUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = await User.findOne({ _id: id, isActive: true }); // Solo usuarios activos
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      handleHttpError(res, "User not found", 404);
+      return;
     }
     res.json({ data: user });
   } catch (error) {
@@ -55,24 +63,26 @@ const updateUser = async (req: Request, res: Response) => {
     const body = matchedData(req); // Desestructura los campos que podrían actualizarse desde el cuerpo de la petición
     const { id } = req.params; // Desestructura id desde los parámetros de ruta (/users/:id, :id)
 
-      if (body.email) {
-      const existingUser = await User.findOne({ email: body.email, _id: { $ne: id } });
+    if (body.email) {
+      const existingUser = await User.findOne({
+        email: body.email,
+        _id: { $ne: id },
+      });
       if (existingUser) {
-        return res.status(409).json({
-          message: "Email is already in use",
-          error: true,
-        });
+        handleHttpError(res, "Email already in use", 409);
       }
     }
 
-    const user = await User.findOneAndUpdate( // findOneAndUpdate busca con filtros un documento y lo actualiza en una sola operación atómica
+    const user = await User.findOneAndUpdate(
+      // findOneAndUpdate busca con filtros un documento y lo actualiza en una sola operación atómica
       { _id: id, isActive: true }, // condición: id coincide y usuario activo
       body, // son los campos a cambiar.
       { new: true } //  Mongoose devuelva el documento ya actualizado
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      handleHttpError(res, "User not found", 404);
+      return;
     }
     res.status(200).json({ message: "User Updated successfully", data: user });
   } catch (error) {
@@ -85,7 +95,8 @@ const hardDeleteUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = await User.findByIdAndDelete(id); // findByIdAndDelete ya devuelve null si no encuentra el usuario con ese id.
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      handleHttpError(res, "User not found", 404);
+      return;
     }
     res.json({ message: "User deleted successfully" });
   } catch (error) {
@@ -102,17 +113,16 @@ const softDeleteUser = async (req: Request, res: Response) => {
       { isActive: false }, // actualización: desactivar usuario
       { new: true } // devuelve el documento actualizado
     );
-    // console.log(user); Es null si no se encontró un usuario activo con ese id.
 
     // Si no se encontró, puede ser porque no existe o ya estaba inactivo
     if (!user) {
       const existingUser = await User.findById(id); // Primero verificamos si el usuario existe
       if (!existingUser) {
-        return res.status(404).json({ message: "User not found", error: true });
+        handleHttpError(res, "User not found", 404);
+        return;
       }
-      return res
-        .status(409)
-        .json({ message: "User is already inactive", error: true });
+      handleHttpError(res, "User is already inactive", 400);
+      return;
     }
 
     res.json({ message: "User soft-deleted successfully", data: user });
@@ -131,24 +141,24 @@ const activateUser = async (req: Request, res: Response) => {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      handleHttpError(res, "User not found", 404);
+      return;
     }
 
     if (user.isActive) {
-      return res.status(400).json({
-        message: "User is already active",
-        error: true,
-      });
+      handleHttpError(res, "User is already active", 400);
+      return;
     }
 
-    res.status(200).json({ message: "User activated successfully", data: user });
+    res
+      .status(200)
+      .json({ message: "User activated successfully", data: user });
   } catch (error) {
     handleHttpError(res, "Error activating user", 500, error);
   }
 };
 
 export default {
-  createUser,
   getAllUsers,
   getUserById,
   updateUser,
