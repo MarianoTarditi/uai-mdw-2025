@@ -38,7 +38,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     } // cualquier otra cosa que no sea "true", filtra inactivos
 
     const users = await User.find(filter); // si existe un filtro, es decir, "isActive: true", lo aplicamos en la consulta find.
-    res.status(200).json({ userRequesting: users, data: users });
+    res.status(200).json({ userRequesting: res.locals.user, data: users });
   } catch (error) {
     handleHttpError(res, "Error getting users", 500, error);
   }

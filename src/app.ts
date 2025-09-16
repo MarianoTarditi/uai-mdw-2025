@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/database";
+import connectDB from "./config/server";
 import router from "./routes";
+import { handleJsonError } from "./middlewares/handleJsonValidator";
 
 dotenv.config();
 connectDB();
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use(handleJsonError)
 
 app.get("/", (req, res) => {
   res.send("Server is ON");
