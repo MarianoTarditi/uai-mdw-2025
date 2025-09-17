@@ -1,7 +1,5 @@
 import User from "../../models/User";
-import handlePassword from "../../utils/handlePassword";
 import { matchedData } from "express-validator";
-import handleJwt from "../../utils/handleJwt";
 import handleHttpError from "../../utils/handleError";
 import { Request, Response } from "express";
 import admin from "../../utils/firebase";
