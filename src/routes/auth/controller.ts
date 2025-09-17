@@ -1,76 +1,67 @@
 import User from "../../models/User";
-import handlePassword from "../../utils/handlePassword";
-import { matchedData } from "express-validator";
-import handleJwt from "../../utils/handleJwt";
 import handleHttpError from "../../utils/handleError";
 import { Request, Response } from "express";
+import admin from "../../utils/firebase";
+import axios from "axios";
 
-// Estás hasheando las contraseñas (con bcrypt).
-// Estás firmando tokens (con JWT).
-
-const register = async (req: Request, res: Response) => {
+const registerUser = async (req: Request, res: Response) => {
   try {
-    const body = matchedData(req);
-    const hashedPassword = await handlePassword.encrpytPassword(body.password); // transforma la contraseña en un hash irreversible, "candado" para que nadie vea la contraseña real.
-
-    const existingEmail = await User.findOne({ email: body.email });
-    if (existingEmail) {
-      handleHttpError(res, "Email already in use", 404);
-      return;
-    }
-
-    const data = { ...body, password: hashedPassword };
-    const user = await User.create(data);
-
-    user.set("password", undefined, { strict: false });
-    const dataUser = {
-      token: await handleJwt.tokenSign(user), // genera y firma un token JWT para el usuario recién creado
-      data: user,
-    };
-
-    res.json({ message: "User registered successfully", data: dataUser });
+    const { email, password, name, lastName } = req.body;
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+    });
+    const user = new User({
+      name,
+      lastName,
+      email,
+      firebaseUid: userRecord.uid,
+    });
+    await user.save();
+    res.status(201).json({ firebaseUser: userRecord, user });
   } catch (error) {
-    handleHttpError(res, "Error registering user", 500, error);
+    handleHttpError(res, "Error while registering user", 500);
+    console.log(error);
   }
 };
 
 const login = async (req: Request, res: Response) => {
+  // Sign in wth email and password
   try {
-    const body = matchedData(req); // extrae solo los campos que pasaron las validaciones.
-    const user = await User.findOne({ email: body.email }).select(
-      "password name email role"
-    ); // solicita explícitamente que el documento incluya esos campos
+    const { email, password } = req.body;
+    if (!email || !password) {
+      handleHttpError(res, "Email and password are required", 400);
+    }
+    const apiKey = process.env.FIREBASE_API_KEY;
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+    const response = await axios.post(url, {
+      email,
+      password,
+      returnSecureToken: true, // to get the ID token
+    });
+    res.json({
+      idToken: response.data.idToken,
+      refreshToken: response.data.refreshToken,
+      expiresIn: response.data.expiresIn,
+      localId: response.data.localId,
+    });
+  } catch (error: any) {
+    const firebaseError = error?.response?.data?.error?.message;
 
-    if (!user) {
-      handleHttpError(res, "User not found", 404);
-      return;
+    if (firebaseError === "USER_DISABLED") {
+      return handleHttpError(res, "User account is disabled, talk to an admin", 403);
     }
 
-
-    const hashPassword = user.password; // Extrae (del documento Mongoose) el campo password (el hash guardado en DB)
-    const check = await handlePassword.comparePassword(
-      body.password,
-      hashPassword
-    );
-
-    if (!check) {
-      handleHttpError(res, "Invalid password", 401);
-      return;
+    if (firebaseError === "INVALID_LOGIN_CREDENTIALS") {
+      return handleHttpError(res, "Email or password incorrect, please try again", 401);
     }
 
-    user.set("password", undefined, { strict: false }); // Borra/oculta el campo password del documento en memoria (no lo elimina de la BD).
-    const dataUser = {
-      token: await handleJwt.tokenSign(user), // genera y firma un token JWT para el usuario, valido por 2 horas
-      user,
-    };
-
-    res.json({ message: "User login successfully", data: dataUser });
-  } catch (error) {
-    handleHttpError(res, "Error login user", 500, error);
+    console.log("Firebase login error:", firebaseError);
+    handleHttpError(res, "Login failed", 401, firebaseError);
   }
 };
 
 export default {
-  register,
+  registerUser,
   login,
 };

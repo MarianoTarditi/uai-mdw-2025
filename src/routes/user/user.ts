@@ -1,17 +1,16 @@
 import express from "express";
 import controllers from "./controller";
 import validator from "./userValidator";
-import authMiddleware from "../../middlewares/session";
-import checkRol from "../../middlewares/rol";
+import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 
 const router = express.Router();
 
-router.get("/", authMiddleware, controllers.getAllUsers);
-router.get("/:id", authMiddleware, validator.getUserValidator, controllers.getUserById);
-router.put("/:id", authMiddleware, validator.UpdateUserValidator, validator.getUserValidator ,controllers.updateUser);
-router.delete('/hard/:id', authMiddleware, checkRol(["user"]), validator.getUserValidator, controllers.hardDeleteUser);
-router.patch('/soft/:id', authMiddleware, checkRol(["user"]), validator.getUserValidator, controllers.softDeleteUser);
-router.patch('/activate/:id', authMiddleware, checkRol(["user"]), validator.getUserValidator, controllers.activateUser);
+router.get("/", authenticateFirebase, controllers.getAllUsers);
+router.get("/:id", authenticateFirebase, validator.getUserValidator, controllers.getUserById);
+router.put("/:id", authenticateFirebase, validator.UpdateUserValidator, validator.getUserValidator ,controllers.updateUser);
+router.delete('/hard/:id', authenticateFirebase, validator.getUserValidator, controllers.hardDeleteUser);
+router.patch('/soft/:id', authenticateFirebase, validator.getUserValidator, controllers.softDeleteUser);
+router.patch('/activate/:id', authenticateFirebase, validator.getUserValidator, controllers.activateUser);
 
 
 export default router;
