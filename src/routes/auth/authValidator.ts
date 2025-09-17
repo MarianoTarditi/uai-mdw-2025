@@ -26,7 +26,7 @@ const registerValidator = [
     .exists().withMessage("Password field is missing").bail()
     .notEmpty().withMessage("Password is required").bail()
     .isString().withMessage("Password must be a string").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Password must be 3-100 characters long"),
+    .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
@@ -44,7 +44,7 @@ const loginValidator = [
   check("password")
     .exists().withMessage("Password field is missing").bail()
     .notEmpty().withMessage("Password is required").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Password must be 3-100 characters long"),
+    .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);

@@ -15,17 +15,14 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
     isActive: {
       type: Boolean,
       default: true,
     },
-    role: {
-      type: ["user", "admin"],
-      default: "user",
+    firebaseUid: {
+      type: String,
+      required: false,
+      unique: true,
     },
   },
   {
