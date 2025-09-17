@@ -1,7 +1,6 @@
 import express from "express";
 import controllers from "./controller";
 import validator from "./userValidator";
-import authMiddleware from "../../middlewares/session";
 import checkRol from "../../middlewares/rol";
 import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 
