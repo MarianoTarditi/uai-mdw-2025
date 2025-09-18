@@ -10,8 +10,8 @@ router.get("/", authenticateFirebase, checkRol(["admin", "profesor"]), controlle
 router.get("/:id", authenticateFirebase, checkRol(["admin", "profesor"]), validator.getUserValidator, controllers.getUserById);
 router.put("/:id", authenticateFirebase, checkRol(["user", "admin", "profesor"]), validator.UpdateUserValidator, validator.getUserValidator ,controllers.updateUser);
 router.delete('/hard/:id', checkRol(["admin"]), authenticateFirebase, validator.getUserValidator, controllers.hardDeleteUser);
-router.patch('/soft/:id', checkRol(["admin"]), authenticateFirebase, validator.getUserValidator, controllers.softDeleteUser);
-router.patch('/activate/:id', checkRol(["admin"]), authenticateFirebase, validator.getUserValidator, controllers.activateUser);
-router.patch('/setUserRole/:id', checkRol(["admin"]), authenticateFirebase, validator.getUserValidator, controllers.setUserRole);
+router.patch('/soft/:id', authenticateFirebase, checkRol(["admin"]),validator.getUserValidator, controllers.softDeleteUser);
+router.patch('/activate/:id',  authenticateFirebase, checkRol(["admin"]), validator.getUserValidator, controllers.activateUser);
+router.patch('/setUserRole/:id', authenticateFirebase, checkRol(["admin"]), validator.getUserValidator, controllers.setUserRole);
 
 export default router;

@@ -3,7 +3,11 @@ import admin from "../utils/firebase";
 import handleHttpError from "../utils/handleError";
 import User from "../models/User";
 
-export const authenticateFirebase = async (req: Request, res: Response, next: NextFunction ) => {
+export const authenticateFirebase = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -16,13 +20,19 @@ export const authenticateFirebase = async (req: Request, res: Response, next: Ne
     const decodedToken = await admin.auth().verifyIdToken(token);
     const user = await User.findOne({ firebaseUid: decodedToken.uid }); // Buscar usuario en Mongo por UID de Firebase
 
+    console.log("decodedToken", decodedToken);
+    console.log("user from Mongo", user);
+
+
     if (!user) {
       handleHttpError(res, "User not found in the database", 404);
       return;
     }
 
+
+    console.log("res.locals.user", res.locals.user);
+
     res.locals.user = {
-      // Guardamos user completo (con roles) en res.locals
       ...decodedToken,
       roles: user.roles,
       _id: user._id,
