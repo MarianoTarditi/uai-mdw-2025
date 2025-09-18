@@ -8,12 +8,9 @@ import axios from "axios";
 const registerUser = async (req: Request, res: Response) => {
   try {
     const { email, password, name, lastName } = req.body;
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-    });
-    const user = new User({
-      name,
+    const userRecord = await admin.auth().createUser({ email, password});
+    
+    const user = new User({name,
       lastName,
       email,
       firebaseUid: userRecord.uid,
