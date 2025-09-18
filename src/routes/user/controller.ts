@@ -1,31 +1,13 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
 import handleHttpError from "../../utils/handleError";
-import { matchedData } from "express-validator";
 
-/*
-const createUser = async (req: Request, res: Response) => {
-  try {
-    const body = matchedData(req);
-
-    const existingUser = await User.findOne({ email: body.email });
-    if (existingUser) {
-      return res.status(409).json({
-        message: "Email is already in use",
-        error: true,
-      });
-    }
-
-    const user = new User(body);
-    await user.save();
-    res
-      .status(201)
-      .json({ message: "User created successfully", data: user, error: false });
-  } catch (error) {
-    handleHttpError(res, "Error creating user", 500, error);
-  }
-};
-*/
+const sanitizeUser = (user: any) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  roles: user.roles,
+});
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -38,7 +20,9 @@ const getAllUsers = async (req: Request, res: Response) => {
     } // cualquier otra cosa que no sea "true", filtra inactivos
 
     const users = await User.find(filter); // si existe un filtro, es decir, "isActive: true", lo aplicamos en la consulta find.
-    res.status(200).json({ userRequesting: res.locals.user, data: users });
+    const requestingUser = sanitizeUser(res.locals.user);
+
+    res.status(200).json({ userRequesting: requestingUser, data: users });
   } catch (error) {
     handleHttpError(res, "Error getting users", 500, error);
   }
@@ -52,7 +36,9 @@ const getUserById = async (req: Request, res: Response) => {
       handleHttpError(res, "User not found", 404);
       return;
     }
-    res.json({ data: user });
+
+    const requestingUser = sanitizeUser(res.locals.user);
+    res.status(200).json({ userRequesting: requestingUser, data: user });
   } catch (error) {
     handleHttpError(res, "Error getting user", 500, error);
   }
@@ -60,33 +46,32 @@ const getUserById = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const body = matchedData(req); // Desestructura los campos que podrían actualizarse desde el cuerpo de la petición
-    const { id } = req.params; // Desestructura id desde los parámetros de ruta (/users/:id, :id)
+    const { id } = req.params;
+    const { name, lastName, email, password } = req.body;
 
-    if (body.email) {
+    if (email) {
       const existingUser = await User.findOne({
-        email: body.email,
+        email: email,
         _id: { $ne: id },
       });
       if (existingUser) {
         handleHttpError(res, "Email already in use", 409);
       }
     }
-
-    const user = await User.findOneAndUpdate(
-      // findOneAndUpdate busca con filtros un documento y lo actualiza en una sola operación atómica
-      { _id: id, isActive: true }, // condición: id coincide y usuario activo
-      body, // son los campos a cambiar.
-      { new: true } //  Mongoose devuelva el documento ya actualizado
+    const findUser = await User.findByIdAndUpdate(
+      id,
+      { name, lastName, email, password },
+      { new: true }
     );
 
-    if (!user) {
-      handleHttpError(res, "User not found", 404);
-      return;
+    if (!findUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "User Updated successfully", data: user });
+
+    const requestingUser = sanitizeUser(res.locals.user);
+    res.status(200).json({ requestingUser: requestingUser, message: "User updated successfully", data: findUser });
   } catch (error) {
-    handleHttpError(res, "Error updating user", 500, error);
+    res.status(500).json({ message: "Error updating user", error });
   }
 };
 
@@ -98,7 +83,9 @@ const hardDeleteUser = async (req: Request, res: Response) => {
       handleHttpError(res, "User not found", 404);
       return;
     }
-    res.json({ message: "User deleted successfully" });
+
+    const requestingUser = sanitizeUser(res.locals.user);
+    res.status(200).json({ requestingUser: requestingUser, message: "User deleted successfully" });
   } catch (error) {
     handleHttpError(res, "Error deleting user", 500, error);
   }
@@ -125,7 +112,8 @@ const softDeleteUser = async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ message: "User soft-deleted successfully", data: user });
+    const requestingUser = sanitizeUser(res.locals.user);
+    res.json({ requestingUser: requestingUser, message: "User soft-deleted successfully", data: user });
   } catch (error) {
     handleHttpError(res, "Error soft-deleting user", 500, error);
   }
@@ -149,12 +137,37 @@ const activateUser = async (req: Request, res: Response) => {
       handleHttpError(res, "User is already active", 400);
       return;
     }
-
-    res
-      .status(200)
-      .json({ message: "User activated successfully", data: user });
+    const requestingUser = sanitizeUser(res.locals.user);
+    res .status(200).json({ requestingUser:requestingUser, message: "User activated successfully", data: user });
   } catch (error) {
     handleHttpError(res, "Error activating user", 500, error);
+  }
+};
+
+const setUserRole = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; // id de Mongo del usuario
+    const { roles } = req.body; // array de roles nuevos: ["admin"]
+
+    if (!roles || !Array.isArray(roles)) {
+      return handleHttpError(res, "Roles must be an array", 400);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { roles }, // 👈 sobrescribe roles
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return handleHttpError(res, "User not found", 404);
+    }
+
+    const requestingUser = sanitizeUser(res.locals.user);
+    res.json({ requestingUser: requestingUser, message: "Roles updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error(error);
+    handleHttpError(res, "Error updating user roles", 500);
   }
 };
 
@@ -165,4 +178,5 @@ export default {
   hardDeleteUser,
   softDeleteUser,
   activateUser,
+  setUserRole,
 };
