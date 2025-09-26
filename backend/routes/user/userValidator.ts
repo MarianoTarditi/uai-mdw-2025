@@ -1,8 +1,8 @@
-import { check, param, query } from "express-validator";
+import { check } from "express-validator";
 import validateResults from "../../middlewares/handleValidator";
 import { Request, Response, NextFunction } from "express";
 
-const registerValidator = [
+const UpdateUserValidator = [
   check("name")
     .exists().withMessage("Name field is missing").bail()
     .notEmpty().withMessage("Name is required").bail()
@@ -13,14 +13,19 @@ const registerValidator = [
     .exists().withMessage("Lastname field is missing").bail()
     .notEmpty().withMessage("Lastname is required").bail()
     .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 20 }).withMessage("Lastname must be 3-20 characters long"),
+    .isLength({ min: 3, max: 50 }).withMessage("Lastname must be 3-50 characters long"),
 
   check("email")
     .exists().withMessage("Email field is missing").bail()
     .notEmpty().withMessage("Email is required").bail()
-    .isEmail().withMessage("Invalid email format").bail()
     .isString().withMessage("Name must be a string").bail()
+    .isEmail().withMessage("Invalid email format").bail()
     .isLength({ min: 3, max: 100 }).withMessage("Email must be 3-100 characters long"),
+
+  check("isActive")
+    .optional()
+    .isBoolean().withMessage("isActive must be true or false")
+    .toBoolean(),
 
   check("password")
     .exists().withMessage("Password field is missing").bail()
@@ -33,25 +38,17 @@ const registerValidator = [
   },
 ];
 
-const loginValidator = [
-  check("email")
-    .exists().withMessage("Email field is missing").bail()
-    .notEmpty().withMessage("Email is required").bail()
-    .isEmail().withMessage("Invalid email format").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Email must be 3-100 characters long"),
-
-  check("password")
-    .exists().withMessage("Password field is missing").bail()
-    .notEmpty().withMessage("Password is required").bail()
-    .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
-
+const getUserValidator = [
+  check("id")
+    .exists().withMessage("ID parameter is missing").bail()
+    .notEmpty().withMessage("ID parameter is required").bail()
+    .isMongoId().withMessage("Invalid ID format"),
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
   },
 ];
 
 export default {
-  loginValidator,
-  registerValidator,
+  getUserValidator,
+  UpdateUserValidator,
 };

@@ -149,14 +149,10 @@ const setUserRole = async (req: Request, res: Response) => {
     const { id } = req.params; // id de Mongo del usuario
     const { roles } = req.body; // array de roles nuevos: ["admin"]
 
-
-        console.log("Requested roles:", roles);
-
     if (!roles || !Array.isArray(roles)) {
       return handleHttpError(res, "Roles must be an array", 400);
     }
 
-    console.log("Requested roles:", roles);
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { roles }, // 👈 sobrescribe roles
@@ -167,7 +163,6 @@ const setUserRole = async (req: Request, res: Response) => {
       return handleHttpError(res, "User not found", 404);
     }
 
-    console.log("Updated roles:", updatedUser.roles);
     const requestingUser = sanitizeUser(res.locals.user);
     res.json({ requestingUser: requestingUser, message: "Roles updated successfully", user: updatedUser });
   } catch (error) {

@@ -8,9 +8,10 @@ import axios from "axios";
 const registerUser = async (req: Request, res: Response) => {
   try {
     const { email, password, name, lastName } = req.body;
-    const userRecord = await admin.auth().createUser({ email, password});
-    
-    const user = new User({name,
+    const userRecord = await admin.auth().createUser({ email, password });
+
+    const user = new User({
+      name,
       lastName,
       email,
       firebaseUid: userRecord.uid,
@@ -47,11 +48,19 @@ const login = async (req: Request, res: Response) => {
     const firebaseError = error?.response?.data?.error?.message;
 
     if (firebaseError === "USER_DISABLED") {
-      return handleHttpError(res, "User account is disabled, talk to an admin", 403);
+      return handleHttpError(
+        res,
+        "User account is disabled, talk to an admin",
+        403
+      );
     }
 
     if (firebaseError === "INVALID_LOGIN_CREDENTIALS") {
-      return handleHttpError(res, "Email or password incorrect, please try again", 401);
+      return handleHttpError(
+        res,
+        "Email or password incorrect, please try again",
+        401
+      );
     }
 
     console.log("Firebase login error:", firebaseError);

@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "client": "npm start --prefix frontend"
+    "server": "ts-node-dev --respawn --transpile-only backend/app.ts",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^24.3.0",
+    "concurrently": "^9.2.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   }
