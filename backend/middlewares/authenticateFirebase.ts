@@ -20,17 +20,11 @@ export const authenticateFirebase = async (
     const decodedToken = await admin.auth().verifyIdToken(token);
     const user = await User.findOne({ firebaseUid: decodedToken.uid }); // Buscar usuario en Mongo por UID de Firebase
 
-    console.log("decodedToken", decodedToken);
-    console.log("user from Mongo", user);
-
 
     if (!user) {
       handleHttpError(res, "User not found in the database", 404);
       return;
     }
-
-
-    console.log("res.locals.user", res.locals.user);
 
     res.locals.user = {
       ...decodedToken,

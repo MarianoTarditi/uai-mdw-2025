@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "proxy": "http://localhost:3001",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,6 +12,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.1",
     "react-scripts": "5.0.1",
+    "react-toastify": "^11.0.5",
     "web-vitals": "^5.1.0"
   },
   "scripts": {
