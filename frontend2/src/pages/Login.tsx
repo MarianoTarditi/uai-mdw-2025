@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react'
 import { FaSignInAlt } from 'react-icons/fa'
-import { useSelector, useDispatch } from 'react-redux'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { login, reset } from '../features/auth/authSlice'
 import Spinner from '../components/Spinner'
 
+interface FormData {
+  email: string
+  password: string
+}
+
 function Login() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
   })
@@ -15,9 +20,9 @@ function Login() {
   const { email, password } = formData
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
+  const { user, isLoading, isError, isSuccess, message } = useAppSelector(
     (state) => state.auth
   )
 
@@ -26,7 +31,7 @@ function Login() {
       toast.error(message)
     }
 
-    if (isSuccess) {
+    if (isSuccess && user) {
       toast.success(`Registration successful, welcome! ${user.name}!`)
       navigate('/')
     }
@@ -34,32 +39,30 @@ function Login() {
     dispatch(reset())
   }, [user, isError, isSuccess, message, navigate, dispatch])
 
-  const onChange = (e) => {
+  // ✅ onChange tipado correctamente
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }))
   }
 
-  const onSubmit = (e) => {
+  // ✅ onSubmit tipado correctamente
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!email || !password) {
-      toast.error("Please complete all fields")
+      toast.error('Please complete all fields')
       return
     }
 
     const emailRegex = /\S+@\S+\.\S+/
     if (!emailRegex.test(email)) {
-      toast.error("Enter a valid email address")
+      toast.error('Enter a valid email address')
       return
     }
 
-    const userData = {
-      email,
-      password,
-    }
-
+    const userData = { email, password }
     dispatch(login(userData))
   }
 
@@ -103,7 +106,7 @@ function Login() {
 
           <div className='form-group'>
             <button type='submit' className='btn btn-block'>
-              Submit
+              Login
             </button>
           </div>
         </form>

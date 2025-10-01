@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 
 function Dashboard() {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
 
-    const { user } = useSelector((state) => state.auth)
+    const { user } = useAppSelector((state) => state.auth)
 
     useEffect(() => {
         if (!user) {

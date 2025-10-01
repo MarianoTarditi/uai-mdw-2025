@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { FaUser } from 'react-icons/fa'
@@ -18,9 +18,9 @@ function Register() {
   const { name, lastName, email, password, password2 } = formData
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
+  const { user, isLoading, isError, isSuccess, message } = useAppSelector(
     (state) => state.auth
   )
 
@@ -36,14 +36,14 @@ function Register() {
     dispatch(reset())
   }, [user, isError, isSuccess, message, navigate, dispatch])
 
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }))
-  }
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setFormData((prev) => ({
+    ...prev,
+    [e.target.name]: e.target.value,
+  }))
+}
 
-  const onSubmit = (e) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // Validaciones frontend
@@ -146,7 +146,7 @@ function Register() {
           </div>
           <div className='form-group'>
             <button type='submit' className='btn btn-block'>
-              Submit
+              Register
             </button>
           </div>
         </form>
