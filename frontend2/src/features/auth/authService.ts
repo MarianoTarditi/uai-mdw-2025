@@ -1,26 +1,11 @@
 import axios from "axios";
+import type { RegisterUserData, LoginUserData } from "../../types/auth";
 
 const API_URL = "/api/auth/";
 
-
-// 📌 Definir la forma de un usuario (ajustá según tu backend)
-export interface User {
-  id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  token: string;
-}
-
-// 📌 Datos que se envían para registrar/loguear
-export interface UserCredentials {
-  email: string;
-  password: string;
-}
-
 // Register user
-const register = async (userData: UserCredentials) => {
-  const response = await axios.post(API_URL + "register/", userData, {
+const register = async (userData: RegisterUserData) => {
+  const response = await axios.post(API_URL + "register", userData, {
   });
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data));
@@ -30,9 +15,8 @@ const register = async (userData: UserCredentials) => {
 };
 
 // Login user
-const login = async (userData: UserCredentials) => {
+const login = async (userData: LoginUserData) => {
   const response = await axios.post(API_URL + "login", userData);
-  console.log(response)
 
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data));

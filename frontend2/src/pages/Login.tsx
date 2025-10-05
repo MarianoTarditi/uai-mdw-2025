@@ -1,118 +1,100 @@
-import { useState, useEffect } from 'react'
-import { FaSignInAlt } from 'react-icons/fa'
-import { useAppSelector, useAppDispatch } from '../app/hooks'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import { login, reset } from '../features/auth/authSlice'
-import Spinner from '../components/Spinner'
-
-interface FormData {
-  email: string
-  password: string
-}
+import { useEffect } from "react";
+import { FaSignInAlt } from "react-icons/fa";
+import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { loginUser, reset } from "../features/auth/authSlice";
+import Spinner from "../components/Spinner";
+import { useForm } from "react-hook-form";
+import type { LoginUserData } from "../types/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "../zodValidations/authSchema";
 
 function Login() {
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
-  })
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const { email, password } = formData
-
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginUserData>({
+    resolver: zodResolver(loginSchema),
+  });
 
   const { user, isLoading, isError, isSuccess, message } = useAppSelector(
     (state) => state.auth
-  )
+  );
 
   useEffect(() => {
     if (isError) {
-      toast.error(message)
+      toast.error(message);
     }
 
     if (isSuccess && user) {
-      toast.success(`Registration successful, welcome! ${user.name}!`)
-      navigate('/')
+      toast.success(`Welcome back, ${user.name}!`);
+      navigate("/");
     }
 
-    dispatch(reset())
-  }, [user, isError, isSuccess, message, navigate, dispatch])
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, navigate, dispatch]);
 
-  // ✅ onChange tipado correctamente
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }))
-  }
-
-  // ✅ onSubmit tipado correctamente
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (!email || !password) {
-      toast.error('Please complete all fields')
-      return
-    }
-
-    const emailRegex = /\S+@\S+\.\S+/
-    if (!emailRegex.test(email)) {
-      toast.error('Enter a valid email address')
-      return
-    }
-
-    const userData = { email, password }
-    dispatch(login(userData))
-  }
+  const onSubmit = (data: LoginUserData) => {
+    dispatch(loginUser(data));
+  };
 
   if (isLoading) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   return (
     <>
-      <section className='heading'>
+      <section className="heading">
         <h1>
           <FaSignInAlt /> Login
         </h1>
         <p>Login and start setting goals</p>
       </section>
 
-      <section className='form'>
-        <form onSubmit={onSubmit}>
-          <div className='form-group'>
+      <section className="form">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-group">
             <input
-              type='email'
-              className='form-control'
-              id='email'
-              name='email'
-              value={email}
-              placeholder='Enter your email'
-              onChange={onChange}
+              {...register("email", { required: "Email is required" })}
+              type="email"
+              className="form-control"
+              id="email"
+              placeholder="Enter your email"
             />
-          </div>
-          <div className='form-group'>
-            <input
-              type='password'
-              className='form-control'
-              id='password'
-              name='password'
-              value={password}
-              placeholder='Enter password'
-              onChange={onChange}
-            />
+            {errors.email && (
+              <p className="field-error">{errors.email.message}</p>
+            )}
           </div>
 
-          <div className='form-group'>
-            <button type='submit' className='btn btn-block'>
+          <div className="form-group">
+            <input
+              {...register("password", {required: "Password is required" })}
+              type="password"
+              className="form-control"
+              id="password"
+              placeholder="Enter password"
+            />
+            {errors.password && (<p className="field-error">{errors.password.message}</p> )}
+          </div>
+
+          <div className="form-group">
+            <button
+              disabled={isSubmitting}
+              type="submit"
+              className="btn btn-block"
+            >
               Login
             </button>
           </div>
         </form>
       </section>
     </>
-  )
+  );
 }
 
-export default Login
+export default Login;

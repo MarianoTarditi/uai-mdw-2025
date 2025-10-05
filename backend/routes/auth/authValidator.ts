@@ -7,13 +7,13 @@ const registerValidator = [
     .exists().withMessage("Name field is missing").bail()
     .notEmpty().withMessage("Name is required").bail()
     .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 20 }).withMessage("Name must be 3-20 characters long"),
+    .isLength({ min: 3, max: 30 }).withMessage("Name must be 3-30 characters long"),
 
   check("lastName")
     .exists().withMessage("Lastname field is missing").bail()
     .notEmpty().withMessage("Lastname is required").bail()
     .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 20 }).withMessage("Lastname must be 3-20 characters long"),
+    .isLength({ min: 3, max: 30 }).withMessage("Lastname must be 3-30 characters long"),
 
   check("email")
     .exists().withMessage("Email field is missing").bail()
@@ -38,13 +38,11 @@ const loginValidator = [
     .exists().withMessage("Email field is missing").bail()
     .notEmpty().withMessage("Email is required").bail()
     .isEmail().withMessage("Invalid email format").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Email must be 3-100 characters long"),
+    .isString().withMessage("Name must be a string").bail(),
 
   check("password")
     .exists().withMessage("Password field is missing").bail()
-    .notEmpty().withMessage("Password is required").bail()
-    .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
+    .notEmpty().withMessage("Password is required").bail(),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
