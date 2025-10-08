@@ -1,4 +1,6 @@
 import { Schema, model, InferSchemaType } from "mongoose";
+import {UserRole} from "../types"
+
 
 const userSchema = new Schema(
   {
@@ -6,8 +8,12 @@ const userSchema = new Schema(
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     isActive: { type: Boolean, default: true },
-    firebaseUid: { type: String, required: false, unique: true },
-    roles: { type: ["admin", "user", "profesor"], default: ["user"] },
+    firebaseUid: { type: String, unique: true },
+    roles: {
+      type: [String],
+      enum: Object.values(UserRole),
+      default: [UserRole.Student],
+    },
   },
   {
     timestamps: true,
@@ -16,5 +22,5 @@ const userSchema = new Schema(
 );
 
 type UserType = InferSchemaType<typeof userSchema>;
-const User = model<UserType>("User", userSchema); // ffdsfs
+const User = model<UserType>("User", userSchema); 
 export default User;

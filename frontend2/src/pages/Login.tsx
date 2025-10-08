@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import type { LoginUserData } from "../types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../zodValidations/authSchema";
+import { Button } from "@mantine/core";
 
 function Login() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function Login() {
 
     if (isSuccess && user) {
       toast.success(`Welcome back, ${user.name}!`);
-      navigate("/");
+      navigate("/home");
     }
 
     dispatch(reset());
@@ -49,50 +50,55 @@ function Login() {
 
   return (
     <>
-      <section className="heading">
-        <h1>
-          <FaSignInAlt /> Login
-        </h1>
-        <p>Login and start setting goals</p>
-      </section>
+      <div className="container">
+        <section className="heading">
+          <h1>
+            <FaSignInAlt /> Login
+          </h1>
+          <p>Login and start setting goals</p>
+        </section>
 
-      <section className="form">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="form-group">
-            <input
-              {...register("email", { required: "Email is required" })}
-              type="email"
-              className="form-control"
-              id="email"
-              placeholder="Enter your email"
-            />
-            {errors.email && (
-              <p className="field-error">{errors.email.message}</p>
-            )}
-          </div>
+        <section className="form">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-group">
+              <input
+                {...register("email", { required: "Email is required" })}
+                type="email"
+                className="form-control"
+                id="email"
+                placeholder="Enter your email"
+              />
+              {errors.email && (
+                <p className="field-error">{errors.email.message}</p>
+              )}
+            </div>
 
-          <div className="form-group">
-            <input
-              {...register("password", {required: "Password is required" })}
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Enter password"
-            />
-            {errors.password && (<p className="field-error">{errors.password.message}</p> )}
-          </div>
+            <div className="form-group">
+              <input
+                {...register("password", { required: "Password is required" })}
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Enter password"
+              />
+              {errors.password && (
+                <p className="field-error">{errors.password.message}</p>
+              )}
+            </div>
 
-          <div className="form-group">
-            <button
-              disabled={isSubmitting}
-              type="submit"
-              className="btn btn-block"
-            >
-              Login
-            </button>
-          </div>
-        </form>
-      </section>
+            <div className="form-group">
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                variant="gradient"
+                gradient={{ from: "grape", to: "violet", deg: 208 }}
+              >
+                Log in
+              </Button>
+            </div>
+          </form>
+        </section>
+      </div>
     </>
   );
 }

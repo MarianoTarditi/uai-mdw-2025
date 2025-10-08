@@ -1,26 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./index.css"
-import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+import SignUp from "./pages/SignUp";
 import Header from "./components/Header";
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-
-
 
 function App() {
   return (
     <>
       <Router>
-        <div className="container">
           <Header/>
           <Routes>
-            <Route path="/" element={<Dashboard/>}></Route>
+            <Route path="/home" element={<Home/>}></Route>
             <Route path="/login" element={<Login/>}></Route>
-            <Route path="/register" element={<Register/>}></Route>
+            <Route path="/signup" element={<SignUp/>}></Route>
           </Routes>
-        </div>
       </Router>
       <ToastContainer/>
     </>
