@@ -1,5 +1,5 @@
 // @register user
-export interface RegisterUserData {
+export interface IRegisterUserData {
   name: string;
   lastName: string;
   email: string;
@@ -8,13 +8,13 @@ export interface RegisterUserData {
 }
 
 // @login user
-export interface LoginUserData {
+export interface ILoginUserData {
   email: string;
   password: string;
 }
 
 // Estado de Auth en Redux
-export interface AuthState {
+export interface IAuthState {
   user: User | null;
   isError: boolean;
   isSuccess: boolean;
@@ -23,7 +23,7 @@ export interface AuthState {
 }
 
 //  Usuario en el estado de Redux
-export interface User {
+export interface IUser {
   idToken: string; 
   refreshToken: string;
   expiresIn: string;

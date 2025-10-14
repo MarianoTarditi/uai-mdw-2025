@@ -1,6 +1,6 @@
 import { FaSignInAlt, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { useAppSelector, useAppDispatch } from "../app/reduxHooks";
 import { logout, reset } from "../features/auth/authSlice";
 
 function Header() {

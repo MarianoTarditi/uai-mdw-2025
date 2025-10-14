@@ -7,7 +7,7 @@ import axios from "axios";
 // @desc    Register a user
 // @route   POST /api/auth/registerUs
 // @access  Public
-const registerUser = async (req: Request, res: Response) => {
+const signUp = async (req: Request, res: Response) => {
   try {
     const { email, password, name, lastName } = req.body;
 
@@ -108,6 +108,6 @@ const login = async (req: Request, res: Response) => {
 };
 
 export default {
-  registerUser,
+  signUp,
   login,
 };

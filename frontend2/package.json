@@ -11,6 +11,7 @@
     "start": "vite"
   },
   "dependencies": {
+    "@gfazioli/mantine-marquee": "^2.6.1",
     "@hookform/resolvers": "^5.2.2",
     "@mantine/carousel": "^8.3.3",
     "@mantine/charts": "^8.3.3",
@@ -25,6 +26,7 @@
     "@mantine/nprogress": "^8.3.3",
     "@mantine/spotlight": "^8.3.3",
     "@mantine/tiptap": "^8.3.3",
+    "@mantinex/dev-icons": "^2.0.0",
     "@mantinex/mantine-logo": "^2.0.0",
     "@reduxjs/toolkit": "^2.9.0",
     "@tabler/icons-react": "^3.35.0",
@@ -34,6 +36,7 @@
     "@tiptap/starter-kit": "^3.6.5",
     "dayjs": "^1.11.18",
     "embla-carousel": "^8.6.0",
+    "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

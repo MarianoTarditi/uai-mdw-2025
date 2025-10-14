@@ -1,27 +1,40 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../app/hooks";
+// import { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { CardFeature } from "../components/card/CardFeature";
+import { Carrusel } from "../components/carrusel/Carrusel";
+import { Contact } from "../components/contact/Contact";
+import { Faq } from "../components/faq/Faq";
+import { Footer } from "../components/footer/Footer";
+import { LeadGrid } from "../components/grid/LeadGrid";
+import { Hero } from "../components/hero/Hero";
 
 function Home() {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const navigate = useNavigate();
+  // const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector((state) => state.auth);
+  // const { user } = useAppSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate, dispatch]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate("/login");
+  //   }
+  // }, [user, navigate, dispatch]);
 
   return (
     <>
-      <div className="container">
-        <section className="heading">
-          <h1>Welcome user: {user && `${user.name}`}</h1>
-          <p>Dashboard</p>
+      <Hero />
+      <section className="section">
+        <CardFeature />
+        <section className="section">
+          <LeadGrid>
+            <Carrusel />
+          </LeadGrid>
         </section>
-      </div>
+        <Contact />
+      </section>
+      <Faq/>
+      <Footer />
     </>
   );
 }

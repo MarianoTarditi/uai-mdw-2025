@@ -1,12 +1,11 @@
 import axios from "axios";
-import type { RegisterUserData, LoginUserData } from "../../types/auth";
+import type { IRegisterUserData, ILoginUserData } from "../../types/auth";
 
 const API_URL = "/api/auth/";
 
 // Register user
-const register = async (userData: RegisterUserData) => {
-  const response = await axios.post(API_URL + "register", userData, {
-  });
+const signUp = async (userData: IRegisterUserData) => {
+  const response = await axios.post(API_URL + "signUp", userData, {});
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data));
   }
@@ -15,14 +14,14 @@ const register = async (userData: RegisterUserData) => {
 };
 
 // Login user
-const login = async (userData: LoginUserData) => {
+const login = async (userData: ILoginUserData) => {
   const response = await axios.post(API_URL + "login", userData);
 
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data));
   }
 
-  console.log(response.data)
+  console.log(response.data);
 
   return response.data;
 };
@@ -33,7 +32,7 @@ const logout = () => {
 };
 
 const authService = {
-  register,
+  signUp,
   logout,
   login,
 };

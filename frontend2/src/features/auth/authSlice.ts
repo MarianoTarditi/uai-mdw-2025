@@ -1,15 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AuthState, RegisterUserData, LoginUserData, User } from "../../types/auth";
+import type {
+  IAuthState,
+  IRegisterUserData,
+  ILoginUserData,
+  IUser,
+} from "../../types/auth";
 import authService from "./authService";
 import axios from "axios";
 
 // Obtener usuario desde localStorage
 const user = localStorage.getItem("user")
-  ? (JSON.parse(localStorage.getItem("user") as string) as User)
+  ? (JSON.parse(localStorage.getItem("user") as string) as IUser)
   : null;
 
-const initialState: AuthState = {
+const initialState: IAuthState = {
   user,
   isError: false,
   isSuccess: false,
@@ -17,13 +22,14 @@ const initialState: AuthState = {
   message: "",
 };
 
-export const registerUser = createAsyncThunk<
-  User,                // Tipo del "payload" que devuelve si la promesa se resuelve bien
-  RegisterUserData,    // Tipo de los argumentos que recibe la función (user)
-  { rejectValue: string } >(  // Tipo del valor que retorna si la promesa falla (thunkAPI.rejectWithValue)
-    "auth/register", async (userData, thunkAPI) => {  // Nombre de la acción en Redux (prefix/type)
+export const signUpUser = createAsyncThunk<
+  IUser, // Tipo del "payload" que devuelve si la promesa se resuelve bien
+  IRegisterUserData, // Tipo de los argumentos que recibe la función (user)
+  { rejectValue: string }
+>("auth/signUp", async (userData, thunkAPI) => { // Tipo del valor que retorna si la promesa falla (thunkAPI.rejectWithValue)
+  // Nombre de la acción en Redux (prefix/type)
   try {
-    return await authService.register(userData);
+    return await authService.signUp(userData);
   } catch (error: unknown) {
     let message: string;
     if (axios.isAxiosError(error) && error.response) {
@@ -37,7 +43,11 @@ export const registerUser = createAsyncThunk<
   }
 });
 
-export const loginUser = createAsyncThunk<User,LoginUserData,{ rejectValue: string }>("auth/login", async (userData, thunkAPI) => {
+export const loginUser = createAsyncThunk<
+  IUser,
+  ILoginUserData,
+  { rejectValue: string }
+>("auth/login", async (userData, thunkAPI) => {
   try {
     return await authService.login(userData);
   } catch (error: unknown) {
@@ -72,25 +82,26 @@ export const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Register
-      .addCase(registerUser.pending, (state) => {
+      .addCase(signUpUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(signUpUser.fulfilled, (state, action: PayloadAction<IUser>) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.user = action.payload;
       })
-      .addCase(registerUser.rejected, (state, action) => {
+      .addCase(signUpUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;
         state.user = null;
+        console.log("SignUp: error", action.payload);
       })
       // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(loginUser.fulfilled, (state, action: PayloadAction<IUser>) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.user = action.payload;

@@ -35,10 +35,15 @@ export const registerSchema = z
 
 // @login user
 export const loginSchema = z.object({
-  email: z.email("Invalid email format").nonempty("email is required"),
+  email: z
+    .email("Invalid email format")
+    .nonempty("email is required")
+    .max(100, "email must be less than 100 characters"),
   password: z
     .string("password must be a string")
-    .nonempty("password is required"),
+    .nonempty("password is required")
+    .min(6, "password must be at least 6 characters")
+    .max(100, "password must be less than 100 characters"),
 });
 
 // ---- Tipos inferidos automáticamente desde Zod
