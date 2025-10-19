@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 
 export function ForgotPassword() {
   return (
-    <Container size={460} my={230}>
+    <Container size={460} my={170}>
       <Title className={classes.title} ta="center">
         Forgot your password?
       </Title>

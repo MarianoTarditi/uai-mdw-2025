@@ -16,13 +16,13 @@ import { TwitterButton } from "../signUp/TwitterButton";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { signUpUser, reset } from "../../../features/auth/authSlice";
 import type { IRegisterUserData } from "../../../types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../../zodValidations/authSchema";
 import { useForm } from "react-hook-form";
-import Spinner from "../../../components/Spinner";
+import { Loader, Center } from "@mantine/core";
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -47,24 +47,24 @@ export function SignUp() {
 
     if (isSuccess && user) {
       toast.success(`Registration successful, welcome! ${user.name}!`);
-      navigate("/");
+      navigate("/dashboard");
     }
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);
 
   const onSubmit = (data: IRegisterUserData) => {
-    console.log("Formulario enviado:", data);
-    console.log(errors);
 
     dispatch(signUpUser(data));
   };
 
   if (isLoading) {
-    return <Spinner />;
+    <Center style={{ width: "100vw", height: "100vh" }}>
+      <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
+    </Center>;
   }
 
   return (
-    <Container size="xs" style={{ marginTop: "100px" }}>
+    <Container size="xs" my={30}>
       <Paper radius="md" p="lg" withBorder>
         <Text size="lg" fw={500} style={{ textAlign: "center" }}>
           Welcome to Mantine, register with
@@ -142,7 +142,8 @@ export function SignUp() {
               Already have an account? Login
             </Anchor>
 
-            <Button type="submit" radius="xl" disabled={isSubmitting}>
+            <Button type="submit" radius="xl" disabled={isSubmitting} color="myColor.9">
+              {/* color="myColor.7" variant="outline"  */}
               Register
             </Button>
           </Group>

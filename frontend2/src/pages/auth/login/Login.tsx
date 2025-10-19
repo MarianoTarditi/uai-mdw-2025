@@ -17,12 +17,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../../zodValidations/authSchema";
 import { useForm } from "react-hook-form";
 import type { ILoginUserData } from "../../../types/auth";
-import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { loginUser, reset } from "../../../features/auth/authSlice";
-import Spinner from "../../../components/Spinner";
+import { Loader, Center } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export function Login() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export function Login() {
 
     if (isSuccess && user) {
       toast.success(`Welcome back, ${user.name}!`);
-      navigate("/");
+      navigate("/dashboard");
     }
 
     dispatch(reset());
@@ -59,11 +59,15 @@ export function Login() {
   };
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <Center style={{ width: "100vw", height: "100vh" }}>
+        <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
+      </Center>
+    );
   }
 
   return (
-    <Container size="xs" style={{ marginTop: "150px" }}>
+    <Container size="xs" my={135}>
       <Paper radius="md" p="lg" withBorder>
         <Text size="lg" fw={500} style={{ textAlign: "center" }}>
           Welcome to Mantine, login with

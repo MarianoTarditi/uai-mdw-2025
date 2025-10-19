@@ -46,6 +46,4 @@ export const loginSchema = z.object({
     .max(100, "password must be less than 100 characters"),
 });
 
-// ---- Tipos inferidos automáticamente desde Zod
-export type RegisterUserData = z.infer<typeof registerSchema>;
-export type LoginUserData = z.infer<typeof loginSchema>;
+

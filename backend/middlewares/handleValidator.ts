@@ -11,8 +11,7 @@ const validateResults = (req: Request, res: Response, next: NextFunction) => {
         errors: errors.array(),
       });
     }
-    
-
+  
     next(); // No hay errores, continua con el siguiente middleware o controlador
   } catch (error) {
     return res.status(500).json({

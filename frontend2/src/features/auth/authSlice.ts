@@ -12,7 +12,7 @@ import axios from "axios";
 // Obtener usuario desde localStorage
 const user = localStorage.getItem("user")
   ? (JSON.parse(localStorage.getItem("user") as string) as IUser)
-  : null;
+: null;
 
 const initialState: IAuthState = {
   user,

@@ -7,22 +7,13 @@ import { Contact } from "../components/contact/Contact";
 import { Faq } from "../components/faq/Faq";
 import { Footer } from "../components/footer/Footer";
 import { LeadGrid } from "../components/grid/LeadGrid";
+import { Header } from "../components/header/Header";
 import { Hero } from "../components/hero/Hero";
 
 function Home() {
-  // const navigate = useNavigate();
-  // const dispatch = useAppDispatch();
-
-  // const { user } = useAppSelector((state) => state.auth);
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate, dispatch]);
-
   return (
     <>
+      <Header />
       <Hero />
       <section className="section">
         <CardFeature />
@@ -33,7 +24,7 @@ function Home() {
         </section>
         <Contact />
       </section>
-      <Faq/>
+      <Faq />
       <Footer />
     </>
   );

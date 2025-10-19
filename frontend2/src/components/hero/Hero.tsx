@@ -2,6 +2,7 @@ import { Button, Container, Overlay, Text, Title } from '@mantine/core';
 import classes from './Hero.module.css';
 import { Link } from "react-router-dom";
 
+
 export function Hero() {
 
   return (
@@ -18,7 +19,8 @@ export function Hero() {
           more than 120 customizable components and hooks to cover you in any situation
         </Text>
 
-        <Button variant="gradient" size="xl" radius="xl" className={classes.control} component={Link} to={"/login"}>
+
+        <Button variant="gradient" size="xl" radius="xl" className={classes.control} component={Link} to={"/login"} >
           Get started
         </Button>
       </Container>
