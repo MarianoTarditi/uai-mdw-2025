@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Footer } from "../footer/Footer";
+// import { Footer } from "../footer/Footer";
 import Sidebar from "../sidebar/SideBar";
 import { ThemeProvider } from "../themeProvider/ThemeProvider";
 
@@ -11,7 +11,7 @@ const MainLayout = () => {
           <main className="flex-1 px-4 py-6">
             <Outlet />
           </main>
-          <Footer />
+          {/* <Footer /> */}
         </Sidebar>
       </div>
     </ThemeProvider>

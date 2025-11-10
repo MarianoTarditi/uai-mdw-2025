@@ -44,7 +44,7 @@ const data = {
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/Dashboard",
         },
       ],
     },
@@ -78,7 +78,7 @@ const data = {
       items: [
         {
           title: "Exercises",
-          url: "#",
+          url: "/Exercises",
         },
         {
           title: "Routines",

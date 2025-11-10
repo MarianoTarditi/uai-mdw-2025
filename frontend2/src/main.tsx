@@ -18,7 +18,7 @@ import "./index.css";
 import { Toaster } from "sonner";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
-import { Exercises } from "./pages/Exercises";
+import { GetAllExercises } from "./pages/exercises/GetAllExercises";
 import { PrivateRoute } from "./components/privateRoute/PrivateRoute";
 import { Form } from "./pages/Form";
 
@@ -43,7 +43,7 @@ const theme = createTheme({
 
 const router = createBrowserRouter([
   {
-    path: "/", // Tu landing page
+    path: "/", // landing page
     element: <Home />,
   },
   {
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "/Dashboard", element: <Dashboard /> },
-          { path: "/Exercises", element: <Exercises /> },
+          { path: "/Exercises", element: <GetAllExercises /> },
           { path: "/Form", element: <Form /> },
         ],
       },

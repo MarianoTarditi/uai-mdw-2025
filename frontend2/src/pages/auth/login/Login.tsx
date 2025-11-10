@@ -37,9 +37,7 @@ export function Login() {
     resolver: zodResolver(loginSchema), // Validación con Zod
   });
 
-  const { user, isLoading, isError, isSuccess, message } = useAppSelector(
-    (state) => state.auth
-  );
+  const { user, isLoading, isError, isSuccess, message } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     if (isError) {

@@ -26,14 +26,10 @@ const createExercise = async (req: Request, res: Response) => {
       videoUrl,
       imageUrl,
     });
-    
 
     await exercise.save();
 
-    res.status(201).json({
-      message: "Exercise created successfully",
-      data: exercise
-    });
+    res.status(201).json({ message: "Exercise created successfully", exercise });
   } catch (error) {
     handleHttpError(res, "Error creating exercise", 500, error);
   }
@@ -43,7 +39,7 @@ const getAllExercises = async (req: Request, res: Response) => {
   try {
     const exercises = await Exercise.find(); // si existe un filtro, es decir, "isActive: true", lo aplicamos en la consulta find.
 
-    res.status(200).json({ data: exercises });
+    res.status(200).json(exercises);
   } catch (error) {
     handleHttpError(res, "Error getting exercises", 500, error);
   }
@@ -58,7 +54,7 @@ const getExerciseById = async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json({ data: exercise });
+    res.status(200).json({ exercise });
   } catch (error) {
     handleHttpError(res, "Error getting exercise", 500, error);
   }
@@ -66,6 +62,7 @@ const getExerciseById = async (req: Request, res: Response) => {
 
 const updateExercise = async (req: Request, res: Response) => {
   try {
+
     const { id } = req.params;
     const { name, description, muscleGroup, videoUrl, imageUrl } = req.body;
 
@@ -79,7 +76,7 @@ const updateExercise = async (req: Request, res: Response) => {
       return handleHttpError(res, "Exercise not found", 404);
     }
 
-    res.status(200).json({ message: "Exercise updated successfully", data: findExercise});
+    res.status(200).json({ message: "Exercise updated successfully", findExercise });
   } catch (error) {
     handleHttpError(res, "Error updating exercise", 500, error);
   }

@@ -24,7 +24,7 @@ export interface IAuthState {
 
 //  Usuario en el estado de Redux
 export interface IUser {
-  idToken: string; 
+  idToken: string;
   refreshToken: string;
   expiresIn: string;
   localId: string;
@@ -32,4 +32,31 @@ export interface IUser {
   name: string;
   lastName: string;
   roles?: string[];
+}
+
+// Reutilizando tu esquema de Mongoose como referencia
+export interface IExercise {
+  _id?: string;
+  name: string;
+  description?: string;
+  muscleGroup: string;
+  videoUrl?: string;
+  imageUrl?: string;
+}
+
+interface IExerciseState {
+  exercises: IExercise[];
+  exercise?: IExercise;
+  isError: boolean;
+  message: string;
+
+  isFetchingSuccess: boolean;
+  isCreatingSuccess: boolean;
+  isUpdatingSuccess: boolean;
+  isDeletingSuccess: boolean;
+
+  isFetchingLoading: boolean;
+  isCreatingLoading: boolean;
+  isUpdatingLoading: boolean;
+  isDeletingLoading: boolean;
 }
