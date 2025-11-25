@@ -16,13 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
-import {
-  reset,
-  createExercise,
-} from "@/features/exercises/exerciseSlice";
+import { reset, createExercise } from "@/features/exercises/exerciseSlice";
 import { exerciseSchema } from "@/zodValidations/exerciseSchema";
 import type { IExercise } from "@/types/auth";
-import { Loader, Center } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 import { useEffect } from "react";
 
 interface CreateExerciseProps {
@@ -31,14 +28,10 @@ interface CreateExerciseProps {
   onSubmit: (data: IExercise) => void; // callback cuando se envía el formulario
 }
 
-export function AddExercise({
-  isOpen,
-  setIsOpen,
-}: CreateExerciseProps) {
+export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
   const dispatch = useAppDispatch();
-  const { isError, isCreatingSuccess, message, isCreatingLoading } = useAppSelector(
-    (state) => state.exercise
-  );
+  const { isError, isCreatingSuccess, message, isCreatingLoading } =
+    useAppSelector((state) => state.exercise);
 
   const {
     register,
@@ -66,11 +59,7 @@ export function AddExercise({
   };
 
   if (isCreatingLoading) {
-    return (
-      <Center style={{ width: "100vw", height: "100vh" }}>
-        <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
-      </Center>
-    );
+    return <SpinnerButton variant="sizes" />;
   }
 
   return (

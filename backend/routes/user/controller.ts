@@ -9,6 +9,25 @@ const sanitizeUser = (user: any) => ({
   roles: user.roles,
 });
 
+const formatBirthDate = (date: Date | string | undefined | null) => {
+  if (!date) return null;
+
+  // Asegurarse de que sea un objeto Date
+  const birthDate = date instanceof Date ? date : new Date(date);
+
+  if (isNaN(birthDate.getTime())) {
+    return null; // Manejar fechas inválidas
+  }
+
+  // Usar toLocaleDateString con la configuración local para obtener DD/MM/YYYY
+  // 'es-ES' suele usar el formato día/mes/año
+  // O construir manualmente para asegurar el formato:
+  const day = birthDate.getDate().toString().padStart(2, "0");
+  const month = (birthDate.getMonth() + 1).toString().padStart(2, "0"); // +1 porque getMonth() es base 0
+  const year = birthDate.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { isActive } = req.query;
@@ -28,17 +47,17 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+// ... dentro de tu archivo de controladores
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = await User.findOne({ _id: id, isActive: true }); // Solo usuarios activos
+    const user = await User.findOne({ firebaseUid: id, isActive: true }).lean(); // Usar .lean() si solo necesitas los datos sin métodos de Mongoose
     if (!user) {
       handleHttpError(res, "User not found", 404);
       return;
     }
-
     const requestingUser = sanitizeUser(res.locals.user);
-    res.status(200).json({ userRequesting: requestingUser, data: user });
+    res.status(200).json({ userRequesting: requestingUser, data: user }); // Enviar el objeto formateado
   } catch (error) {
     handleHttpError(res, "Error getting user", 500, error);
   }
@@ -47,20 +66,22 @@ const getUserById = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, lastName, email, password } = req.body;
+    const { name, lastName, height, weight, birthDate, gender, profileImage } =
+      req.body;
 
-    if (email) {
-      const existingUser = await User.findOne({
-        email: email,
-        _id: { $ne: id },
-      });
-      if (existingUser) {
-        handleHttpError(res, "Email already in use", 409);
-      }
-    }
+    const formattedBirthdate = formatBirthDate(birthDate);
+
     const findUser = await User.findByIdAndUpdate(
       id,
-      { name, lastName, email, password },
+      {
+        name,
+        lastName,
+        height,
+        weight,
+        birthDate: formattedBirthdate,
+        gender,
+        profileImage,
+      },
       { new: true }
     );
 
@@ -69,7 +90,9 @@ const updateUser = async (req: Request, res: Response) => {
     }
 
     const requestingUser = sanitizeUser(res.locals.user);
-    res.status(200).json({ requestingUser: requestingUser, message: "User updated successfully", data: findUser });
+    res
+      .status(200)
+      .json({ message: "User updated successfully", data: findUser });
   } catch (error) {
     res.status(500).json({ message: "Error updating user", error });
   }
@@ -85,7 +108,10 @@ const hardDeleteUser = async (req: Request, res: Response) => {
     }
 
     const requestingUser = sanitizeUser(res.locals.user);
-    res.status(200).json({ requestingUser: requestingUser, message: "User deleted successfully" });
+    res.status(200).json({
+      requestingUser: requestingUser,
+      message: "User deleted successfully",
+    });
   } catch (error) {
     handleHttpError(res, "Error deleting user", 500, error);
   }
@@ -113,7 +139,11 @@ const softDeleteUser = async (req: Request, res: Response) => {
     }
 
     const requestingUser = sanitizeUser(res.locals.user);
-    res.json({ requestingUser: requestingUser, message: "User soft-deleted successfully", data: user });
+    res.json({
+      requestingUser: requestingUser,
+      message: "User soft-deleted successfully",
+      data: user,
+    });
   } catch (error) {
     handleHttpError(res, "Error soft-deleting user", 500, error);
   }
@@ -138,7 +168,11 @@ const activateUser = async (req: Request, res: Response) => {
       return;
     }
     const requestingUser = sanitizeUser(res.locals.user);
-    res .status(200).json({ requestingUser:requestingUser, message: "User activated successfully", data: user });
+    res.status(200).json({
+      requestingUser: requestingUser,
+      message: "User activated successfully",
+      data: user,
+    });
   } catch (error) {
     handleHttpError(res, "Error activating user", 500, error);
   }
@@ -164,7 +198,11 @@ const setUserRole = async (req: Request, res: Response) => {
     }
 
     const requestingUser = sanitizeUser(res.locals.user);
-    res.json({ requestingUser: requestingUser, message: "Roles updated successfully", user: updatedUser });
+    res.json({
+      requestingUser: requestingUser,
+      message: "Roles updated successfully",
+      user: updatedUser,
+    });
   } catch (error) {
     console.error(error);
     handleHttpError(res, "Error updating user roles", 500);

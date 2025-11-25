@@ -1,6 +1,5 @@
 import { Schema, model, InferSchemaType } from "mongoose";
-import {UserRole} from "../types"
-
+import { UserRole } from "../types";
 
 const userSchema = new Schema(
   {
@@ -14,6 +13,12 @@ const userSchema = new Schema(
       enum: Object.values(UserRole),
       default: [UserRole.Student],
     },
+
+    birthDate: { type: Date, default: null }, 
+    gender: { type: String, enum: ["male", "female", "other"], default: null },
+    height: { type: Number, default: null },
+    weight: { type: Number, default: null },
+    profileImage: { type: String, default: null },
   },
   {
     timestamps: true,
@@ -22,5 +27,5 @@ const userSchema = new Schema(
 );
 
 type UserType = InferSchemaType<typeof userSchema>;
-const User = model<UserType>("User", userSchema); 
+const User = model<UserType>("User", userSchema);
 export default User;

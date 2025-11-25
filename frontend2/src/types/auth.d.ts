@@ -5,7 +5,14 @@ export interface IRegisterUserData {
   email: string;
   password: string;
   confirmPassword: string;
+
+  gender: "Male" | "Female" | "Other";
+  birthDate: string; // formato "2025-02-10"
 }
+
+export type IEditProfileData = z.infer<typeof editProfileSchema>;
+
+
 
 // @login user
 export interface ILoginUserData {
@@ -13,28 +20,7 @@ export interface ILoginUserData {
   password: string;
 }
 
-// Estado de Auth en Redux
-export interface IAuthState {
-  user: User | null;
-  isError: boolean;
-  isSuccess: boolean;
-  isLoading: boolean;
-  message: string;
-}
-
-//  Usuario en el estado de Redux
-export interface IUser {
-  idToken: string;
-  refreshToken: string;
-  expiresIn: string;
-  localId: string;
-  email: string;
-  name: string;
-  lastName: string;
-  roles?: string[];
-}
-
-// Reutilizando tu esquema de Mongoose como referencia
+// EXERCISE
 export interface IExercise {
   _id?: string;
   name: string;
@@ -44,7 +30,7 @@ export interface IExercise {
   imageUrl?: string;
 }
 
-interface IExerciseState {
+export interface IExerciseState {
   exercises: IExercise[];
   exercise?: IExercise;
   isError: boolean;

@@ -13,7 +13,7 @@ import type { IExercise } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/app/reduxHooks";
 import { deleteExercise, reset } from "@/features/exercises/exerciseSlice";
 import { toast } from "sonner";
-import { Center, Loader } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 import { useEffect } from "react";
 
 interface DeleteExerciseProps {
@@ -75,13 +75,7 @@ export function DeleteExercise({
             onClick={handleDelete}
             disabled={isDeletingLoading}
           >
-            {isDeletingLoading ? (
-              <Center>
-                <Loader size="sm" color="white" />
-              </Center>
-            ) : (
-              "Delete"
-            )}
+            {isDeletingLoading ? <SpinnerButton variant="sizes" /> : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

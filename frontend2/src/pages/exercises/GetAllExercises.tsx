@@ -36,7 +36,7 @@ import {
 import { DataTablePagination } from "../../components/exercises/table/DataTablePagination";
 import { DataTableViewOptions } from "../../components/exercises/table/DataTableViewOptions";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
-import { Center, Loader } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 import { getAllExercises } from "@/features/exercises/exerciseSlice";
 import { UpdateExercise } from "@/components/exercises/UpdateExercise";
 import { AddExercise } from "@/components/exercises/CreateExercise";
@@ -190,9 +190,7 @@ export function GetAllExercises() {
 
   if (isFetchingLoading) {
     return (
-      <Center style={{ width: "100%", height: "100%" }}>
-        <Loader />
-      </Center>
+      <SpinnerButton variant="sizes" />
     );
   }
 

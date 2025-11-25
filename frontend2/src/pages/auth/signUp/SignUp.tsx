@@ -7,6 +7,7 @@ import {
   Group,
   Paper,
   PasswordInput,
+  Select,
   Stack,
   Text,
   TextInput,
@@ -17,12 +18,12 @@ import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { signUpUser, reset } from "../../../features/auth/authSlice";
+import { registerUser, reset } from "../../../features/auth/authSlice";
 import type { IRegisterUserData } from "../../../types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../../zodValidations/authSchema";
 import { useForm } from "react-hook-form";
-import { Loader, Center } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -46,21 +47,18 @@ export function SignUp() {
     }
 
     if (isSuccess && user) {
-      toast.success(`Registration successful, welcome! ${user.name}!`);
+      toast.success(`Registration successful, welcome! ${user.email}!`);
       navigate("/dashboard");
     }
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);
 
   const onSubmit = (data: IRegisterUserData) => {
-
-    dispatch(signUpUser(data));
+    dispatch(registerUser(data));
   };
 
   if (isLoading) {
-    <Center style={{ width: "100vw", height: "100vh" }}>
-      <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
-    </Center>;
+    <SpinnerButton variant="sizes" />;
   }
 
   return (
@@ -110,6 +108,27 @@ export function SignUp() {
               radius="md"
             />
 
+            <TextInput
+              required
+              label="Birth Date"
+              placeholder="2000-02-10"
+              {...register("birthDate")}
+              error={errors.birthDate?.message}
+              radius="md"
+            />
+
+            <Select
+              label="Gender"
+              placeholder="Select gender"
+              {...register("gender")}
+              data={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "other", label: "Other" },
+              ]}
+              error={errors.gender?.message}
+            />
+
             <PasswordInput
               required
               label="Password"
@@ -142,7 +161,12 @@ export function SignUp() {
               Already have an account? Login
             </Anchor>
 
-            <Button type="submit" radius="xl" disabled={isSubmitting} color="myColor.9">
+            <Button
+              type="submit"
+              radius="xl"
+              disabled={isSubmitting}
+              color="myColor.9"
+            >
               {/* color="myColor.7" variant="outline"  */}
               Register
             </Button>

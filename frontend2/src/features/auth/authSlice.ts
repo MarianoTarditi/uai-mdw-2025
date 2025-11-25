@@ -1,123 +1,207 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type {
-  IAuthState,
-  IRegisterUserData,
-  ILoginUserData,
-  IUser,
-} from "../../types/auth";
-import authService from "./authService";
-import axios from "axios";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signOut,
+  type User,
+} from "firebase/auth";
+import { auth } from "@/firebase/firebase";
+import type { AppDispatch, RootState } from "@/app/store";
+import { FirebaseError } from "firebase/app";
+import {
+  getFirebaseLoginErrorMessage,
+  getFirebaseRegisterError,
+} from "../../firebase/firebaseErrors";
+import { fetchUserProfile } from "../users/userSlice";
+import { clearProfile } from "../users/userSlice";
 
-// Obtener usuario desde localStorage
-const user = localStorage.getItem("user")
-  ? (JSON.parse(localStorage.getItem("user") as string) as IUser)
-: null;
+interface IAuthUser {
+  // firebase
+  uid: string;
+  email: string | null;
+  token: string;
+}
+
+interface IAuthState {
+  user: IAuthUser | null;
+  isError: boolean;
+  isLoading: boolean;
+  errorMessage: string;
+  isSuccess: boolean;
+  isCheckingAuth: boolean;
+}
 
 const initialState: IAuthState = {
-  user,
+  user: null,
   isError: false,
-  isSuccess: false,
   isLoading: false,
-  message: "",
+  isSuccess: false,
+  isCheckingAuth: true,
+  errorMessage: "",
 };
 
-export const signUpUser = createAsyncThunk<
-  IUser, // Tipo del "payload" que devuelve si la promesa se resuelve bien
-  IRegisterUserData, // Tipo de los argumentos que recibe la función (user)
+export const registerUser = createAsyncThunk<
+  IAuthUser,
+  { email: string; password: string },
   { rejectValue: string }
->("auth/signUp", async (userData, thunkAPI) => { // Tipo del valor que retorna si la promesa falla (thunkAPI.rejectWithValue)
-  // Nombre de la acción en Redux (prefix/type)
+>("auth/registerUser", async ({ email, password }, { rejectWithValue }) => {
   try {
-    return await authService.signUp(userData);
-  } catch (error: unknown) {
-    let message: string;
-    if (axios.isAxiosError(error) && error.response) {
-      message = error.response.data?.message || error.message;
-    } else if (error instanceof Error) {
-      message = error.message;
-    } else {
-      message = String(error);
-    }
-    return thunkAPI.rejectWithValue(message);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = userCredential.user;
+
+    return {
+      uid: user.uid,
+      email: user.email,
+      token: await user.getIdToken(),
+    };
+  } catch (error) {
+    return rejectWithValue(getFirebaseRegisterError(error));
   }
 });
 
 export const loginUser = createAsyncThunk<
-  IUser,
-  ILoginUserData,
+  IAuthUser,
+  { email: string; password: string },
   { rejectValue: string }
->("auth/login", async (userData, thunkAPI) => {
+>("auth/login", async ({ email, password }, { rejectWithValue }) => {
   try {
-    return await authService.login(userData);
-  } catch (error: unknown) {
-    let message: string;
-    if (axios.isAxiosError(error) && error.response) {
-      message = error.response.data?.message || error.message;
-    } else if (error instanceof Error) {
-      message = error.message;
-    } else {
-      message = String(error);
-    }
-    return thunkAPI.rejectWithValue(message);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const token = await userCredential.user.getIdToken();
+    localStorage.setItem("token", token);
+
+    return {
+      uid: userCredential.user.uid,
+      email: userCredential.user.email,
+      token,
+    };
+  } catch (error) {
+    return rejectWithValue(getFirebaseLoginErrorMessage(error));
   }
 });
 
-export const logout = createAsyncThunk("auth/logout", async () => {
-  await authService.logout();
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("token");
+      return true;
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Unknown error occurred");
+    }
+  }
+);
+
+// Observe Firebase user state
+export const observeUser = createAsyncThunk<
+  void,
+  void,
+  { dispatch: AppDispatch }
+>("auth/observeUser", async (_, { dispatch }) => {
+  dispatch(setCheckingAuth(true));
+
+  onAuthStateChanged(auth, async (user: User | null) => {
+    if (user) {
+      const token = await user.getIdToken();
+      dispatch(setUser({ uid: user.uid, email: user.email, token }));
+      await dispatch(fetchUserProfile(user.uid));
+    } else {
+      dispatch(clearUser());
+      dispatch(clearProfile());
+    }
+
+    dispatch(setCheckingAuth(false));
+  });
 });
 
-// Reducer
 export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     reset: (state) => {
       state.isLoading = false;
-      state.isSuccess = false;
       state.isError = false;
-      state.message = "";
+      state.errorMessage = "";
+    },
+    setUser: (state, action: PayloadAction<IAuthUser>) => {
+      state.user = action.payload;
+    },
+    clearUser: (state) => {
+      state.user = null;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setCheckingAuth: (state, action: PayloadAction<boolean>) => {
+      state.isCheckingAuth = action.payload;
     },
   },
+
   extraReducers: (builder) => {
     builder
-      // Register
-      .addCase(signUpUser.pending, (state) => {
+      .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
+        state.isError = false;
       })
-      .addCase(signUpUser.fulfilled, (state, action: PayloadAction<IUser>) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true;
         state.user = action.payload;
       })
-      .addCase(signUpUser.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload as string;
+        state.errorMessage = action.payload as string;
         state.user = null;
-        console.log("SignUp: error", action.payload);
       })
-      // Login
+
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
+        state.isError = false;
       })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<IUser>) => {
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true;
         state.user = action.payload;
+        state.isError = false;
+        state.errorMessage = "";
+        state.isSuccess = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload as string;
+        state.errorMessage = action.payload as string;
         state.user = null;
       })
-      // Logout
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.isError = false;
+        state.errorMessage = "";
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isError = true;
+        state.errorMessage = action.payload as string;
       });
   },
 });
 
-export const { reset } = authSlice.actions;
+export const { setUser, clearUser, setLoading, setCheckingAuth, reset } =
+  authSlice.actions;
+
+export const selectUser = (state: RootState) => state.auth.user;
+export const getAuthState = (state: RootState) => state.auth;
+
 export default authSlice.reducer;

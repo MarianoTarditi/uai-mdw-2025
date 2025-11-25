@@ -17,7 +17,7 @@ import { exerciseSchema } from "@/zodValidations/exerciseSchema";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Loader, Center } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner"; 
 import { reset, updateExercise } from "@/features/exercises/exerciseSlice";
 
 interface UpdateExerciseProps {
@@ -58,14 +58,13 @@ export function UpdateExercise({
 
   const handleFormSubmit = async (data: IExercise) => {
     if (!exercise?._id) return;
+    
     await dispatch(updateExercise({ id: exercise._id, exerciseData: data }));
   };
 
   if (isUpdatingLoading) {
     return (
-      <Center style={{ width: "100vw", height: "100vh" }}>
-        <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
-      </Center>
+      <SpinnerButton variant="sizes" />
     );
   }
 

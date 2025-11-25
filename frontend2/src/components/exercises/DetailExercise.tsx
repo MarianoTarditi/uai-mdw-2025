@@ -14,7 +14,7 @@ import type { IExercise } from "@/types/auth";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Loader, Center } from "@mantine/core";
+import { SpinnerButton } from "@/components/spinner/Spinner"; 
 import { reset, getExercise } from "@/features/exercises/exerciseSlice";
 
 interface DetailExerciseProps {
@@ -67,9 +67,7 @@ export function DetailExercise({
           </DialogHeader>
           {/* 8. Lógica de Carga (Loader) */}
           {isFetchingLoading ? (
-            <Center className="h-60">
-              <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
-            </Center>
+            <SpinnerButton/>
           ) : (
             // 9. Contenido cuando la carga termina
             <div className="grid gap-4">

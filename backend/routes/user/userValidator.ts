@@ -15,23 +15,16 @@ const UpdateUserValidator = [
     .isString().withMessage("Name must be a string").bail()
     .isLength({ min: 3, max: 50 }).withMessage("Lastname must be 3-50 characters long"),
 
-  check("email")
-    .exists().withMessage("Email field is missing").bail()
-    .notEmpty().withMessage("Email is required").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isEmail().withMessage("Invalid email format").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Email must be 3-100 characters long"),
-
   check("isActive")
     .optional()
     .isBoolean().withMessage("isActive must be true or false")
     .toBoolean(),
 
-  check("password")
-    .exists().withMessage("Password field is missing").bail()
-    .notEmpty().withMessage("Password is required").bail()
-    .isString().withMessage("Password must be a string").bail()
-    .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
+  // check("password")
+  //   .exists().withMessage("Password field is missing").bail()
+  //   .notEmpty().withMessage("Password is required").bail()
+  //   .isString().withMessage("Password must be a string").bail()
+  //   .isLength({ min: 6, max: 100 }).withMessage("Password must be 6-100 characters long"),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);

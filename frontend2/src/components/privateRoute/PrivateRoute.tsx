@@ -1,14 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/reduxHooks";
+import { getAuthState } from "../../features/auth/authSlice";
+import type { ReactElement } from "react";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 
-export function PrivateRoute() {
-  const { user } = useAppSelector((state) => state.auth);
+const PrivateRoute = ({ children }: { children: ReactElement }) => {
+  const { user, isCheckingAuth } = useAppSelector(getAuthState);
 
-  // Si no hay usuario, redirige a login
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (isCheckingAuth) {
+    return <SpinnerButton variant="sizes" />
+
   }
 
-  // Si hay usuario, renderiza las rutas hijas
-  return <Outlet />;
-}
+  return user ? children : <Navigate to="/login" replace />;
+};
+
+export default PrivateRoute;

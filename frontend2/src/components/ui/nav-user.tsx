@@ -16,10 +16,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAppDispatch } from "../../app/reduxHooks";
-import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useAppDispatch } from "@/app/reduxHooks";
+import { logoutUser } from "@/features/auth/authSlice";
 
 export type NavUserProps = {
   user: {
@@ -30,17 +30,19 @@ export type NavUserProps = {
 };
 
 export function NavUser({ user }: NavUserProps) {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
   const { isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    dispatch(logoutUser());
+    toast.success("Session closed successfully!");
     navigate("/login");
-
-    toast.info(`Se ha cerrado sesión correctamente!`);
   };
+
+  const handleProfile = () => {
+    navigate("/UserProfile");
+  }
 
   return (
     <SidebarMenu>
@@ -83,7 +85,7 @@ export function NavUser({ user }: NavUserProps) {
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleProfile}>
                 <BadgeCheck />
                 Profile
               </DropdownMenuItem>

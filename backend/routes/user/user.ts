@@ -8,7 +8,7 @@ import {UserRole} from "../../types"
 const router = express.Router();
 
 router.get("/", authenticateFirebase, controllers.getAllUsers);
-router.get("/:id", authenticateFirebase, checkRol([UserRole.Student]), validator.getUserValidator, controllers.getUserById);
+router.get("/:id", authenticateFirebase, controllers.getUserById);
 router.put("/:id", authenticateFirebase, checkRol([UserRole.Student]), validator.UpdateUserValidator, validator.getUserValidator ,controllers.updateUser);
 router.delete('/hard/:id', checkRol([UserRole.Student]), authenticateFirebase, validator.getUserValidator, controllers.hardDeleteUser);
 router.patch('/soft/:id', authenticateFirebase, checkRol([UserRole.Student]),validator.getUserValidator, controllers.softDeleteUser);

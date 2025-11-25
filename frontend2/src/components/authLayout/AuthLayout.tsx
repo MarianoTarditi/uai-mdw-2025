@@ -1,9 +1,24 @@
 import classes from "./AuthLayout.module.css";
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { Footer } from "../footer/Footer";
 import { AuthHeader } from "../header/AuthHeader";
+import { useAppSelector } from "@/app/reduxHooks";
+import { SpinnerButton } from "@/components/spinner/Spinner";
 
 const AuthLayout = () => {
+  const { user, isCheckingAuth } = useAppSelector((state) => state.auth);
+
+  // Todavía no sabemos si hay sesión
+  if (isCheckingAuth) {
+    return <SpinnerButton variant="sizes" />;
+  }
+
+  // Ya hay sesión => redirigir al dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Vista normal cuando NO hay sesión
   return (
     <div className={classes.layout}>
       <AuthHeader />

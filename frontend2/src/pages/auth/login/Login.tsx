@@ -37,20 +37,20 @@ export function Login() {
     resolver: zodResolver(loginSchema), // Validación con Zod
   });
 
-  const { user, isLoading, isError, isSuccess, message } = useAppSelector((state) => state.auth);
+  const { user, isLoading, isError, isSuccess, errorMessage } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     if (isError) {
-      toast.error(message);
+      toast.error(errorMessage);
     }
 
     if (isSuccess && user) {
-      toast.success(`Welcome back, ${user.name}!`);
+      toast.success(`Welcome back, ${user.email}!`);
       navigate("/dashboard");
     }
 
     dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+  }, [user, isError, isSuccess, errorMessage, navigate, dispatch]);
 
   const onSubmit = (data: ILoginUserData) => {
     dispatch(loginUser(data));
