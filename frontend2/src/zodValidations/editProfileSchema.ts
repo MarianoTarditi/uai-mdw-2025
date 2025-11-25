@@ -43,9 +43,8 @@ export const editProfileSchema = z.object({
       "Invalid gender"
     ),
 
-  // HEIGHT: null permitido, validar si hay número
   height: z
-    .string() // <-- siempre string desde el input
+    .string() 
     .transform((val) => (val === "" ? null : Number(val)))
     .refine(
       (val) => val === null || (!Number.isNaN(val) && val >= 100 && val <= 250),

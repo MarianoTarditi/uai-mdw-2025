@@ -33,7 +33,6 @@ export const updateExercise = async (
   exerciseData: IExercise
 ): Promise<IExercise> => {
   const response = await axios.put(`${API_URL}${id}`, exerciseData);
-  // Asumiendo que la respuesta PUT también devuelve el ejercicio anidado
   return response.data.findExercise;
 };
 

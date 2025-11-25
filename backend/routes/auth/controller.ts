@@ -4,9 +4,6 @@ import { Request, Response } from "express";
 import admin from "../../utils/firebase";
 import axios from "axios";
 
-// @desc    Register a user
-// @route   POST /api/auth/registerUs
-// @access  Public
 const signUp = async (req: Request, res: Response) => {
   try {
     const { email, password, name, lastName } = req.body;
@@ -37,9 +34,6 @@ const signUp = async (req: Request, res: Response) => {
   }
 };
 
-// @desc    Authenticate a user
-// @route   POST /api/auth/login
-// @access  Public
 const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;

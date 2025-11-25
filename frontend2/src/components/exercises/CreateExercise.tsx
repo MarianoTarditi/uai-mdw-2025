@@ -25,7 +25,7 @@ import { useEffect } from "react";
 interface CreateExerciseProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onSubmit: (data: IExercise) => void; // callback cuando se envía el formulario
+  onSubmit: (data: IExercise) => void; 
 }
 
 export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
@@ -50,7 +50,7 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
     if (isCreatingSuccess) {
       toast.success("Exercise created successfully!");
       dispatch(reset());
-      setIsOpen(false); // cerrar modal aquí
+      setIsOpen(false); 
     }
   }, [isError, isCreatingSuccess, message, dispatch, setIsOpen]);
 

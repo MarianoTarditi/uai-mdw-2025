@@ -12,18 +12,14 @@ const sanitizeUser = (user: any) => ({
 const formatBirthDate = (date: Date | string | undefined | null) => {
   if (!date) return null;
 
-  // Asegurarse de que sea un objeto Date
   const birthDate = date instanceof Date ? date : new Date(date);
 
   if (isNaN(birthDate.getTime())) {
-    return null; // Manejar fechas inválidas
+    return null; 
   }
 
-  // Usar toLocaleDateString con la configuración local para obtener DD/MM/YYYY
-  // 'es-ES' suele usar el formato día/mes/año
-  // O construir manualmente para asegurar el formato:
   const day = birthDate.getDate().toString().padStart(2, "0");
-  const month = (birthDate.getMonth() + 1).toString().padStart(2, "0"); // +1 porque getMonth() es base 0
+  const month = (birthDate.getMonth() + 1).toString().padStart(2, "0"); 
   const year = birthDate.getFullYear();
 
   return `${day}/${month}/${year}`;
@@ -31,14 +27,14 @@ const formatBirthDate = (date: Date | string | undefined | null) => {
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { isActive } = req.query;
-    let filter = {}; // Filtro vacío por defecto "todos los usuarios".
+    let filter = {}; 
 
     if (isActive !== undefined) {
-      // Verificamos si el query param 'isActive' está definido.
-      filter = { isActive: isActive === "true" }; // si es true
-    } // cualquier otra cosa que no sea "true", filtra inactivos
+      
+      filter = { isActive: isActive === "true" }; 
+    } 
 
-    const users = await User.find(filter); // si existe un filtro, es decir, "isActive: true", lo aplicamos en la consulta find.
+    const users = await User.find(filter); 
     const requestingUser = sanitizeUser(res.locals.user);
 
     res.status(200).json({ userRequesting: requestingUser, data: users });
@@ -47,17 +43,16 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-// ... dentro de tu archivo de controladores
 const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = await User.findOne({ firebaseUid: id, isActive: true }).lean(); // Usar .lean() si solo necesitas los datos sin métodos de Mongoose
+    const user = await User.findOne({ firebaseUid: id, isActive: true }).lean(); 
     if (!user) {
       handleHttpError(res, "User not found", 404);
       return;
     }
     const requestingUser = sanitizeUser(res.locals.user);
-    res.status(200).json({ userRequesting: requestingUser, data: user }); // Enviar el objeto formateado
+    res.status(200).json({ userRequesting: requestingUser, data: user }); 
   } catch (error) {
     handleHttpError(res, "Error getting user", 500, error);
   }
@@ -129,7 +124,7 @@ const softDeleteUser = async (req: Request, res: Response) => {
 
     // Si no se encontró, puede ser porque no existe o ya estaba inactivo
     if (!user) {
-      const existingUser = await User.findById(id); // Primero verificamos si el usuario existe
+      const existingUser = await User.findById(id); 
       if (!existingUser) {
         handleHttpError(res, "User not found", 404);
         return;
@@ -180,8 +175,8 @@ const activateUser = async (req: Request, res: Response) => {
 
 const setUserRole = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params; // id de Mongo del usuario
-    const { roles } = req.body; // array de roles nuevos: ["admin"]
+    const { id } = req.params; 
+    const { roles } = req.body; 
 
     if (!roles || !Array.isArray(roles)) {
       return handleHttpError(res, "Roles must be an array", 400);
@@ -189,7 +184,7 @@ const setUserRole = async (req: Request, res: Response) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { roles }, // 👈 sobrescribe roles
+      { roles },
       { new: true }
     );
 

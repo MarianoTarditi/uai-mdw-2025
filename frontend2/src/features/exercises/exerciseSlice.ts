@@ -194,13 +194,13 @@ export const exerciseSlice = createSlice({
         (state, action: PayloadAction<IExercise>) => {
           state.isCreatingLoading = false;
           state.isCreatingSuccess = true;
-          state.exercises.push(action.payload); // lo agrega directamente al array global exercises[] sin realizar otro fetch
+          state.exercises.push(action.payload); 
         }
       )
       .addCase(createExercise.rejected, (state, action) => {
         state.isCreatingLoading = false;
         state.isError = true;
-        state.message = action.payload as string; // perimite devolver el error del metodo create: return thunkAPI.rejectWithValue(message);
+        state.message = action.payload as string; 
       })
 
       // UPDATE

@@ -7,7 +7,7 @@ export interface IRegisterUserData {
   confirmPassword: string;
 
   gender: "Male" | "Female" | "Other";
-  birthDate: string; // formato "2025-02-10"
+  birthDate: string; 
 }
 
 export type IEditProfileData = z.infer<typeof editProfileSchema>;

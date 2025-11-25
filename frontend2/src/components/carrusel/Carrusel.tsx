@@ -15,11 +15,11 @@ export function Carrusel() {
         plugins={[autoplay.current]}
         onMouseEnter={autoplay.current.stop}
         onMouseLeave={() => autoplay.current.play()}
-        style={{ margin: "0 auto" }} // ancho 400px centrado
+        style={{ margin: "0 auto" }} 
         styles={{
           control: {
-            color: "black", // color del ícono (flecha)
-            backgroundColor: "white", // fondo translúcido
+            color: "black", 
+            backgroundColor: "white", 
             borderRadius: "50%",
             width: "30px",
             height: "30px",
@@ -28,7 +28,7 @@ export function Carrusel() {
             },
           },
           indicator: {
-            backgroundColor: "white", // puntos blancos
+            backgroundColor: "white", 
           },
         }}
       >

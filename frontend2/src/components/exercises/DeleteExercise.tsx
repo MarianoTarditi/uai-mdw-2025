@@ -39,15 +39,13 @@ export function DeleteExercise({
 
     if (isDeletingSuccess) {
       toast.success("Exercise deleted successfully!");
-      dispatch(reset()); // limpiar flags
+      dispatch(reset()); 
     }
   }, [isError, isDeletingSuccess, message, dispatch, isOpen, setIsOpen]);
 
   const handleDelete = () => {
-    // Ya no necesita ser 'async'
     if (!exercise._id) return;
 
-    // Simplemente disparamos la acción. El useEffect reaccionará.
     dispatch(deleteExercise(exercise._id));
   };
 

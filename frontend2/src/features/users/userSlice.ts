@@ -36,9 +36,6 @@ const initialState: UserState = {
   message: "",
 };
 
-// =========================
-// FETCH USER PROFILE
-// =========================
 export const fetchUserProfile = createAsyncThunk<
   IUserProfile,
   string,
@@ -54,9 +51,6 @@ export const fetchUserProfile = createAsyncThunk<
   }
 });
 
-// =========================
-// UPDATE USER PROFILE
-// =========================
 export const updateUserProfile = createAsyncThunk<
   IUserProfile,
   { id: string; userData: IEditProfileData },

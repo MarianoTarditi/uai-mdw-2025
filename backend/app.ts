@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: "http://localhost:5173", // o el puerto donde corre React
+  origin: "http://localhost:5173", 
   credentials: true
 }));
 

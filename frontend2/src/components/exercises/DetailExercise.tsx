@@ -59,21 +59,17 @@ export function DetailExercise({
       <DialogContent className="data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[425px] bg-background text-foreground">
         <div>
           <DialogHeader className="mb-4">
-            {/* 7. Títulos y descripciones corregidos */}
             <DialogTitle>Exercise Details</DialogTitle>
             <DialogDescription>
               Viewing the details for this exercise.
             </DialogDescription>
           </DialogHeader>
-          {/* 8. Lógica de Carga (Loader) */}
           {isFetchingLoading ? (
             <SpinnerButton/>
           ) : (
-            // 9. Contenido cuando la carga termina
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name-1">Name</Label>
-                {/* 10. Inputs en 'readOnly' y mostrando 'detailedExercise' */}
                 <Input
                   id="name-1"
                   readOnly

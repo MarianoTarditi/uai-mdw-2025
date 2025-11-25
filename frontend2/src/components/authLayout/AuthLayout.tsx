@@ -8,17 +8,14 @@ import { SpinnerButton } from "@/components/spinner/Spinner";
 const AuthLayout = () => {
   const { user, isCheckingAuth } = useAppSelector((state) => state.auth);
 
-  // Todavía no sabemos si hay sesión
   if (isCheckingAuth) {
     return <SpinnerButton variant="sizes" />;
   }
 
-  // Ya hay sesión => redirigir al dashboard
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Vista normal cuando NO hay sesión
   return (
     <div className={classes.layout}>
       <AuthHeader />

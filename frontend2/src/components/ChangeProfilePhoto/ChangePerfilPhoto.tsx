@@ -3,9 +3,9 @@
 
 import { X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FileUploadProfile } from "./ChangePerfilPhoto"; // Asegúrate que esta ruta sea correcta
+import { FileUploadProfile } from "./ChangePerfilPhoto"; 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils"; // Necesitas una función de utilidad para concatenar clases
+import { cn } from "@/lib/utils"; 
 
 interface ChangeProfilePhotoDialogProps {
   currentImageUrl: string | null;
@@ -19,10 +19,6 @@ export function ChangeProfilePhotoDialog({
   onOpenChange,
 }: ChangeProfilePhotoDialogProps) {
 
-  // Función para cerrar el diálogo si la subida fue exitosa (puedes pasarla como prop a FileUploadProfile)
-  // const handleUploadSuccess = () => {
-  //   onOpenChange(false);
-  // };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -41,14 +37,12 @@ export function ChangeProfilePhotoDialog({
               alt="Current Profile Photo" 
             />
             <AvatarFallback>
-              {/* Muestra las iniciales del usuario si no hay imagen (Opcional) */}
             </AvatarFallback>
           </Avatar>
           
           <div className="w-full">
-            {/* Aquí integramos el componente de subida de archivos */}
+           
             <FileUploadProfile 
-            //  onUploadSuccess={handleUploadSuccess} // Si deseas cerrar el diálogo al éxito
             />
           </div>
         </div>
