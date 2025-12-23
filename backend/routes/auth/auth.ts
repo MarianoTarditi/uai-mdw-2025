@@ -4,7 +4,6 @@ import controller from "./controller";
 
 const router = express.Router();
 
-router.post("/signUp", validator.registerValidator, controller.signUp);
-router.post("/login", validator.loginValidator, controller.login); // Sign in wth email and password
+router.post("/saveUser", validator.registerValidator, controller.saveUser);
 
 export default router;

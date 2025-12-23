@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { RootState } from "@/app/store";
 import axiosPrivate from "../../config/axios";
-import type { IEditProfileData } from "@/types/auth";
 
 export interface IUserProfile {
   name: string;
@@ -53,18 +52,13 @@ export const fetchUserProfile = createAsyncThunk<
 
 export const updateUserProfile = createAsyncThunk<
   IUserProfile,
-  { id: string; userData: IEditProfileData },
+  { id: string; userData: FormData },
   { rejectValue: string }
 >("user/updateProfile", async ({ id, userData }, { rejectWithValue }) => {
   try {
     const res = await axiosPrivate.put(`/user/${id}`, userData);
     return res.data.data;
   } catch (error: any) {
-
-     console.log("🔴 UPDATE ERROR RAW:", error);
-    console.log("🔴 RESPONSE DATA:", error.response?.data);
-    console.log("🔴 STATUS:", error.response?.status);
-    console.log("🔴 HEADERS:", error.response?.headers);
     return rejectWithValue(
       error.response?.data?.message || "Error updating profile"
     );

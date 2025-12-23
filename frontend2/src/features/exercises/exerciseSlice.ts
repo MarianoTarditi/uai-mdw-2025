@@ -48,6 +48,7 @@ export const getExercise = createAsyncThunk<
   { rejectValue: string }
 >("exercise/fetchOne", async (id, thunkAPI) => {
   try {
+    console.log("Fetching exercise with id:", id);
     return await exerciseService.getExercise(id);
   } catch (error: unknown) {
     let message: string;

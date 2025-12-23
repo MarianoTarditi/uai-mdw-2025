@@ -15,6 +15,7 @@ import { RouterProvider } from "react-router-dom";
 import UserProfile from "./pages/userProfile/userProfile";
 import { useAppSelector } from "./app/reduxHooks";
 import { fetchUserProfile } from "./features/users/userSlice";
+import { ProfileStepper } from "./components/editUser/ProfileStepper";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
           { path: "/Dashboard", element: <Dashboard /> },
           { path: "/Exercises", element: <GetAllExercises /> },
           { path: "/UserProfile", element: <UserProfile /> },
+          { path: "/ProfileStepper", element: <ProfileStepper /> },
         ],
       },
     ],

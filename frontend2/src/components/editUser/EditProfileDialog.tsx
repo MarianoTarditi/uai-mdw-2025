@@ -22,7 +22,6 @@ import { toast } from "sonner";
 import { SpinnerButton } from "../spinner/Spinner";
 import { reset } from "@/features/users/userSlice";
 import { SelectGender } from "../shadcn-studio/select/SelectGender";
-import { FileUploadProfile } from "../ChangeProfilePhoto/ChangePerfilPhoto";
 
 export function EditProfileDialog({
   profile,
@@ -35,6 +34,21 @@ export function EditProfileDialog({
   );
   const [open, setOpen] = useState(false);
 
+  const formatIsoToDDMMYYYY = (date: string | null | undefined): string => {
+    if (!date) return ""; 
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+      return "";
+    }
+    const day = d.getUTCDate().toString().padStart(2, "0");
+    const month = (d.getUTCMonth() + 1).toString().padStart(2, "0");
+    const year = d.getUTCFullYear();
+
+    return `${day}/${month}/${year}`; 
+  };
+
   const {
     register,
     handleSubmit,
@@ -44,7 +58,7 @@ export function EditProfileDialog({
     defaultValues: {
       name: profile?.name ?? "",
       lastName: profile?.lastName ?? "",
-      birthDate: profile?.birthDate ?? null,
+      birthDate: formatIsoToDDMMYYYY(profile?.birthDate),
       gender: profile?.gender ?? null,
       height: profile?.height ?? null,
       weight: profile?.weight ?? null,
@@ -69,9 +83,35 @@ export function EditProfileDialog({
   const handleFormSubmit = async (data: IEditProfileData) => {
     if (!profile?._id) return;
 
-    await dispatch(updateUserProfile({ id: profile._id, userData: data }));
-  };
+    const formData = new FormData();
 
+    formData.append("name", data.name);
+    formData.append("lastName", data.lastName);
+    formData.append("birthDate", data.birthDate ?? "");
+    formData.append("gender", data.gender ?? "");
+    formData.append("height", data.height?.toString() ?? "");
+    formData.append("weight", data.weight?.toString() ?? "");
+
+    const imageValue = data.profileImage;
+    const existingImageUrl = profile?.profileImage;
+
+    let newFile: File | null = null;
+
+    if (imageValue instanceof File) {
+      newFile = imageValue;
+    } else if (imageValue instanceof FileList && imageValue.length > 0) {
+      newFile = imageValue[0];
+    }
+
+    if (newFile) {
+      formData.append("profileImage", newFile);
+      console.log("Se envía nuevo archivo para Multer");
+    } else if (existingImageUrl) {
+      formData.append("existingProfileImage", existingImageUrl);
+    }
+
+    await dispatch(updateUserProfile({ id: profile._id, userData: formData }));
+  };
   if (isLoading) {
     return <SpinnerButton variant="sizes" />;
   }
@@ -101,7 +141,6 @@ export function EditProfileDialog({
                 <p className="text-sm text-red-500">{errors.name.message}</p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label htmlFor="lastName">Last Name</Label>
               <Input id="lastName" {...register("lastName")} />
@@ -111,7 +150,6 @@ export function EditProfileDialog({
                 </p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label htmlFor="birthDate">Birth Date</Label>
               <Input type="text" id="birthDate" {...register("birthDate")} />
@@ -122,7 +160,10 @@ export function EditProfileDialog({
               )}
             </div>
 
-            <SelectGender />
+            <SelectGender
+              register={register} 
+              defaultValue={profile?.gender} 
+            />
 
             <div className="grid gap-3">
               <Label htmlFor="height">Height (cm)</Label>
@@ -131,7 +172,6 @@ export function EditProfileDialog({
                 <p className="text-sm text-red-500">{errors.height?.message}</p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label htmlFor="weight">Weight (kg)</Label>
               <Input type="number" id="weight" {...register("weight")} />
@@ -141,8 +181,13 @@ export function EditProfileDialog({
             </div>
 
             <div className="grid gap-3">
-              <Label htmlFor="profileImage">Profile Image (URL)</Label>
-              <Input id="profileImage" {...register("profileImage")} />
+              <Label htmlFor="profileImage">Profile Image</Label>
+              <Input
+                id="profileImage"
+                type="file"
+                accept="image/*"
+                {...register("profileImage")}
+              />
               {errors.profileImage && (
                 <p className="text-sm text-red-500">
                   {errors.profileImage.message}

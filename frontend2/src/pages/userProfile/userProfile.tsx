@@ -1,10 +1,10 @@
 import { useAppSelector } from "@/app/reduxHooks";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Mail, ShieldCheck, Calendar, Heart, Ruler, Scale } from "lucide-react";
 import { EditProfileDialog } from "../../components/editUser/EditProfileDialog";
 import { SpinnerButton } from "@/components/spinner/Spinner";
+import { UserAvatar } from "@/components/userAvatar/UserAvatar";
 
 export default function UserProfile() {
   const { profile, isLoading } = useAppSelector((state) => state.user);
@@ -21,20 +21,12 @@ export default function UserProfile() {
     <div className="flex justify-center p-8">
       <Card className="max-w-lg w-full shadow-lg">
         <CardHeader className="flex flex-col items-center gap-4">
-          <Avatar className="w-20 h-20">
-            {profile.profileImage ? (
-              <img
-                src={profile.profileImage}
-                alt="Profile"
-                className="rounded-full"
-              />
-            ) : (
-              <AvatarFallback>
-                {profile.name[0]}
-                {profile.lastName[0]}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <UserAvatar
+            imagePath={profile.profileImage} 
+            name={profile.name}
+            lastName={profile.lastName}
+            className="w-20 h-20"
+          ></UserAvatar>
 
           <h2 className="text-xl font-semibold">
             {profile.name} {profile.lastName}
@@ -70,7 +62,7 @@ export default function UserProfile() {
               ))}
             </div>
           </div>
-          
+
           <div className="space-y-1">
             <label className="text-sm font-medium flex items-center gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />

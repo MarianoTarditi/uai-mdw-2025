@@ -1,18 +1,8 @@
 // @register user
-export interface IRegisterUserData {
-  name: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
+type IRegisterUserData = z.infer<typeof registerSchema>;
 
-  gender: "Male" | "Female" | "Other";
-  birthDate: string; 
-}
 
 export type IEditProfileData = z.infer<typeof editProfileSchema>;
-
-
 
 // @login user
 export interface ILoginUserData {

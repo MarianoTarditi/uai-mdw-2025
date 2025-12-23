@@ -44,31 +44,61 @@ export const editProfileSchema = z.object({
     ),
 
   height: z
-    .string() 
-    .transform((val) => (val === "" ? null : Number(val)))
+    .preprocess(
+      (val) => (val === "" || val === null ? null : val),
+      z.union([z.number(), z.string()])
+    )
+    .transform((val) => (val === null || val === "" ? null : Number(val)))
     .refine(
-      (val) => val === null || (!Number.isNaN(val) && val >= 100 && val <= 250),
+      (val) =>
+        val === null ||
+        (!Number.isNaN(val as number) &&
+          (val as number) >= 100 &&
+          (val as number) <= 250),
       "Enter a valid height"
     )
     .nullable(),
 
   // WEIGHT
   weight: z
-    .string()
-    .transform((val) => (val === "" ? null : Number(val)))
+    .preprocess(
+      (val) => (val === "" || val === null ? null : val),
+      z.union([z.number(), z.string()])
+    )
+    .transform((val) => (val === null || val === "" ? null : Number(val)))
     .refine(
-      (val) => val === null || (!Number.isNaN(val) && val >= 1 && val <= 200),
+      (val) =>
+        val === null ||
+        (!Number.isNaN(val as number) &&
+          (val as number) >= 1 &&
+          (val as number) <= 200),
       "Enter a valid weight"
     )
     .nullable(),
 
   // PROFILE IMAGE
   profileImage: z
-    .string()
-    .transform((val) => (val === "" ? null : val))
+    .union([z.string(), z.instanceof(FileList)])
     .nullable()
-    .refine(
-      (val) => val === null || /^https?:\/\/.+/.test(val),
-      "Invalid image URL"
-    ),
+    .transform((val) => {
+      if (val === null || val === "") return null;
+
+      if (val instanceof FileList) {
+        return val.length > 0 ? val.item(0) : null;
+      }
+
+      return val;
+    })
+    .refine((val) => {
+      if (val === null) return true;
+
+      if (val instanceof File) {
+        return val.type.startsWith("image/") && val.size <= 5 * 1024 * 1024; // 5MB
+      }
+
+      if (typeof val === "string") return true;
+
+      return false;
+    }, "Invalid image file type or format.")
+    .nullable(),
 });

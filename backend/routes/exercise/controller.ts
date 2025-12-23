@@ -49,6 +49,7 @@ const getExerciseById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const exercise = await Exercise.findById(id); // Solo usuarios activos
+    console.log("Fetched exercise:", exercise);
     if (!exercise) {
       handleHttpError(res, "Exercise not found", 404);
       return;

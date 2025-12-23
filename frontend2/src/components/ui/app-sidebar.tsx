@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Bot, Frame, GalleryVerticalEnd, Map, Settings2 } from "lucide-react";
-
 import { NavMain } from "@/components/ui/nav-main";
 import { NavProjects } from "@/components/ui/nav-projects";
 import { NavUser } from "@/components/ui/nav-user";
@@ -19,17 +18,32 @@ import { useAppSelector } from "@/app/reduxHooks";
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
 
+  const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
+
+  const getImageUrl = (imagePath: string | null | undefined) => {
+    if (!imagePath) return null;
+
+    // Eliminar la barra inicial de imagePath si la tiene
+    const normalizedPath = imagePath.startsWith("/")
+      ? imagePath.substring(1)
+      : imagePath;
+
+    return `${STATIC_BASE_URL}/${normalizedPath}`;
+  };
+
   const data = {
     user: {
       name: profile?.name ?? "Unknown",
       email: profile?.email ?? "No email",
-      avatar: profile?.profileImage ?? "/default-avatar.png",
+      avatar: profile?.profileImage
+        ? getImageUrl(profile.profileImage)
+        : "/default-avatar.png",
     },
     teams: [
       {
-        name: "AgustinTurriEF",
+        name: "AgustinTurriEDF",
         logo: GalleryVerticalEnd,
-        plan: "Enterprise",
+        plan: "Entrenador de fuerza",
       },
     ],
     navMain: [
@@ -51,14 +65,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "Clients",
-            url: "#",
-          },
-          {
-            title: "Exercises",
-            url: "#",
-          },
-          {
-            title: "Routines",
             url: "#",
           },
           {

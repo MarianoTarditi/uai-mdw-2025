@@ -16,6 +16,8 @@ import {
 } from "../../firebase/firebaseErrors";
 import { fetchUserProfile } from "../users/userSlice";
 import { clearProfile } from "../users/userSlice";
+import type { IRegisterUserData } from "@/types/auth";
+import axiosPrivate from "../../config/axios";
 
 interface IAuthUser {
   // firebase
@@ -44,25 +46,52 @@ const initialState: IAuthState = {
 
 export const registerUser = createAsyncThunk<
   IAuthUser,
-  { email: string; password: string },
+  IRegisterUserData,
   { rejectValue: string }
->("auth/registerUser", async ({ email, password }, { rejectWithValue }) => {
+>("auth/saveUser", async (formData, { rejectWithValue }) => {
   try {
+    // 1. Crear usuario en Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
-      email,
-      password
+      formData.email,
+      formData.password
     );
 
     const user = userCredential.user;
+    const firebaseToken = await user.getIdToken();
 
+    // 2. Preparar payload para MongoDB
+    const dbPayload = {
+      firebaseUid: user.uid,
+      email: formData.email,
+      name: formData.name,
+      lastName: formData.lastName,
+      gender: formData.gender,
+      birthDate: formData.birthDate,
+      weight: formData.weight,
+      height: formData.height,
+    };
+
+    // 3. Registrar usuario en tu backend
+    await axiosPrivate.post("http://localhost:3001/api/auth/saveUser/", dbPayload, {
+      headers: {
+        Authorization: `Bearer ${firebaseToken}`,
+      },
+    });
+
+    console.log("user: ", user);
+
+    // 4. Devolver autenticación exitosa
     return {
       uid: user.uid,
       email: user.email,
-      token: await user.getIdToken(),
+      token: firebaseToken,
     };
-  } catch (error) {
-    return rejectWithValue(getFirebaseRegisterError(error));
+  } catch (error: any) {
+    console.log("Error en registerUser thunk:", error);
+    const errorMessage =
+      error.response?.data?.message || getFirebaseRegisterError(error);
+    return rejectWithValue(errorMessage);
   }
 });
 

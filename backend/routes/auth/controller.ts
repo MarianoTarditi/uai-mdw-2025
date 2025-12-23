@@ -1,107 +1,48 @@
 import User from "../../models/User";
 import handleHttpError from "../../utils/handleError";
 import { Request, Response } from "express";
-import admin from "../../utils/firebase";
-import axios from "axios";
 
-const signUp = async (req: Request, res: Response) => {
+const saveUser = async (req: Request, res: Response) => {
   try {
-    const { email, password, name, lastName } = req.body;
+    console.log("BODY RECIBIDO:", req.body); // 👈 AQUI
 
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      handleHttpError(res, "Email already in use", 409);
-    }
-
-    const userRecord = await admin.auth().createUser({ email, password });
-
-    const user = new User({
+    const {
+      firebaseUid,
+      email,
       name,
       lastName,
+      gender,
+      birthDate,
+      weight,
+      height,
+    } = req.body;
+
+    // 1. Verificar si ya existe
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return handleHttpError(res, "Email already in use", 409);
+    }
+
+    // 2. Crear usuario en MongoDB
+    const user = await User.create({
+      firebaseUid,
       email,
-      firebaseUid: userRecord.uid,
+      name,
+      lastName,
+      gender,
+      birthDate,
+      weight,
+      height,
     });
-    await user.save();
-    res.status(201).json({
-      firebaseUser: userRecord,
-      name: user.name,
-      lastName: user.lastName,
-      email: user.email,
+
+    return res.status(201).json({
+      success: true,
+      user,
     });
   } catch (error) {
-    handleHttpError(res, "Error while registering user", 500);
     console.log(error);
+    return handleHttpError(res, "Error while registering user", 500);
   }
 };
 
-const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return handleHttpError(res, "Email and password are required", 400);
-    }
-
-    // Buscar el usuario en tu DB
-    const apiKey = process.env.FIREBASE_API_KEY;
-    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
-
-    // Login en Firebase
-    const response = await axios.post(url, {
-      email,
-      password,
-      returnSecureToken: true,
-    });
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return handleHttpError(res, "User not found in database", 404);
-    }
-
-    // Devolver datos completos
-    res.json({
-      idToken: response.data.idToken,
-      refreshToken: response.data.refreshToken,
-      expiresIn: response.data.expiresIn,
-      localId: response.data.localId,
-      email: response.data.email,
-      name: user.name,
-      lastName: user.lastName,
-      roles: user.roles,
-    });
-  } catch (error: any) {
-    const firebaseError = error?.response?.data?.error?.message;
-
-    if (firebaseError === "USER_DISABLED") {
-      return handleHttpError(
-        res,
-        "User account is disabled, talk to an admin",
-        403
-      );
-    }
-
-    if (firebaseError === "INVALID_LOGIN_CREDENTIALS") {
-      return handleHttpError(
-        res,
-        "Email or password incorrect, please try again",
-        401
-      );
-    }
-
-    if (firebaseError === "INVALID_LOGIN_CREDENTIALS") {
-      return handleHttpError(
-        res,
-        "Email or password incorrect, please try again",
-        401
-      );
-    }
-
-    console.log("Firebase login error:", firebaseError);
-    handleHttpError(res, "Login failed", 401, firebaseError);
-  }
-};
-
-export default {
-  signUp,
-  login,
-};
+export default { saveUser };

@@ -4,12 +4,13 @@ import validator from "./userValidator";
 import checkRol from "../../middlewares/checkRole";
 import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 import {UserRole} from "../../types"
+import { uploadProfileImage } from "../../utils/multer";
 
 const router = express.Router();
 
 router.get("/", authenticateFirebase, controllers.getAllUsers);
 router.get("/:id", authenticateFirebase, controllers.getUserById);
-router.put("/:id", authenticateFirebase, checkRol([UserRole.Student]), validator.UpdateUserValidator, validator.getUserValidator ,controllers.updateUser);
+router.put("/:id", authenticateFirebase, checkRol([UserRole.Student]), uploadProfileImage.single("profileImage"),validator.UpdateUserValidator, validator.getUserValidator, controllers.updateUser);
 router.delete('/hard/:id', checkRol([UserRole.Student]), authenticateFirebase, validator.getUserValidator, controllers.hardDeleteUser);
 router.patch('/soft/:id', authenticateFirebase, checkRol([UserRole.Student]),validator.getUserValidator, controllers.softDeleteUser);
 router.patch('/activate/:id',  authenticateFirebase, checkRol([UserRole.Student]), validator.getUserValidator, controllers.activateUser);
