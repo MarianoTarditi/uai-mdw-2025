@@ -12,20 +12,25 @@ const sanitizeUser = (user: any) => ({
 
 const createExercise = async (req: Request, res: Response) => {
   try {
-    const { name, description, muscleGroup, videoUrl, imageUrl } = req.body;
+    const { nombre, comentario, etiquetas, musculosPrincipales, musculosSecundarios, materialesNecesarios, videoUrl, imageUrl } = req.body;
 
-    const existingExercise = await Exercise.findOne({ name: name });
+    const existingExercise = await Exercise.findOne({ name: nombre });
     if (existingExercise) {
       return handleHttpError(res, "Exercise already exist", 409);
     }
 
     const exercise = new Exercise({
-      name,
-      description,
-      muscleGroup,
+      nombre,
+      comentario,
+      materialesNecesarios,
+      musculosPrincipales,
+      musculosSecundarios,
+      etiquetas,
       videoUrl,
       imageUrl,
     });
+
+    console.log("Creating exercise:", exercise);
 
     await exercise.save();
 
@@ -65,11 +70,11 @@ const updateExercise = async (req: Request, res: Response) => {
   try {
 
     const { id } = req.params;
-    const { name, description, muscleGroup, videoUrl, imageUrl } = req.body;
+    const { nombre, comentario, etiquetas, musculosPrincipales, musculosSecundarios, materialesNecesarios, videoUrl, imageUrl } = req.body;
 
     const findExercise = await Exercise.findByIdAndUpdate(
       id,
-      { name, description, muscleGroup, videoUrl, imageUrl },
+      { nombre, comentario, etiquetas, musculosPrincipales, musculosSecundarios, materialesNecesarios, videoUrl, imageUrl },
       { new: true }
     );
 

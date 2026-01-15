@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { SpinnerButton } from "@/components/spinner/Spinner";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { getAllExercises } from "@/features/exercises/exerciseSlice";
-import { ExerciseTable } from "./ExerciseTable";
-import { useExerciseTable } from "./useExerciseTable";
-import { ExerciseButton } from "./ExerciseButton";
+import { ExerciseTable } from "./Table/ExerciseTable";
+import { useExerciseTable } from "./Table/useExerciseTable";
+import { ExerciseButton } from "./Table/ExerciseButton";
 import { DataTableViewOptions } from "../../components/exercises/table/DataTableViewOptions";
 import * as React from "react";
 
@@ -28,10 +28,10 @@ export function GetAllExercises() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter by nombre..."
+          value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
           onChange={(e) =>
-            table.getColumn("name")?.setFilterValue(e.target.value)
+            table.getColumn("nombre")?.setFilterValue(e.target.value)
           }
           className="max-w-sm"
         />

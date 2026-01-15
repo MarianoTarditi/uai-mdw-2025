@@ -22,7 +22,11 @@ export default function UserProfile() {
       <Card className="max-w-lg w-full shadow-lg">
         <CardHeader className="flex flex-col items-center gap-4">
           <UserAvatar
-            imagePath={profile.profileImage} 
+            imagePath={
+              profile.profileImage
+                ? `${profile.profileImage}?t=${Date.now()}`
+                : undefined
+            }
             name={profile.name}
             lastName={profile.lastName}
             className="w-20 h-20"

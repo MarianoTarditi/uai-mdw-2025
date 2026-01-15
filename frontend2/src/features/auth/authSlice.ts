@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   type User,
 } from "firebase/auth";
@@ -73,11 +74,15 @@ export const registerUser = createAsyncThunk<
     };
 
     // 3. Registrar usuario en tu backend
-    await axiosPrivate.post("http://localhost:3001/api/auth/saveUser/", dbPayload, {
-      headers: {
-        Authorization: `Bearer ${firebaseToken}`,
-      },
-    });
+    await axiosPrivate.post(
+      "http://localhost:3000/api/auth/saveUser/",
+      dbPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${firebaseToken}`,
+        },
+      }
+    );
 
     console.log("user: ", user);
 
@@ -135,6 +140,22 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const resetPassword = createAsyncThunk<
+  boolean,
+  string,
+  { rejectValue: string }
+>("auth/resetPassword", async (email, { rejectWithValue }) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      return rejectWithValue(error.message);
+    }
+    return rejectWithValue("Unknown error occurred");
+  }
+});
 
 // Observe Firebase user state
 export const observeUser = createAsyncThunk<
@@ -221,6 +242,23 @@ export const authSlice = createSlice({
         state.errorMessage = "";
       })
       .addCase(logoutUser.rejected, (state, action) => {
+        state.isError = true;
+        state.errorMessage = action.payload as string;
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.errorMessage = "";
+        state.isSuccess = false;
+      })
+
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
         state.isError = true;
         state.errorMessage = action.payload as string;
       });

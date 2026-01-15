@@ -11,7 +11,6 @@ import {
   TextInput,
 } from "@mantine/core";
 import { GoogleButton } from "../signUp/GoogleButton";
-import { TwitterButton } from "../signUp/TwitterButton";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../../zodValidations/authSchema";
@@ -73,7 +72,6 @@ export function Login() {
 
         <Group grow mb="md" mt="md">
           <GoogleButton radius="xl">Google</GoogleButton>
-          <TwitterButton radius="xl">Twitter</TwitterButton>
         </Group>
 
         <Divider

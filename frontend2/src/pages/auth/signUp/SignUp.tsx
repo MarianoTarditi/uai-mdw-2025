@@ -13,7 +13,6 @@ import {
   Title,
 } from "@mantine/core";
 import { GoogleButton } from "../signUp/GoogleButton";
-import { TwitterButton } from "../signUp/TwitterButton";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { Link, useNavigate } from "react-router-dom";
@@ -99,7 +98,6 @@ export function SignUp() {
         </Text>
         <Group grow mb="md" mt="md">
           <GoogleButton radius="xl">Google</GoogleButton>
-          <TwitterButton radius="xl">Twitter</TwitterButton>
         </Group>
         <Divider
           label="Or continue with email"

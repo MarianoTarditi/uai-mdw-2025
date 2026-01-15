@@ -8,16 +8,12 @@ interface UserAvatarProps {
   className?: string; // Para pasar clases de Tailwind/shadcn/ui
 }
 
-const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL as string;
+const STATIC_BASE_URL = "http://localhost:3000";
 
 const getImageUrl = (imagePath: string): string | null => {
   if (!imagePath) return null;
 
-  const normalizedPath = imagePath.startsWith("/")
-    ? imagePath.substring(1)
-    : imagePath;
-
-  return `${STATIC_BASE_URL}/${normalizedPath}`;
+  return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
 };
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({

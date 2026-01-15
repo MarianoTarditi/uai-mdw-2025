@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import { SpinnerButton } from "../spinner/Spinner";
 import { reset } from "@/features/users/userSlice";
 import { SelectGender } from "../shadcn-studio/select/SelectGender";
+import { fetchUserProfile } from "@/features/users/userSlice";
+
 
 export function EditProfileDialog({
   profile,
@@ -77,6 +79,7 @@ export function EditProfileDialog({
       toast.success("Profile updated successfully!");
       dispatch(reset());
       setOpen(false);
+      
     }
   }, [isError, isSuccess, message, dispatch]);
 

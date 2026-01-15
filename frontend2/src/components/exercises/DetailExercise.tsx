@@ -2,19 +2,22 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
-  DialogContent,
+  DialogContent, // <--- Asegúrate que venga de @/components/ui/dialog
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+// DialogTrigger, // <-- A veces falta este si lo usas, pero aquí lo controlas por estado
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge"; // Necesitas importar esto
 import type { IExercise } from "@/types/auth";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { SpinnerButton } from "@/components/spinner/Spinner"; 
+import { SpinnerButton } from "@/components/spinner/Spinner";
 import { reset, getExercise } from "@/features/exercises/exerciseSlice";
 
 interface DetailExerciseProps {
@@ -40,12 +43,15 @@ export function DetailExercise({
     if (isOpen && exercise?._id) {
       dispatch(getExercise(exercise._id));
     }
+    // No reseteamos en error aquí para permitir ver el toast, se resetea al cerrar
+  }, [isOpen, exercise?._id, dispatch]);
 
-    if (isError && isOpen) {
-      toast.error(message || "Failed to fetch exercise details");
-      dispatch(reset());
+  // Manejo de errores visual
+  useEffect(() => {
+     if (isError && isOpen) {
+      toast.error(message || "Error cargando ejercicio");
     }
-  }, [isOpen, exercise?._id, dispatch, isError, message]);
+  }, [isError, message, isOpen]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -54,72 +60,123 @@ export function DetailExercise({
     }
   };
 
+  // Helper para evitar crasheos si el array viene undefined
+// Helper para evitar crasheos
+  const renderList = (items: string[] | undefined | string) => { // Aceptamos string también por si acaso
+    // 1. Si es null o undefined
+    if (!items) return <span className="text-muted-foreground text-sm">N/A</span>;
+
+    // 2. BLOQUE DE SEGURIDAD: Si viene un STRING (Dato viejo de la BD), lo mostramos directo
+    if (typeof items === 'string') {
+       return <Badge variant="secondary">{items}</Badge>;
+    }
+
+    // 3. Si es un Array pero está vacío
+    if (Array.isArray(items) && items.length === 0) {
+        return <span className="text-muted-foreground text-sm">N/A</span>;
+    }
+
+    // 4. Si NO es un array (y no era string), evitamos el crash del map
+    if (!Array.isArray(items)) {
+        return <span className="text-red-500 text-xs">Error de datos</span>;
+    }
+
+    // 5. Renderizado normal de Array
+    return (
+      <div className="flex flex-wrap gap-1">
+        {items.map((item, idx) => (
+          <Badge key={idx} variant="secondary">
+            {item}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[425px] bg-background text-foreground">
-        <div>
-          <DialogHeader className="mb-4">
-            <DialogTitle>Exercise Details</DialogTitle>
-            <DialogDescription>
-              Viewing the details for this exercise.
-            </DialogDescription>
-          </DialogHeader>
-          {isFetchingLoading ? (
-            <SpinnerButton/>
-          ) : (
-            <div className="grid gap-4">
-              <div className="grid gap-3">
-                <Label htmlFor="name-1">Name</Label>
-                <Input
-                  id="name-1"
-                  readOnly
-                  defaultValue={detailedExercise?.name}
-                />
-              </div>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-background text-foreground p-6">
+        <DialogHeader>
+          <DialogTitle>Detalles del Ejercicio</DialogTitle>
+          <DialogDescription>
+            Información completa del ejercicio seleccionado.
+          </DialogDescription>
+        </DialogHeader>
 
-              <div className="grid gap-3">
-                <Label htmlFor="muscleGroup-1">Muscle Group</Label>
-                <Input
-                  id="muscleGroup-1"
-                  readOnly
-                  defaultValue={detailedExercise?.muscleGroup}
-                />
-              </div>
+        {isFetchingLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <SpinnerButton />
+          </div>
+        ) : (
+          <div className="grid gap-4 py-2">
+            
+            {/* NOMBRE */}
+            <div className="grid gap-2">
+              <Label>Nombre</Label>
+              <Input readOnly value={detailedExercise?.nombre || ""} />
+            </div>
 
-              <div className="grid gap-3">
-                <Label htmlFor="description-1">Description</Label>
-                <Input
-                  id="description-1"
-                  readOnly
-                  defaultValue={detailedExercise?.description}
-                />
-              </div>
-
-              <div className="grid gap-3">
-                <Label htmlFor="image-1">Image</Label>
-                <Input
-                  id="image-1"
-                  readOnly
-                  defaultValue={detailedExercise?.imageUrl}
-                />
-              </div>
-
-              <div className="grid gap-3">
-                <Label htmlFor="video-1">Video</Label>
-                <Input
-                  id="video-1"
-                  readOnly
-                  defaultValue={detailedExercise?.videoUrl}
-                />
+            {/* MÚSCULOS PRINCIPALES (Aquí estaba el error) */}
+            <div className="grid gap-2">
+              <Label>Músculos Principales</Label>
+              <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
+                 {renderList(detailedExercise?.musculosPrincipales)}
               </div>
             </div>
-          )}
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button>Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </div>
+
+            {/* MÚSCULOS SECUNDARIOS */}
+            <div className="grid gap-2">
+              <Label>Músculos Secundarios</Label>
+              <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
+                 {renderList(detailedExercise?.musculosSecundarios)}
+              </div>
+            </div>
+
+             {/* MATERIALES */}
+             <div className="grid gap-2">
+              <Label>Materiales Necesarios</Label>
+              <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
+                 {renderList(detailedExercise?.materialesNecesarios)}
+              </div>
+            </div>
+
+            {/* ETIQUETAS */}
+            <div className="grid gap-2">
+              <Label>Etiquetas</Label>
+              <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
+                 {renderList(detailedExercise?.etiquetas)}
+              </div>
+            </div>
+
+            {/* COMENTARIO */}
+            <div className="grid gap-2">
+              <Label>Comentario</Label>
+              <Textarea 
+                readOnly 
+                value={detailedExercise?.comentario || ""} 
+                className="resize-none"
+              />
+            </div>
+
+             {/* VIDEO & IMAGEN (Opcional: mostrar links o imágenes reales) */}
+             <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                    <Label>Video URL</Label>
+                    <Input readOnly value={detailedExercise?.videoUrl || ""} />
+                </div>
+                <div className="grid gap-2">
+                    <Label>Image URL</Label>
+                    <Input readOnly value={detailedExercise?.imageUrl || ""} />
+                </div>
+             </div>
+
+          </div>
+        )}
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline">Cerrar</Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

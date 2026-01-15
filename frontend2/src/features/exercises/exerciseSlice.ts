@@ -15,6 +15,7 @@ const initialState: IExerciseState = {
   isCreatingLoading: false,
   isUpdatingLoading: false,
   isDeletingLoading: false,
+  isDetailLoading: false,
 
   isFetchingSuccess: false,
   isCreatingSuccess: false,
@@ -30,14 +31,16 @@ export const getAllExercises = createAsyncThunk<
   try {
     return await exerciseService.getAllExercises();
   } catch (error: unknown) {
-    let message: string;
+    let message = "Ocurrió un error desconocido";
+
     if (axios.isAxiosError(error) && error.response) {
+      console.error("Error del servidor (Backend):", error.response.data);
+
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
-    } else {
-      message = String(error);
     }
+
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -51,14 +54,16 @@ export const getExercise = createAsyncThunk<
     console.log("Fetching exercise with id:", id);
     return await exerciseService.getExercise(id);
   } catch (error: unknown) {
-    let message: string;
+    let message = "Ocurrió un error desconocido";
+
     if (axios.isAxiosError(error) && error.response) {
+      console.error("Error del servidor (Backend):", error.response.data);
+
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
-    } else {
-      message = String(error);
     }
+
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -71,14 +76,16 @@ export const createExercise = createAsyncThunk<
   try {
     return await exerciseService.createExercise(exerciseData);
   } catch (error: unknown) {
-    let message: string;
+    let message = "Ocurrió un error desconocido";
+
     if (axios.isAxiosError(error) && error.response) {
+      console.error("Error del servidor (Backend):", error.response.data);
+
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
-    } else {
-      message = String(error);
     }
+
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -91,14 +98,16 @@ export const updateExercise = createAsyncThunk<
   try {
     return await exerciseService.updateExercise(id, exerciseData);
   } catch (error: unknown) {
-    let message: string;
+    let message = "Ocurrió un error desconocido";
+
     if (axios.isAxiosError(error) && error.response) {
+      console.error("Error del servidor (Backend):", error.response.data);
+
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
-    } else {
-      message = String(error);
     }
+
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -138,6 +147,7 @@ export const exerciseSlice = createSlice({
       state.isCreatingSuccess = false;
       state.isUpdatingSuccess = false;
       state.isDeletingSuccess = false;
+      state.isDetailLoading = false;
 
       state.isFetchingLoading = false;
       state.isCreatingLoading = false;
@@ -168,19 +178,16 @@ export const exerciseSlice = createSlice({
 
       // GET ONE
       .addCase(getExercise.pending, (state) => {
-        state.isFetchingLoading = true;
+        state.isDetailLoading = true; // <--- CAMBIO AQUÍ
         state.isFetchingSuccess = false;
       })
-      .addCase(
-        getExercise.fulfilled,
-        (state, action: PayloadAction<IExercise>) => {
-          state.isFetchingLoading = false;
-          state.exercise = action.payload;
-          state.isFetchingSuccess = true;
-        }
-      )
+      .addCase(getExercise.fulfilled, (state, action) => {
+        state.isDetailLoading = false; // <--- CAMBIO AQUÍ
+        state.exercise = action.payload;
+        state.isFetchingSuccess = true;
+      })
       .addCase(getExercise.rejected, (state, action) => {
-        state.isFetchingLoading = false;
+        state.isDetailLoading = false; // <--- CAMBIO AQUÍ
         state.isError = true;
         state.message = action.payload as string;
       })
@@ -195,13 +202,13 @@ export const exerciseSlice = createSlice({
         (state, action: PayloadAction<IExercise>) => {
           state.isCreatingLoading = false;
           state.isCreatingSuccess = true;
-          state.exercises.push(action.payload); 
+          state.exercises.push(action.payload);
         }
       )
       .addCase(createExercise.rejected, (state, action) => {
         state.isCreatingLoading = false;
         state.isError = true;
-        state.message = action.payload as string; 
+        state.message = action.payload as string;
       })
 
       // UPDATE

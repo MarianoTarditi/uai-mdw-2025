@@ -1,7 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Bot, Frame, GalleryVerticalEnd, Map, Settings2 } from "lucide-react";
+import {
+  GalleryVerticalEnd,
+  CreditCard,
+  User,
+  Dumbbell,
+  LayoutDashboard,
+  ListCheck,
+  CircleQuestionMark,
+  Settings
+} from "lucide-react";
 import { NavMain } from "@/components/ui/nav-main";
 import { NavProjects } from "@/components/ui/nav-projects";
 import { NavUser } from "@/components/ui/nav-user";
@@ -18,17 +27,12 @@ import { useAppSelector } from "@/app/reduxHooks";
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
 
-  const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
+  const STATIC_BASE_URL = "http://localhost:3000";
 
   const getImageUrl = (imagePath: string | null | undefined) => {
     if (!imagePath) return null;
 
-    // Eliminar la barra inicial de imagePath si la tiene
-    const normalizedPath = imagePath.startsWith("/")
-      ? imagePath.substring(1)
-      : imagePath;
-
-    return `${STATIC_BASE_URL}/${normalizedPath}`;
+    return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
   };
 
   const data = {
@@ -49,60 +53,41 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       {
         title: "Dashboard",
-        url: "#",
-        icon: Bot,
-        items: [
-          {
-            title: "Dashboard",
-            url: "/Dashboard",
-          },
-        ],
+        url: "/Dashboard",
+        icon: LayoutDashboard,
       },
       {
-        title: "Clients",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "Clients",
-            url: "#",
-          },
-          {
-            title: "Progress",
-            url: "#",
-          },
-        ],
+        title: "Users",
+        url: "/Users",
+        icon: User,
+      },
+      {
+        title: "Exercises",
+        url: "/Exercises",
+        icon: Dumbbell,
       },
       {
         title: "Routines",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "Exercises",
-            url: "/Exercises",
-          },
-          {
-            title: "Routines",
-            url: "#",
-          },
-          {
-            title: "Progress",
-            url: "#",
-          },
-        ],
+        url: "/Routines",
+        icon: ListCheck,
+      },
+      {
+        title: "Payments",
+        url: "/Payments",
+        icon: CreditCard,
       },
     ],
+
     projects: [
-      {
-        name: "Adjustmentments",
-        url: "#",
-        icon: Frame,
-      },
       {
         name: "FAQ",
         url: "#",
-        icon: Map,
+        icon: CircleQuestionMark,
+      },
+      {
+        name: "Settings",
+        url: "#",
+        icon: Settings,
       },
     ],
   };

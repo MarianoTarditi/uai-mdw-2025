@@ -15,33 +15,52 @@ export function Carrusel() {
         plugins={[autoplay.current]}
         onMouseEnter={autoplay.current.stop}
         onMouseLeave={() => autoplay.current.play()}
-        style={{ margin: "0 auto" }} 
         styles={{
+          root: {
+            position: "relative",
+          },
           control: {
-            color: "black", 
-            backgroundColor: "white", 
+            color: "black",
+            backgroundColor: "white",
             borderRadius: "50%",
-            width: "30px",
-            height: "30px",
+            width: 36,
+            height: 36,
+            top: "50%",
+            transform: "translateY(-200%)",
             "&:hover": {
-              backgroundColor: "rgba(255,255,255,0.2)",
+              backgroundColor: "rgba(255,255,255,0.8)",
             },
           },
           indicator: {
-            backgroundColor: "white", 
+            backgroundColor: "white",
           },
         }}
       >
         <Carousel.Slide>
-          <Image src="/images/gym1.jpeg" height={400} alt="Slide 1" />
+          <Image
+            src="/images/gym1.jpeg"
+            h="100%"
+            fit="cover"
+            alt="Slide 1"
+          />
         </Carousel.Slide>
 
         <Carousel.Slide>
-          <Image src="/images/photoGym.jfif" height={400} alt="Slide 2" />
+          <Image
+            src="/images/photoGym.jpeg"
+            h="100%"
+            fit="cover"
+            alt="Slide 2"
+          />
         </Carousel.Slide>
 
         <Carousel.Slide>
-          <Image src="/images/gym2.jpg" height={400} alt="Slide 3" />
+          <Image
+            src="/images/sentadilla-con-barra.jpg"
+            h="100%"
+            fit="cover"
+            alt="Slide 3"
+          />
         </Carousel.Slide>
       </Carousel>
     </div>

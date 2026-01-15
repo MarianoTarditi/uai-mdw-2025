@@ -35,7 +35,13 @@ export function ExerciseActionsCell({ exercise }: { exercise: IExercise }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsDetailOpen(true)}>
+        <DropdownMenuItem 
+            onClick={(e) => {
+              // Evita que el evento burbujee y cause conflictos
+              e.stopPropagation(); 
+              setIsDetailOpen(true);
+            }}
+          >
             View Detail
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsEditOpen(true)}>

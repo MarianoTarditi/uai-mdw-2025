@@ -46,23 +46,23 @@ export function useExerciseTable(exercises: IExercise[]) {
         enableHiding: false,
       },
       {
-        accessorKey: "name",
+        accessorKey: "nombre",
         header: ({ column }) => (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name <ArrowUpDown />
+            Nombre <ArrowUpDown />
           </Button>
         ),
       },
       {
-        accessorKey: "muscleGroup",
-        header: "Muscle Group",
+        accessorKey: "musculosPrincipales",
+        header: "Músculos principales",
       },
       {
-        accessorKey: "description",
-        header: "Description",
+        accessorKey: "comentario",
+        header: "Comentario",
       },
       {
         id: "actions",

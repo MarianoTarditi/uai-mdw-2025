@@ -5,6 +5,7 @@ const API_URL = "/api/exercise/";
 
 const getAllExercises = async (): Promise<IExercise[]> => {
   const response = await axios.get(API_URL); // GET /api/exercise
+  console.log(response.data);
   return response.data.map((ex: IExercise) => ({
     ...ex,
   }));

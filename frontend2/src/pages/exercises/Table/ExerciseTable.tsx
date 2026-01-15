@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
-import { DataTablePagination } from "../../components/exercises/table/DataTablePagination";
+import { DataTablePagination } from "../../../components/exercises/table/DataTablePagination";
 import type { Table as TableType } from "@tanstack/react-table";
 
 export function ExerciseTable({ table }: { table: TableType<any> }) {

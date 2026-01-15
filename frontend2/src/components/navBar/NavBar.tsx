@@ -55,7 +55,11 @@ const Navbar = () => {
               className="relative h-10 w-10 rounded-full p-0"
             >
               <UserAvatar
-                imagePath={profile?.profileImage}
+                imagePath={
+                  profile?.profileImage
+                    ? `${profile.profileImage}?t=${Date.now()}`
+                    : undefined
+                }
                 name={profile?.name ?? "U"}
                 lastName={profile?.lastName ?? "A"}
                 className="w-8 h-8" // Usar el tamaño estándar
