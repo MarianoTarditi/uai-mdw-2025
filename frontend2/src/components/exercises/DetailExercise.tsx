@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-// DialogTrigger, // <-- A veces falta este si lo usas, pero aquí lo controlas por estado
+  // DialogTrigger, // <-- A veces falta este si lo usas, pero aquí lo controlas por estado
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { SpinnerButton } from "@/components/spinner/Spinner";
 import { reset, getExercise } from "@/features/exercises/exerciseSlice";
+import { VideoPlayer } from "@/utils/videoPlayer";
 
 interface DetailExerciseProps {
   exercise: IExercise | null;
@@ -48,7 +49,7 @@ export function DetailExercise({
 
   // Manejo de errores visual
   useEffect(() => {
-     if (isError && isOpen) {
+    if (isError && isOpen) {
       toast.error(message || "Error cargando ejercicio");
     }
   }, [isError, message, isOpen]);
@@ -61,24 +62,26 @@ export function DetailExercise({
   };
 
   // Helper para evitar crasheos si el array viene undefined
-// Helper para evitar crasheos
-  const renderList = (items: string[] | undefined | string) => { // Aceptamos string también por si acaso
+  // Helper para evitar crasheos
+  const renderList = (items: string[] | undefined | string) => {
+    // Aceptamos string también por si acaso
     // 1. Si es null o undefined
-    if (!items) return <span className="text-muted-foreground text-sm">N/A</span>;
+    if (!items)
+      return <span className="text-muted-foreground text-sm">N/A</span>;
 
     // 2. BLOQUE DE SEGURIDAD: Si viene un STRING (Dato viejo de la BD), lo mostramos directo
-    if (typeof items === 'string') {
-       return <Badge variant="secondary">{items}</Badge>;
+    if (typeof items === "string") {
+      return <Badge variant="secondary">{items}</Badge>;
     }
 
     // 3. Si es un Array pero está vacío
     if (Array.isArray(items) && items.length === 0) {
-        return <span className="text-muted-foreground text-sm">N/A</span>;
+      return <span className="text-muted-foreground text-sm">N/A</span>;
     }
 
     // 4. Si NO es un array (y no era string), evitamos el crash del map
     if (!Array.isArray(items)) {
-        return <span className="text-red-500 text-xs">Error de datos</span>;
+      return <span className="text-red-500 text-xs">Error de datos</span>;
     }
 
     // 5. Renderizado normal de Array
@@ -108,7 +111,6 @@ export function DetailExercise({
           </div>
         ) : (
           <div className="grid gap-4 py-2">
-            
             {/* NOMBRE */}
             <div className="grid gap-2">
               <Label>Nombre</Label>
@@ -119,7 +121,7 @@ export function DetailExercise({
             <div className="grid gap-2">
               <Label>Músculos Principales</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
-                 {renderList(detailedExercise?.musculosPrincipales)}
+                {renderList(detailedExercise?.musculosPrincipales)}
               </div>
             </div>
 
@@ -127,15 +129,15 @@ export function DetailExercise({
             <div className="grid gap-2">
               <Label>Músculos Secundarios</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
-                 {renderList(detailedExercise?.musculosSecundarios)}
+                {renderList(detailedExercise?.musculosSecundarios)}
               </div>
             </div>
 
-             {/* MATERIALES */}
-             <div className="grid gap-2">
+            {/* MATERIALES */}
+            <div className="grid gap-2">
               <Label>Materiales Necesarios</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
-                 {renderList(detailedExercise?.materialesNecesarios)}
+                {renderList(detailedExercise?.materialesNecesarios)}
               </div>
             </div>
 
@@ -143,38 +145,38 @@ export function DetailExercise({
             <div className="grid gap-2">
               <Label>Etiquetas</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
-                 {renderList(detailedExercise?.etiquetas)}
+                {renderList(detailedExercise?.etiquetas)}
               </div>
             </div>
 
             {/* COMENTARIO */}
             <div className="grid gap-2">
               <Label>Comentario</Label>
-              <Textarea 
-                readOnly 
-                value={detailedExercise?.comentario || ""} 
+              <Textarea
+                readOnly
+                value={detailedExercise?.comentario || ""}
                 className="resize-none"
               />
             </div>
 
-             {/* VIDEO & IMAGEN (Opcional: mostrar links o imágenes reales) */}
-             <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                    <Label>Video URL</Label>
-                    <Input readOnly value={detailedExercise?.videoUrl || ""} />
-                </div>
-                <div className="grid gap-2">
-                    <Label>Image URL</Label>
-                    <Input readOnly value={detailedExercise?.imageUrl || ""} />
-                </div>
-             </div>
+            {/* VIDEO & IMAGEN */}
+            <div className="mt-4">
+                        <DialogTitle className="mb-2">Video explicativo</DialogTitle>
 
+
+              {/* CORRECCIÓN 1: Usamos detailedExercise y agregamos '|| ""' */}
+              <VideoPlayer url={detailedExercise?.videoUrl || ""} />
+
+     
+            </div>
           </div>
         )}
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline">Cerrar</Button>
+            <Button type="button" variant="outline">
+              Cerrar
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

@@ -6,8 +6,6 @@ const checkRol =
     try {
       const user = res.locals.user; // viene de authenticateFirebase
 
-      console.log(user);
-
       if (!user) {
         return handleHttpError(res, "User not authenticated", 401);
       }

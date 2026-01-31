@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 
 const saveUser = async (req: Request, res: Response) => {
   try {
-    console.log("BODY RECIBIDO:", req.body); // 👈 AQUI
 
     const {
       firebaseUid,

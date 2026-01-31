@@ -55,7 +55,7 @@ export const registerUser = createAsyncThunk<
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       formData.email,
-      formData.password
+      formData.password,
     );
 
     const user = userCredential.user;
@@ -81,7 +81,7 @@ export const registerUser = createAsyncThunk<
         headers: {
           Authorization: `Bearer ${firebaseToken}`,
         },
-      }
+      },
     );
 
     console.log("user: ", user);
@@ -109,7 +109,7 @@ export const loginUser = createAsyncThunk<
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
 
     const token = await userCredential.user.getIdToken();
@@ -138,7 +138,7 @@ export const logoutUser = createAsyncThunk(
       }
       return rejectWithValue("Unknown error occurred");
     }
-  }
+  },
 );
 
 export const resetPassword = createAsyncThunk<
@@ -168,9 +168,15 @@ export const observeUser = createAsyncThunk<
   onAuthStateChanged(auth, async (user: User | null) => {
     if (user) {
       const token = await user.getIdToken();
+
+      // ✅ ESTE ERA EL FALTANTE
+      localStorage.setItem("token", token);
+
       dispatch(setUser({ uid: user.uid, email: user.email, token }));
-      await dispatch(fetchUserProfile(user.uid));
+
+      await dispatch(fetchUserProfile());
     } else {
+      localStorage.removeItem("token");
       dispatch(clearUser());
       dispatch(clearProfile());
     }

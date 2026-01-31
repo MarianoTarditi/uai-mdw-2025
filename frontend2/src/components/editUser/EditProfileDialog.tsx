@@ -108,7 +108,6 @@ export function EditProfileDialog({
 
     if (newFile) {
       formData.append("profileImage", newFile);
-      console.log("Se envía nuevo archivo para Multer");
     } else if (existingImageUrl) {
       formData.append("existingProfileImage", existingImageUrl);
     }

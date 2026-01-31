@@ -30,7 +30,12 @@ import { ComboBoxMultiSelect } from "@/components/comboBoxMultiSelect/ComboBoxMu
 
 // --- IMPORTACIONES NUEVAS ---
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link as LinkIcon, UploadCloud, FileVideo, Youtube } from "lucide-react";
+import {
+  Link as LinkIcon,
+  UploadCloud,
+  FileVideo,
+  Youtube,
+} from "lucide-react";
 
 interface CreateExerciseProps {
   isOpen: boolean;
@@ -69,6 +74,7 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
   const musculoOptions = MUSCULOS.map((m) => ({ value: m, label: m }));
   const materialOptions = MATERIALES.map((m) => ({ value: m, label: m }));
   const etiquetaOptions = ETIQUETAS.map((e) => ({ value: e, label: e }));
+  const [videoFile, setVideoFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (isError) {
@@ -85,8 +91,40 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
   }, [isError, isCreatingSuccess, message, dispatch, setIsOpen]);
 
   const handleFormSubmit = async (data: IExercise) => {
-    // Aquí se enviaría la data. Si usas videoUrl, ya va en 'data'.
-    await dispatch(createExercise(data));
+    // Si hay un archivo seleccionado y estamos en la pestaña "upload"
+    // (Asumiendo que agregas un estado activeTab o validas si videoFile existe)
+    if (videoFile) {
+      const formData = new FormData();
+
+      // 1. Textos Simples
+      formData.append("nombre", data.nombre);
+      formData.append("comentario", data.comentario || "");
+
+      // 2. Arrays (CRÍTICO: Convertirlos a JSON string)
+      // Si no haces esto, se envían vacíos o mal formados
+      formData.append("etiquetas", JSON.stringify(data.etiquetas));
+      formData.append(
+        "musculosPrincipales",
+        JSON.stringify(data.musculosPrincipales),
+      );
+      formData.append(
+        "musculosSecundarios",
+        JSON.stringify(data.musculosSecundarios),
+      );
+      formData.append(
+        "materialesNecesarios",
+        JSON.stringify(data.materialesNecesarios),
+      );
+
+      // 3. El Archivo de Video
+      formData.append("video", videoFile);
+
+      // 4. Despachar
+      await dispatch(createExercise(formData as any));
+    } else {
+      // Lógica normal para links de youtube (JSON simple)
+      await dispatch(createExercise(data));
+    }
   };
 
   if (isCreatingLoading) {
@@ -206,8 +244,8 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
             <div className="grid gap-3 mt-2 p-4 border rounded-lg bg-muted/10">
               <Label className="text-base font-semibold">Elige tu video</Label>
               <p className="text-xs text-muted-foreground mb-2">
-                El video que vayas a subir debe ser corto y con un inicio y final
-                en la misma posición para una mejor visualización (bucle).
+                El video que vayas a subir debe ser corto y con un inicio y
+                final en la misma posición para una mejor visualización (bucle).
               </p>
 
               <Tabs defaultValue="link" className="w-full">
@@ -220,7 +258,9 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 <TabsContent value="link" className="mt-4 space-y-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Youtube className="h-5 w-5 text-red-500" />
-                    <span className="text-sm font-medium">Youtube, Vimeo o Drive Público</span>
+                    <span className="text-sm font-medium">
+                      Youtube, Vimeo o Drive Público
+                    </span>
                   </div>
                   <div className="relative">
                     <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -231,7 +271,9 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                     />
                   </div>
                   {errors.videoUrl && (
-                    <p className="text-sm text-red-500">{errors.videoUrl.message}</p>
+                    <p className="text-sm text-red-500">
+                      {errors.videoUrl.message}
+                    </p>
                   )}
                 </TabsContent>
 
@@ -245,7 +287,10 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <UploadCloud className="w-8 h-8 mb-3 text-muted-foreground" />
                         <p className="mb-1 text-sm text-muted-foreground">
-                          <span className="font-semibold">Click para subir</span> o arrastrar
+                          <span className="font-semibold">
+                            Click para subir
+                          </span>{" "}
+                          o arrastrar
                         </p>
                       </div>
                       <input
@@ -254,9 +299,11 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                         className="hidden"
                         accept="video/*"
                         onChange={(e) => {
-                          // Lógica visual solo para mostrar nombre (Backend requiere FormData para funcionar real)
                           const file = e.target.files?.[0];
-                          if (file) setFileName(file.name);
+                          if (file) {
+                            setVideoFile(file); // <--- GUARDAR EL ARCHIVO AQUÍ
+                            setFileName(file.name);
+                          }
                         }}
                       />
                     </label>
@@ -268,7 +315,9 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                     </div>
                   )}
                   <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                    *Para subir archivos reales (.mp4) requieres configuración de almacenamiento en nube. Por ahora usa la opción de Enlace.
+                    *Para subir archivos reales (.mp4) requieres configuración
+                    de almacenamiento en nube. Por ahora usa la opción de
+                    Enlace.
                   </p>
                 </TabsContent>
               </Tabs>

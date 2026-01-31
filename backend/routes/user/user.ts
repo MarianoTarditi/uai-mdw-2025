@@ -3,17 +3,59 @@ import controllers from "./controller";
 import validator from "./userValidator";
 import checkRol from "../../middlewares/checkRole";
 import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
-import {UserRole} from "../../types"
+import { UserRole } from "../../types";
 import { uploadProfileImage } from "../../utils/multer";
 
 const router = express.Router();
 
 router.get("/", authenticateFirebase, controllers.getAllUsers);
+
+// ✅ CORRECCIÓN: Esta ruta DEBE ir antes de /:id
+router.get("/profile", authenticateFirebase, controllers.getProfile); 
+
+// Rutas dinámicas (que reciben parámetros) van al final
 router.get("/:id", authenticateFirebase, controllers.getUserById);
-router.put("/:id", authenticateFirebase, checkRol([UserRole.Student]), uploadProfileImage.single("profileImage"),validator.UpdateUserValidator, validator.getUserValidator, controllers.updateUser);
-router.delete('/hard/:id', checkRol([UserRole.Student]), authenticateFirebase, validator.getUserValidator, controllers.hardDeleteUser);
-router.patch('/soft/:id', authenticateFirebase, checkRol([UserRole.Student]),validator.getUserValidator, controllers.softDeleteUser);
-router.patch('/activate/:id',  authenticateFirebase, checkRol([UserRole.Student]), validator.getUserValidator, controllers.activateUser);
-router.patch('/setUserRole/:id', authenticateFirebase, checkRol([UserRole.Student]), validator.getUserValidator, controllers.setUserRole);
+
+router.put(
+  "/:id",
+  authenticateFirebase,
+  checkRol([UserRole.Student]),
+  uploadProfileImage.single("profileImage"),
+  validator.UpdateUserValidator,
+  validator.getUserValidator,
+  controllers.updateUser
+);
+
+router.delete(
+  "/hard/:id",
+  checkRol([UserRole.Student]),
+  authenticateFirebase,
+  validator.getUserValidator,
+  controllers.hardDeleteUser
+);
+
+router.patch(
+  "/soft/:id",
+  authenticateFirebase,
+  checkRol([UserRole.Student]),
+  validator.getUserValidator,
+  controllers.softDeleteUser
+);
+
+router.patch(
+  "/activate/:id",
+  authenticateFirebase,
+  checkRol([UserRole.Student]),
+  validator.getUserValidator,
+  controllers.activateUser
+);
+
+router.patch(
+  "/setUserRole/:id",
+  authenticateFirebase,
+  checkRol([UserRole.Student]),
+  validator.getUserValidator,
+  controllers.setUserRole
+);
 
 export default router;

@@ -51,7 +51,6 @@ export const getExercise = createAsyncThunk<
   { rejectValue: string }
 >("exercise/fetchOne", async (id, thunkAPI) => {
   try {
-    console.log("Fetching exercise with id:", id);
     return await exerciseService.getExercise(id);
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
@@ -90,19 +89,28 @@ export const createExercise = createAsyncThunk<
   }
 });
 
+// features/exercises/exerciseSlice.ts
+
+// src/features/exercises/exerciseSlice.ts
+
 export const updateExercise = createAsyncThunk<
-  IExercise,
-  { id: string; exerciseData: IExercise },
-  { rejectValue: string }
+  IExercise, // 1. Tipo de retorno (éxito)
+  { id: string; exerciseData: IExercise | FormData }, // 2. Argumentos de entrada
+  { rejectValue: string } // 3. Tipo de error
 >("exercise/update", async ({ id, exerciseData }, thunkAPI) => {
   try {
-    return await exerciseService.updateExercise(id, exerciseData);
+    // Llamamos al servicio (ahora ya no dará error de tipos en los argumentos)
+    const response = await exerciseService.updateExercise(id, exerciseData);
+
+    // TypeScript ahora sabe que response es 'any' (o lo que hayas definido en el service),
+    // así que te dejará acceder a .updatedExercise sin errores.
+    return response.updatedExercise;
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
 
     if (axios.isAxiosError(error) && error.response) {
-      console.error("Error del servidor (Backend):", error.response.data);
-
+      // Log para depurar si algo falla
+      console.error("Error update slice:", error.response.data);
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
@@ -168,7 +176,7 @@ export const exerciseSlice = createSlice({
           state.isFetchingLoading = false;
           state.isFetchingSuccess = true;
           state.exercises = action.payload;
-        }
+        },
       )
       .addCase(getAllExercises.rejected, (state, action) => {
         state.isFetchingLoading = false;
@@ -203,7 +211,7 @@ export const exerciseSlice = createSlice({
           state.isCreatingLoading = false;
           state.isCreatingSuccess = true;
           state.exercises.push(action.payload);
-        }
+        },
       )
       .addCase(createExercise.rejected, (state, action) => {
         state.isCreatingLoading = false;
@@ -221,10 +229,17 @@ export const exerciseSlice = createSlice({
         (state, action: PayloadAction<IExercise>) => {
           state.isUpdatingLoading = false;
           state.isUpdatingSuccess = true;
+
+          // Reemplaza el ejercicio viejo con el nuevo (limpio)
           state.exercises = state.exercises.map((ex) =>
-            ex._id === action.payload._id ? action.payload : ex
+            ex._id === action.payload._id ? action.payload : ex,
           );
-        }
+
+          // Si estamos viendo el detalle de este ejercicio, actualízalo también
+          if (state.exercise && state.exercise._id === action.payload._id) {
+            state.exercise = action.payload;
+          }
+        },
       )
       .addCase(updateExercise.rejected, (state, action) => {
         state.isUpdatingLoading = false;
@@ -243,9 +258,9 @@ export const exerciseSlice = createSlice({
           state.isDeletingLoading = false;
           state.isDeletingSuccess = true;
           state.exercises = state.exercises.filter(
-            (ex) => ex._id !== action.payload
+            (ex) => ex._id !== action.payload,
           );
-        }
+        },
       )
       .addCase(deleteExercise.rejected, (state, action) => {
         state.isDeletingLoading = false;

@@ -16,6 +16,7 @@ import UserProfile from "./pages/userProfile/userProfile";
 import { useAppSelector } from "./app/reduxHooks";
 import { fetchUserProfile } from "./features/users/userSlice";
 import { ProfileStepper } from "./components/editUser/ProfileStepper";
+import { GetAllUsers } from "./pages/users/GetAllUsers";
 
 const router = createBrowserRouter([
   {
@@ -43,10 +44,8 @@ const router = createBrowserRouter([
           { path: "/Exercises", element: <GetAllExercises /> },
           { path: "/UserProfile", element: <UserProfile /> },
           { path: "/ProfileStepper", element: <ProfileStepper /> },
-          { path: "/Routines", element: <UserProfile /> },
-          { path: "/Payments", element: <UserProfile /> },
-          { path: "/Settings", element: <UserProfile /> },
-        ],
+          { path: "/GetAllUsers", element: <GetAllUsers /> },
+          ],
       },
     ],
   },
@@ -59,12 +58,6 @@ export const AppWithObserver = () => {
   useEffect(() => {
     dispatch(observeUser());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (user?.uid) {
-      dispatch(fetchUserProfile(user.uid));
-    }
-  }, [user, dispatch]);
 
   return <RouterProvider router={router} />;
 };

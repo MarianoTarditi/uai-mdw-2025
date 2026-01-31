@@ -29,12 +29,9 @@ const deleteExercise = async (id: string): Promise<{ message: string }> => {
   return response.data;
 };
 
-export const updateExercise = async (
-  id: string,
-  exerciseData: IExercise
-): Promise<IExercise> => {
-  const response = await axios.put(`${API_URL}${id}`, exerciseData);
-  return response.data.findExercise;
+const updateExercise = async (id: string, exerciseData: IExercise | FormData) => {
+  const response = await axios.put(API_URL + id, exerciseData);
+  return response.data; 
 };
 
 const exerciseService = {

@@ -8,7 +8,7 @@ import { ExerciseTable } from "./Table/ExerciseTable";
 import { useExerciseTable } from "./Table/useExerciseTable";
 import { ExerciseButton } from "./Table/ExerciseButton";
 import { DataTableViewOptions } from "../../components/exercises/table/DataTableViewOptions";
-import * as React from "react";
+import { useEffect } from "react";
 
 export function GetAllExercises() {
   const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ export function GetAllExercises() {
     (state) => state.exercise
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(getAllExercises());
   }, [dispatch]);
 

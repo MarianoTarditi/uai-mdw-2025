@@ -1,15 +1,25 @@
-import { useAppSelector } from "@/app/reduxHooks";
+import { useAppDispatch, useAppSelector } from "@/app/reduxHooks";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mail, ShieldCheck, Calendar, Heart, Ruler, Scale } from "lucide-react";
 import { EditProfileDialog } from "../../components/editUser/EditProfileDialog";
 import { SpinnerButton } from "@/components/spinner/Spinner";
 import { UserAvatar } from "@/components/userAvatar/UserAvatar";
+import { fetchUserProfile } from "@/features/users/userSlice";
+import { useEffect } from "react";
 
 export default function UserProfile() {
-  const { profile, isLoading } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch(); // <--- 4. Inicializar dispatch
+  const { profile, isFetchingLoading } = useAppSelector((state) => state.user);
 
-  if (isLoading || !profile) {
+  // 5. EFECTO: Si no hay perfil, pídelo al cargar el componente
+  useEffect(() => {
+    if (!profile) {
+      dispatch(fetchUserProfile());
+    }
+  }, [dispatch, profile]);
+
+  if (isFetchingLoading || !profile) {
     return (
       <div className="flex justify-center items-center h-[80vh]">
         <SpinnerButton variant="sizes" />
