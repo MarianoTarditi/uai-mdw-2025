@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/server"; // Asegúrate que esta ruta sea correcta
+import { connectDB } from "./config/server"; // Asegúrate que esta ruta sea correcta
 import router from "./routes";
 import { handleJsonError } from "./middlewares/handleJsonValidator";
 import path from "path";
@@ -10,7 +10,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 app.use(
   cors({

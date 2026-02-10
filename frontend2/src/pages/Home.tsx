@@ -1,14 +1,11 @@
-// import { useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { CardFeature } from "../components/card/CardFeature";
-import { Carrusel } from "../components/carrusel/Carrusel";
-import { Contact } from "../components/contact/Contact";
-import { Faq } from "../components/faq/Faq";
-import { Footer } from "../components/footer/Footer";
-import { LeadGrid } from "../components/grid/LeadGrid";
-import { Header } from "../components/header/Header";
-import { Hero } from "../components/hero/Hero";
+import { CardFeature } from "../components/public/card/CardFeature";
+import { Carrusel } from "../components/public/carrusel/Carrusel";
+import { Contact } from "../components/public/contact/Contact";
+import { Faq } from "../components/public/faq/Faq";
+import { Footer } from "../components/public/footer/Footer";
+import { LeadGrid } from "../components/public/grid/LeadGrid";
+import { Header } from "../components/public/header/Header";
+import { Hero } from "../components/public/hero/Hero";
 
 function Home() {
   return (

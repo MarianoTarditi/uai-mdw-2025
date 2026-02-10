@@ -5,7 +5,7 @@ interface VideoPlayerProps {
 }
 
 export const VideoPlayer = ({ url }: VideoPlayerProps) => {
-  const API_URL = "http://localhost:3000"; 
+  const API_URL = "http://localhost:3001"; 
 
   // 1. Función para extraer ID de YouTube (Soporta links cortos, largos, etc.)
   const getYoutubeId = (url: string) => {

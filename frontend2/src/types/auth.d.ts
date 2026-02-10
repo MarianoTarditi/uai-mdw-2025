@@ -1,8 +1,7 @@
 // @register user
-import { Musculo, Material, Etiqueta } from "@/components/exercises/constants"; // Ajusta la ruta
+import { Musculo, Material, Etiqueta } from "@/pages/exercises/constants"; // Ajusta la ruta
 
 type IRegisterUserData = z.infer<typeof registerSchema>;
-
 
 export type IEditProfileData = z.infer<typeof editProfileSchema>;
 
@@ -50,14 +49,14 @@ export type Material =
   | "Fitball"
   | "Saco Búlgaro"
   | "Cajón"
-  | "Landime" 
+  | "Landime"
   | "Bosu"
   | "Multipower"
   | "Polea"
   | "Escalera de Coordinación"
   | "Valla"
   | "Aro"
-  | "Stetps" 
+  | "Stetps"
   | "Disco"
   | "Conos"
   | "Espaldera";
@@ -76,10 +75,10 @@ export interface IExercise {
   _id?: string;
   nombre: string;
   comentario?: string;
-  musculosPrincipales: Musculo[];    
-  musculosSecundarios?: Musculo[];   
-  materialesNecesarios: Material[]; 
-  etiquetas: Etiqueta[];             
+  musculosPrincipales: Musculo[];
+  musculosSecundarios: Musculo[];
+  materialesNecesarios: Material[];
+  etiquetas: Etiqueta[];
   videoUrl?: string;
   imageUrl?: string;
 }
@@ -100,4 +99,6 @@ export interface IExerciseState {
   isCreatingLoading: boolean;
   isUpdatingLoading: boolean;
   isDeletingLoading: boolean;
+
+  deletedRoutine: boolean; // 👈 NUEVO
 }

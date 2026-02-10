@@ -19,9 +19,9 @@ import { fetchUserProfile } from "../users/userSlice";
 import { clearProfile } from "../users/userSlice";
 import type { IRegisterUserData } from "@/types/auth";
 import axiosPrivate from "../../config/axios";
+import { toast } from "sonner";
 
 interface IAuthUser {
-  // firebase
   uid: string;
   email: string | null;
   token: string;
@@ -51,7 +51,6 @@ export const registerUser = createAsyncThunk<
   { rejectValue: string }
 >("auth/saveUser", async (formData, { rejectWithValue }) => {
   try {
-    // 1. Crear usuario en Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       formData.email,
@@ -73,9 +72,8 @@ export const registerUser = createAsyncThunk<
       height: formData.height,
     };
 
-    // 3. Registrar usuario en tu backend
     await axiosPrivate.post(
-      "http://localhost:3000/api/auth/saveUser/",
+      "http://localhost:3001/api/auth/saveUser/",
       dbPayload,
       {
         headers: {
@@ -86,7 +84,6 @@ export const registerUser = createAsyncThunk<
 
     console.log("user: ", user);
 
-    // 4. Devolver autenticación exitosa
     return {
       uid: user.uid,
       email: user.email,
@@ -112,15 +109,43 @@ export const loginUser = createAsyncThunk<
       password,
     );
 
-    const token = await userCredential.user.getIdToken();
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    try {
+      const response = await axiosPrivate.get(
+        "http://localhost:3001/api/user/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const userProfile = response.data.data;
+
+      if (userProfile.isActive === false) {
+        await signOut(auth);
+        return rejectWithValue("Tu cuenta está inactiva. Contacta al soporte.");
+      }
+    } catch (backendError) {
+      await signOut(auth);
+      console.log(backendError);
+      return rejectWithValue("Error verificando el estado de la cuenta.");
+    }
+
     localStorage.setItem("token", token);
+    toast.success(`Bienvenido, ${user.email}!`);
 
     return {
-      uid: userCredential.user.uid,
-      email: userCredential.user.email,
+      uid: user.uid,
+      email: user.email,
       token,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    if (typeof error === "string") {
+      return rejectWithValue(error);
+    }
     return rejectWithValue(getFirebaseLoginErrorMessage(error));
   }
 });
@@ -157,7 +182,6 @@ export const resetPassword = createAsyncThunk<
   }
 });
 
-// Observe Firebase user state
 export const observeUser = createAsyncThunk<
   void,
   void,
@@ -169,7 +193,6 @@ export const observeUser = createAsyncThunk<
     if (user) {
       const token = await user.getIdToken();
 
-      // ✅ ESTE ERA EL FALTANTE
       localStorage.setItem("token", token);
 
       dispatch(setUser({ uid: user.uid, email: user.email, token }));
@@ -193,6 +216,7 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.errorMessage = "";
+      state.isSuccess = false;
     },
     setUser: (state, action: PayloadAction<IAuthUser>) => {
       state.user = action.payload;

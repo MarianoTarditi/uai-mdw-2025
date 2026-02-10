@@ -1,40 +1,36 @@
 import { Request, Response, NextFunction } from "express";
 import admin from "../utils/firebase";
-import handleHttpError from "../utils/handleError";
-import User from "../models/User";
 
 export const authenticateFirebase = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    const user = await User.findOne({ firebaseUid: decodedToken.uid }); // Buscar usuario en Mongo por UID de Firebase
+    const authHeader = req.headers.authorization;
 
-
-    if (!user) {
-      handleHttpError(res, "User not found in the database", 404);
-      return;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        error: true,
+        code: 401,
+        message: "No token provided",
+      });
     }
 
-    res.locals.user = {
-      ...decodedToken,
-      roles: user.roles,
-      _id: user._id,
-      email: user.email,
-    };
+    const token = authHeader.split(" ")[1];
+
+    const decodedToken = await admin.auth().verifyIdToken(token);
+
+    (req as any).user = decodedToken;
 
     next();
   } catch (error) {
-    return handleHttpError(res, "Invalid or expired token", 401);
+    console.error("AUTH ERROR:", error);
+
+    return res.status(401).json({
+      error: true,
+      code: 401,
+      message: "User not authenticated",
+    });
   }
 };

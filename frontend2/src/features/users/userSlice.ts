@@ -1,13 +1,8 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { RootState } from "@/app/store";
 import axiosPrivate from "../../config/axios";
 import { isAxiosError } from "axios";
 
-// 1. Definición de la Interfaz (Igual que antes)
 export interface IUserProfile {
   name: string;
   lastName: string;
@@ -24,20 +19,17 @@ export interface IUserProfile {
   updatedAt: string;
 }
 
-// 2. Estado del Slice
 interface UserState {
-  profile: IUserProfile | null; // Usuario autenticado (MI perfil)
-  users: IUserProfile[]; // Lista de usuarios (Tabla)
-  selectedUser: IUserProfile | null; // <--- NUEVO: Usuario seleccionado para ver detalle/editar
+  profile: IUserProfile | null;
+  users: IUserProfile[];
+  selectedUser: IUserProfile | null;
 
-  // Estados de Carga
   isFetchingLoading: boolean;
   isDetailLoading: boolean;
   isCreatingLoading: boolean;
   isUpdatingLoading: boolean;
   isDeletingLoading: boolean;
 
-  // Estados de Error/Éxito
   isError: boolean;
   message: string;
   isFetchingSuccess: boolean;
@@ -46,11 +38,10 @@ interface UserState {
   isDeletingSuccess: boolean;
 }
 
-// 3. Estado Inicial
 const initialState: UserState = {
   profile: null,
   users: [],
-  selectedUser: null, // <--- Inicializamos en null
+  selectedUser: null,
 
   isFetchingLoading: false,
   isDetailLoading: false,
@@ -67,9 +58,6 @@ const initialState: UserState = {
   isDeletingSuccess: false,
 };
 
-// --- THUNKS ---
-
-// Thunk existente para cargar MI perfil (usualmente al login)
 export const fetchUserProfile = createAsyncThunk<
   IUserProfile,
   void,
@@ -78,29 +66,32 @@ export const fetchUserProfile = createAsyncThunk<
   try {
     const res = await axiosPrivate.get(`/user/profile`);
     return res.data.data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error loading profile",
-    );
+  } catch (error) {
+    let message = "Error al obtener el detalle del usuario";
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
+    }
+
+    return rejectWithValue(message);
   }
 });
 
-
-// NUEVO THUNK: Obtener usuario por ID (para el detalle)
 export const getUserById = createAsyncThunk<
   IUserProfile,
   string,
   { rejectValue: string }
 >("user/getUserById", async (id, { rejectWithValue }) => {
   try {
-    const res = await axiosPrivate.get(`/user/${id}`);
+    const res = await axiosPrivate.get<{ data: IUserProfile }>(`/user/${id}`);
     return res.data.data;
-  } catch (error: any) {
-    console.log(error);
+  } catch (error) {
     let message = "Error al obtener el detalle del usuario";
-    if (isAxiosError(error) && error.response) {
-      message = error.response.data?.message || error.message;
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
     }
+
     return rejectWithValue(message);
   }
 });
@@ -114,7 +105,7 @@ export const getAllUsers = createAsyncThunk<
     const res = await axiosPrivate.get(`/user`);
     return res.data.data;
   } catch (error: unknown) {
-    let message = "Ocurrió un error desconocido";
+    let message = "Error al listar los usuarios";
     if (isAxiosError(error) && error.response) {
       message = error.response.data?.message || error.message;
     }
@@ -131,7 +122,7 @@ export const updateUserProfile = createAsyncThunk<
     const res = await axiosPrivate.put(`/user/${id}`, userData);
     return res.data.data;
   } catch (error: unknown) {
-    let message = "Error al actualizar";
+    let message = "Error al actualizar el usuario";
     if (isAxiosError(error) && error.response) {
       message = error.response.data?.message || error.message;
     }
@@ -147,14 +138,35 @@ export const deleteUser = createAsyncThunk<
   try {
     const res = await axiosPrivate.patch(`/user/soft/${id}`);
     return res.data.data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error desactivando usuario",
-    );
+  } catch (error) {
+    let message = "Error al eliminar del usuario";
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
+    }
+
+    return rejectWithValue(message);
   }
 });
 
-// --- SLICE ---
+export const activateUser = createAsyncThunk<
+  IUserProfile,
+  string,
+  { rejectValue: string }
+>("user/activate", async (id, { rejectWithValue }) => {
+  try {
+    const res = await axiosPrivate.patch(`/user/activate/${id}`);
+    return res.data.data;
+  } catch (error) {
+    let message = "Error al activar usuario";
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
+    }
+
+    return rejectWithValue(message);
+  }
+});
 
 const userSlice = createSlice({
   name: "user",
@@ -163,7 +175,6 @@ const userSlice = createSlice({
     clearProfile: (state) => {
       state.profile = null;
     },
-    // Acción útil para limpiar el usuario seleccionado al cerrar el modal
     clearSelectedUser: (state) => {
       state.selectedUser = null;
     },
@@ -183,7 +194,7 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // FETCH USER PROFILE (MI PERFIL)
+      // FETCH USER
       .addCase(fetchUserProfile.pending, (state) => {
         state.isDetailLoading = true;
         state.isError = false;
@@ -198,15 +209,14 @@ const userSlice = createSlice({
         state.message = action.payload as string;
       })
 
-      // NUEVO: GET USER BY ID (DETALLE DE OTRO)
+      // GET USER BY ID
       .addCase(getUserById.pending, (state) => {
         state.isDetailLoading = true;
         state.isError = false;
-        state.selectedUser = null; // Limpiamos selección previa
       })
       .addCase(getUserById.fulfilled, (state, action) => {
         state.isDetailLoading = false;
-        state.selectedUser = action.payload; // Guarda en 'selectedUser'
+        state.selectedUser = action.payload;
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.isDetailLoading = false;
@@ -241,15 +251,12 @@ const userSlice = createSlice({
         state.isUpdatingSuccess = true;
         const updatedUser = action.payload;
 
-        // 1. Actualizar lista
         state.users = state.users.map((u) =>
           u._id === updatedUser._id ? updatedUser : u,
         );
-        // 2. Actualizar 'profile' si soy yo
         if (state.profile?._id === updatedUser._id) {
           state.profile = updatedUser;
         }
-        // 3. Actualizar 'selectedUser' si es el que estoy viendo
         if (state.selectedUser?._id === updatedUser._id) {
           state.selectedUser = updatedUser;
         }
@@ -270,12 +277,10 @@ const userSlice = createSlice({
         state.isDeletingSuccess = true;
         const deletedUser = action.payload;
 
-        // Actualizar lista
         state.users = state.users.map((u) =>
           u._id === deletedUser._id ? deletedUser : u,
         );
 
-        // Actualizar vistas individuales si coinciden
         if (state.profile?._id === deletedUser._id) state.profile = deletedUser;
         if (state.selectedUser?._id === deletedUser._id)
           state.selectedUser = deletedUser;
@@ -285,12 +290,18 @@ const userSlice = createSlice({
         state.isError = true;
         state.message = action.payload as string;
       });
+    builder.addCase(activateUser.fulfilled, (state, action) => {
+      const updatedUser = action.payload;
+
+      state.users = state.users.map((user) =>
+        user._id === updatedUser._id ? updatedUser : user,
+      );
+    });
   },
 });
 
 export const { clearProfile, clearSelectedUser, reset } = userSlice.actions;
 
-// Selectores
 export const selectUserProfile = (state: RootState) => state.user.profile;
 export const selectSelectedUser = (state: RootState) => state.user.selectedUser; // <--- Nuevo Selector
 export const selectAllUsers = (state: RootState) => state.user.users;

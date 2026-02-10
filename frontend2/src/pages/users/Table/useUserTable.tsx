@@ -1,4 +1,3 @@
-// features/users/table/useUserTable.ts
 import {
   getCoreRowModel,
   getPaginationRowModel,
@@ -11,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { type IUserProfile } from "@/features/users/userSlice";
-import { columns } from "./Columns"; // Asegúrate de que Columns.tsx exista
+import { columns } from "./Columns"; 
 
 export function useUserTable(data: IUserProfile[]) {
   const [sorting, setSorting] = useState<SortingState>([]);

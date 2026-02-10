@@ -4,25 +4,17 @@ import { Request, Response } from "express";
 
 const saveUser = async (req: Request, res: Response) => {
   try {
+    const firebaseUser = (req as any).user;
+    const firebaseUid = firebaseUser.uid;
+    const email = firebaseUser.email;
 
-    const {
-      firebaseUid,
-      email,
-      name,
-      lastName,
-      gender,
-      birthDate,
-      weight,
-      height,
-    } = req.body;
+    const { name, lastName, gender, birthDate, weight, height } = req.body;
 
-    // 1. Verificar si ya existe
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ firebaseUid });
     if (existingUser) {
-      return handleHttpError(res, "Email already in use", 409);
+      return handleHttpError(res, "User already exists", 409);
     }
 
-    // 2. Crear usuario en MongoDB
     const user = await User.create({
       firebaseUid,
       email,

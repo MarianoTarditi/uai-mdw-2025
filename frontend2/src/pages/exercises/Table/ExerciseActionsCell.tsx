@@ -1,5 +1,3 @@
-// components/exercises/table/ExerciseActionsCell.tsx
-
 import * as React from "react";
 import {
   DropdownMenu,
@@ -10,11 +8,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash } from "lucide-react";
 
-import { DetailExercise } from "@/components/exercises/DetailExercise";
-import { UpdateExercise } from "@/components/exercises/UpdateExercise";
-import { DeleteExercise } from "@/components/exercises/DeleteExercise";
+import { DetailExercise } from "@/pages/exercises/components/DetailExercise";
+import { UpdateExercise } from "@/pages/exercises/components/UpdateExercise";
+import { DeleteExercise } from "@/pages/exercises/components/DeleteExercise";
 
 import type { IExercise } from "@/types/auth";
 
@@ -33,22 +31,29 @@ export function ExerciseActionsCell({ exercise }: { exercise: IExercise }) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           <DropdownMenuSeparator />
-        <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={(e) => {
-              // Evita que el evento burbujee y cause conflictos
-              e.stopPropagation(); 
+              e.stopPropagation();
               setIsDetailOpen(true);
             }}
           >
-            View Detail
+            <Eye className="mr-2 h-4 w-4" />
+            Ver Detalle
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-            Edit
+            <Pencil className="mr-2 h-4 w-4" />
+            Editar
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsDeleteOpen(true)}>
-            Delete
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            onClick={() => setIsDeleteOpen(true)}
+            className="text-red-600 focus:text-red-600"
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            Eliminar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

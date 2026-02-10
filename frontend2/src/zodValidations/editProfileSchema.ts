@@ -4,8 +4,8 @@ import { z } from "zod";
 const dateRegex = /^([0-2]?\d|3[01])\/([0]?\d|1[0-2])\/(19|20)\d{2}$/;
 
 export const editProfileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  name: z.string().min(1, "El campo Nombre es requerido"),
+  lastName: z.string().min(1, "El campo Apellido es requerido"),
 
   // BIRTHDATE
   birthDate: z
@@ -14,7 +14,7 @@ export const editProfileSchema = z.object({
     .nullable()
     .refine(
       (val) => val === null || dateRegex.test(val),
-      "Invalid date format DD/MM/YYYY"
+      "Formato de fecha no válido DD/MM/AAAA"
     )
     .refine((val) => {
       if (!val) return true;
@@ -31,7 +31,7 @@ export const editProfileSchema = z.object({
       }
 
       return age >= 10 && age <= 100;
-    }, "Enter a valid date"),
+    }, "Ingresa una fecha válida"),
 
   // GENDER
   gender: z
@@ -40,7 +40,7 @@ export const editProfileSchema = z.object({
     .nullable()
     .refine(
       (val) => val === null || ["male", "female", "other"].includes(val),
-      "Invalid gender"
+      "Género inválido"
     ),
 
   height: z
@@ -55,7 +55,7 @@ export const editProfileSchema = z.object({
         (!Number.isNaN(val as number) &&
           (val as number) >= 100 &&
           (val as number) <= 250),
-      "Enter a valid height"
+      "Ingrese una altura válida"
     )
     .nullable(),
 
@@ -72,7 +72,7 @@ export const editProfileSchema = z.object({
         (!Number.isNaN(val as number) &&
           (val as number) >= 1 &&
           (val as number) <= 200),
-      "Enter a valid weight"
+      "Ingrese un peso válido"
     )
     .nullable(),
 
@@ -99,6 +99,6 @@ export const editProfileSchema = z.object({
       if (typeof val === "string") return true;
 
       return false;
-    }, "Invalid image file type or format.")
+    }, "Tipo o formato de archivo de imagen no válido.")
     .nullable(),
 });

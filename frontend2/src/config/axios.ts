@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAuth } from "firebase/auth";
 
 const axiosPrivate = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, 
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 axiosPrivate.interceptors.request.use(
@@ -11,13 +11,13 @@ axiosPrivate.interceptors.request.use(
     const user = auth.currentUser;
 
     if (user) {
-      const token = await user.getIdToken(/* forceRefresh */ false);
+      const token = await user.getIdToken(false);
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 axiosPrivate.interceptors.response.use(
@@ -25,7 +25,6 @@ axiosPrivate.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Token expirado o inválido
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -33,14 +32,14 @@ axiosPrivate.interceptors.response.use(
       const user = auth.currentUser;
 
       if (user) {
-        const newToken = await user.getIdToken(true); 
+        const newToken = await user.getIdToken(true);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosPrivate(originalRequest);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosPrivate;

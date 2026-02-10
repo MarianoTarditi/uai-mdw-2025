@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from "express";
 const CreateExerciseValidator = [
   check("nombre")
     .exists()
-    .withMessage("Name field is missing")
+    .withMessage("El campo nombre no existe")
     .bail()
     .notEmpty()
     .withMessage("Name is required")

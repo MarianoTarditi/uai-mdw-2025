@@ -21,6 +21,8 @@ const initialState: IExerciseState = {
   isCreatingSuccess: false,
   isUpdatingSuccess: false,
   isDeletingSuccess: false,
+
+  deletedRoutine: false,
 };
 
 export const getAllExercises = createAsyncThunk<
@@ -32,15 +34,12 @@ export const getAllExercises = createAsyncThunk<
     return await exerciseService.getAllExercises();
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
-
     if (axios.isAxiosError(error) && error.response) {
       console.error("Error del servidor (Backend):", error.response.data);
-
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
     }
-
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -54,15 +53,12 @@ export const getExercise = createAsyncThunk<
     return await exerciseService.getExercise(id);
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
-
     if (axios.isAxiosError(error) && error.response) {
       console.error("Error del servidor (Backend):", error.response.data);
-
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
     }
-
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -76,66 +72,57 @@ export const createExercise = createAsyncThunk<
     return await exerciseService.createExercise(exerciseData);
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
-
     if (axios.isAxiosError(error) && error.response) {
       console.error("Error del servidor (Backend):", error.response.data);
-
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
     }
-
     return thunkAPI.rejectWithValue(message);
   }
 });
-
-// features/exercises/exerciseSlice.ts
-
-// src/features/exercises/exerciseSlice.ts
 
 export const updateExercise = createAsyncThunk<
-  IExercise, // 1. Tipo de retorno (éxito)
-  { id: string; exerciseData: IExercise | FormData }, // 2. Argumentos de entrada
-  { rejectValue: string } // 3. Tipo de error
+  IExercise,
+  { id: string; exerciseData: IExercise | FormData },
+  { rejectValue: string }
 >("exercise/update", async ({ id, exerciseData }, thunkAPI) => {
   try {
-    // Llamamos al servicio (ahora ya no dará error de tipos en los argumentos)
-    const response = await exerciseService.updateExercise(id, exerciseData);
-
-    // TypeScript ahora sabe que response es 'any' (o lo que hayas definido en el service),
-    // así que te dejará acceder a .updatedExercise sin errores.
-    return response.updatedExercise;
+    return await exerciseService.updateExercise(id, exerciseData);
   } catch (error: unknown) {
     let message = "Ocurrió un error desconocido";
-
     if (axios.isAxiosError(error) && error.response) {
-      // Log para depurar si algo falla
-      console.error("Error update slice:", error.response.data);
+      console.error("Error del servidor (Backend):", error.response.data);
       message = error.response.data?.message || error.message;
     } else if (error instanceof Error) {
       message = error.message;
     }
-
     return thunkAPI.rejectWithValue(message);
   }
 });
 
+interface DeleteExerciseResponse {
+  id: string;
+  routineDeleted: boolean;
+}
+
 export const deleteExercise = createAsyncThunk<
-  string,
+  DeleteExerciseResponse,
   string,
   { rejectValue: string }
 >("exercise/delete", async (id, thunkAPI) => {
   try {
-    await exerciseService.deleteExercise(id);
-    return id;
+    const response = await exerciseService.deleteExercise(id);
+    const data = response as { routineDeleted?: boolean };
+
+    return {
+      id: id,
+      routineDeleted: data.routineDeleted || false,
+    };
   } catch (error: unknown) {
-    let message: string;
+    let message = "Error al eliminar";
     if (axios.isAxiosError(error) && error.response) {
       message = error.response.data?.message || error.message;
-    } else if (error instanceof Error) {
-      message = error.message;
-    } else {
-      message = String(error);
     }
     return thunkAPI.rejectWithValue(message);
   }
@@ -150,6 +137,7 @@ export const exerciseSlice = createSlice({
       state.isError = false;
       state.message = "";
       state.exercise = undefined;
+      state.deletedRoutine = false;
 
       state.isFetchingSuccess = false;
       state.isCreatingSuccess = false;
@@ -186,16 +174,16 @@ export const exerciseSlice = createSlice({
 
       // GET ONE
       .addCase(getExercise.pending, (state) => {
-        state.isDetailLoading = true; // <--- CAMBIO AQUÍ
+        state.isDetailLoading = true;
         state.isFetchingSuccess = false;
       })
       .addCase(getExercise.fulfilled, (state, action) => {
-        state.isDetailLoading = false; // <--- CAMBIO AQUÍ
+        state.isDetailLoading = false;
         state.exercise = action.payload;
         state.isFetchingSuccess = true;
       })
       .addCase(getExercise.rejected, (state, action) => {
-        state.isDetailLoading = false; // <--- CAMBIO AQUÍ
+        state.isDetailLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       })
@@ -230,12 +218,10 @@ export const exerciseSlice = createSlice({
           state.isUpdatingLoading = false;
           state.isUpdatingSuccess = true;
 
-          // Reemplaza el ejercicio viejo con el nuevo (limpio)
           state.exercises = state.exercises.map((ex) =>
             ex._id === action.payload._id ? action.payload : ex,
           );
 
-          // Si estamos viendo el detalle de este ejercicio, actualízalo también
           if (state.exercise && state.exercise._id === action.payload._id) {
             state.exercise = action.payload;
           }
@@ -252,21 +238,24 @@ export const exerciseSlice = createSlice({
         state.isDeletingLoading = true;
         state.isDeletingSuccess = false;
       })
-      .addCase(
-        deleteExercise.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.isDeletingLoading = false;
-          state.isDeletingSuccess = true;
-          state.exercises = state.exercises.filter(
-            (ex) => ex._id !== action.payload,
-          );
-        },
-      )
       .addCase(deleteExercise.rejected, (state, action) => {
         state.isDeletingLoading = false;
         state.isError = true;
         state.message = action.payload || "Error deleting exercise";
-      });
+      })
+      .addCase(
+        deleteExercise.fulfilled,
+        (state, action: PayloadAction<DeleteExerciseResponse>) => {
+          state.isDeletingLoading = false;
+          state.isDeletingSuccess = true;
+
+          state.deletedRoutine = action.payload.routineDeleted;
+
+          state.exercises = state.exercises.filter(
+            (ex) => ex._id !== action.payload.id,
+          );
+        },
+      );
   },
 });
 

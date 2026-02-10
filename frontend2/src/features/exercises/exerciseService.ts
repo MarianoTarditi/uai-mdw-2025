@@ -1,45 +1,40 @@
-import axios from "axios";
+import axiosPrivate from "../../config/axios";
 import type { IExercise } from "../../types/auth";
 
-const API_URL = "/api/exercise/";
+const API_URL = "/exercise/";
 
 const getAllExercises = async (): Promise<IExercise[]> => {
-  const response = await axios.get(API_URL); // GET /api/exercise
-  console.log(response.data);
-  return response.data.map((ex: IExercise) => ({
-    ...ex,
-  }));
+  const response = await axiosPrivate.get(API_URL);
+  return response.data.data;
 };
 
 const getExercise = async (id: string): Promise<IExercise> => {
-  const response = await axios.get(`${API_URL}${id}`);
-  console.log(response.data);
-  return {
-    ...response.data.exercise,
-  };
+  const response = await axiosPrivate.get(`${API_URL}${id}`);
+  return response.data.data;
 };
 
-const createExercise = async (exerciseData: IExercise): Promise<IExercise> => {
-  const response = await axios.post(API_URL, exerciseData);
-  return response.data.exercise;
+const createExercise = async (exerciseData: IExercise | FormData): Promise<IExercise> => {
+  const response = await axiosPrivate.post(API_URL, exerciseData);
+  return response.data.data;
 };
 
-const deleteExercise = async (id: string): Promise<{ message: string }> => {
-  const response = await axios.delete(`${API_URL}${id}`);
-  return response.data;
+const deleteExercise = async (id: string) => {
+  const response = await axiosPrivate.delete(`${API_URL}${id}`);
+  return response.data.data;
 };
 
-const updateExercise = async (id: string, exerciseData: IExercise | FormData) => {
-  const response = await axios.put(API_URL + id, exerciseData);
-  return response.data; 
+const updateExercise = async (
+  id: string,
+  exerciseData: IExercise | FormData
+) => {
+  const response = await axiosPrivate.put(`${API_URL}${id}`, exerciseData);
+  return response.data.data;
 };
 
-const exerciseService = {
+export default {
   getAllExercises,
   getExercise,
   createExercise,
   deleteExercise,
   updateExercise,
 };
-
-export default exerciseService;

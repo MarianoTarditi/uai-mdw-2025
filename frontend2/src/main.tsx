@@ -9,7 +9,6 @@ import {
 } from "@mantine/core";
 import "./index.css";
 import { Toaster } from "sonner";
-
 import { AppWithObserver } from "./AppWithObserver";
 
 const myColor: MantineColorsTuple = [

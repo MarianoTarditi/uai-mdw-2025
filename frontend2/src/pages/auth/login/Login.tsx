@@ -18,13 +18,12 @@ import { useForm } from "react-hook-form";
 import type { ILoginUserData } from "../../../types/auth";
 import { useEffect } from "react";
 import { loginUser, reset } from "../../../features/auth/authSlice";
-import { Loader, Center } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { SpinnerButton } from "@/components/private/spinner/Spinner";
+import { Center } from "@mantine/core";
 
 export function Login() {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const {
@@ -32,24 +31,19 @@ export function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ILoginUserData>({
-    // Interfaz para los datos del formulario
-    resolver: zodResolver(loginSchema), // Validación con Zod
+    resolver: zodResolver(loginSchema),
   });
 
-  const { user, isLoading, isError, isSuccess, errorMessage } = useAppSelector((state) => state.auth);
+  const { isError, errorMessage, isLoading } = useAppSelector(
+    (state) => state.auth,
+  );
 
   useEffect(() => {
-    if (isError) {
+    if (isError && errorMessage) {
       toast.error(errorMessage);
+      dispatch(reset());
     }
-
-    if (isSuccess && user) {
-      toast.success(`Welcome back, ${user.email}!`);
-      navigate("/dashboard");
-    }
-
-    dispatch(reset());
-  }, [user, isError, isSuccess, errorMessage, navigate, dispatch]);
+  }, [isError, errorMessage, dispatch]);
 
   const onSubmit = (data: ILoginUserData) => {
     dispatch(loginUser(data));
@@ -58,7 +52,7 @@ export function Login() {
   if (isLoading) {
     return (
       <Center style={{ width: "100vw", height: "100vh" }}>
-        <Loader color="rgba(0, 0, 0, 0.87)" size="sm" type="dots" />
+        <SpinnerButton variant="sizes" />
       </Center>
     );
   }
@@ -67,7 +61,7 @@ export function Login() {
     <Container size="xs" my={135}>
       <Paper radius="md" p="lg" withBorder>
         <Text size="lg" fw={500} style={{ textAlign: "center" }}>
-          Welcome to Mantine, login with
+          Bienvenido a AgustinTurriEDF
         </Text>
 
         <Group grow mb="md" mt="md">
@@ -75,7 +69,7 @@ export function Login() {
         </Group>
 
         <Divider
-          label="Or continue with email"
+          label="O continúa con el email"
           labelPosition="center"
           my="lg"
         />
@@ -85,7 +79,7 @@ export function Login() {
             <TextInput
               required
               label="Email"
-              placeholder="hello@mantine.dev"
+              placeholder="tucorreo@gmail.com"
               {...register("email")}
               error={errors.email?.message}
               radius="md"
@@ -93,8 +87,8 @@ export function Login() {
 
             <PasswordInput
               required
-              label="Password"
-              placeholder="Your password"
+              label="Contraseña"
+              placeholder="tu contraseña"
               {...register("password")}
               error={errors.password?.message}
               radius="md"
@@ -109,11 +103,11 @@ export function Login() {
               c="dimmed"
               size="xs"
             >
-              Don't have an account? Register
+              ¿No tienes una cuenta? Registráte
             </Anchor>
 
             <Button type="submit" radius="xl" disabled={isSubmitting}>
-              Login
+              Iniciar sesión
             </Button>
           </Group>
 
@@ -128,7 +122,7 @@ export function Login() {
             component={Link}
             to={"/forgotPassword"}
           >
-            Forgot password? Reset now
+            ¿Olvidaste tu contraseña? Restablecer ahora
           </Anchor>
         </form>
       </Paper>

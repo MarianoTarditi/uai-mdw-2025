@@ -8,9 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { flexRender, type Table as TableType } from "@tanstack/react-table";
-import { DataTablePagination } from "@/components/exercises/table/DataTablePagination"; // O la ruta correcta a tu paginación
+import { DataTablePagination } from "@/components/private/table/DataTablePagination";
 
-// Nota: aquí recibimos la instancia "table" como prop
 export function UserTable({ table }: { table: TableType<any> }) {
   const columns = table.getAllColumns();
 
@@ -27,7 +26,7 @@ export function UserTable({ table }: { table: TableType<any> }) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -45,7 +44,7 @@ export function UserTable({ table }: { table: TableType<any> }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

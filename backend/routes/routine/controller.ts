@@ -2,49 +2,62 @@ import { Request, Response } from "express";
 import Routine from "../../models/Routine";
 import handleHttpError from "../../utils/handleError";
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { id: string; [key: string]: any };
+    }
+  }
+}
+
 const createRoutine = async (req: Request, res: Response) => {
   try {
-    const { name, description, startDate, endDate, trainerId, studentIds, exerciseAssignment } = req.body;
-
-    const existingRoutine = await Routine.findOne({ name });
-    if (existingRoutine) {
-      return handleHttpError(res, "Routine already exist", 409);
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
     }
 
-    const routine = new Routine({
+    const { name, description, exerciseAssignments } = req.body;
+    const trainerId = req.user.uid;
+
+    if (!name || !exerciseAssignments?.length) {
+      return handleHttpError(res, "Invalid routine data", 400);
+    }
+
+    let routine = await Routine.create({
       name,
       description,
-      startDate,
-      endDate,
       trainerId,
-      studentIds,
-      exerciseAssignment
+      exerciseAssignments,
     });
 
-    await routine.save();
+    routine = await routine.populate({
+      path: "exerciseAssignments.exerciseId",
+      select: "nombre musculosPrincipales imgUrl",
+    });
 
     res.status(201).json({
       message: "Routine created successfully",
-      data: routine
+      data: routine,
     });
   } catch (error) {
+    console.error("CREATE ROUTINE ERROR:", error);
     handleHttpError(res, "Error creating routine", 500, error);
   }
 };
 
 const getAllRoutines = async (req: Request, res: Response) => {
   try {
-    const routine = await Routine.find()
-    .populate("trainerId", "name lastName email")
-    .populate("studentIds", "name lastName email")
-    .populate({ path: "exerciseAssignment", select: "sets reps restTime notes",
-      populate: { path: "exerciseId", select: "name muscleGroup description" },
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const routines = await Routine.find({ trainerId: req.user.uid }).populate({
+      path: "exerciseAssignments.exerciseId",
+      select: "nombre musculosPrincipales",
     });
 
-    res.status(200).json({ data: routine });
+    res.status(200).json({ data: routines });
   } catch (error) {
-    console.log(error)
-
     handleHttpError(res, "Error getting routines", 500, error);
   }
 };
@@ -53,14 +66,11 @@ const getRoutineById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const routine = await Routine.findById(id)
-    .populate("trainerId", "name lastName email")
-    .populate("studentIds", "name lastName email")
-    .populate({
-        path: "exerciseAssignment",
-        populate: { path: "exerciseId", select: "name muscleGroup description" },
-    });
-
-    console.log(routine)
+      .populate("trainerId", "name lastName email")
+      .populate({
+        path: "exerciseAssignments.exerciseId",
+        select: "nombre musculosPrincipales imgUrl",
+      });
 
     if (!routine) {
       return handleHttpError(res, "Routine not found", 404);
@@ -75,33 +85,40 @@ const getRoutineById = async (req: Request, res: Response) => {
 const updateRoutine = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, description, startDate, endDate, trainerId, studentIds, exerciseAssignment } = req.body;
+    const updateData = req.body;
 
-    const findRoutine = await Routine.findByIdAndUpdate(
-      id,
-      { name, description, startDate, endDate, trainerId, studentIds, exerciseAssignment },
-      { new: true }
-    );
+    const updatedRoutine = await Routine.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate({
+      path: "exerciseAssignments.exerciseId",
+      select: "nombre musculosPrincipales imgUrl",
+    });
 
-    if (!findRoutine) {
+    if (!updatedRoutine) {
       return handleHttpError(res, "Routine not found", 404);
     }
 
-    res.status(200).json({ message: "Routine updated successfully", data: findRoutine});
+    res.status(200).json({
+      message: "Routine updated successfully",
+      data: updatedRoutine,
+    });
   } catch (error) {
+    console.error("UPDATE ERROR:", error);
     handleHttpError(res, "Error updating routine", 500, error);
   }
 };
 
-const hardDeleteRoutine = async (req: Request, res: Response) => {
+const deleteRoutine = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const routine = await Routine.findByIdAndDelete(id); // findByIdAndDelete ya devuelve null si no encuentra el usuario con ese id.
+
+    const routine = await Routine.findByIdAndDelete(id);
+
     if (!routine) {
       return handleHttpError(res, "Routine not found", 404);
     }
 
-    res.status(200).json({ message: "Routine deleted successfully", });
+    res.status(200).json({ message: "Routine deleted successfully" });
   } catch (error) {
     handleHttpError(res, "Error deleting routine", 500, error);
   }
@@ -112,5 +129,5 @@ export default {
   getAllRoutines,
   getRoutineById,
   updateRoutine,
-  hardDeleteRoutine,
+  deleteRoutine,
 };

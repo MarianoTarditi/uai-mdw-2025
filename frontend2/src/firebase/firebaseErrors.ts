@@ -4,65 +4,67 @@ export function getFirebaseLoginErrorMessage(error: unknown): string {
   if (error instanceof FirebaseError) {
     switch (error.code) {
       case "auth/invalid-credential":
-        return "Email or password incorrect, please try again";
+        return "Email y/o contraseña incorrectos, por favor intenta de nuevo.";
 
       case "auth/user-not-found":
-        return "Email or password incorrect, please try again";
+        return "Email y/o contraseña incorrectos, por favor intenta de nuevo.";
 
       case "auth/wrong-password":
-        return "Email or password incorrect, please try again";
+        return "Email y/o contraseña incorrectos, por favor intenta de nuevo.";
 
       case "auth/invalid-email":
-        return "The email format is invalid.";
+        return "El formato del correo es inválido.";
 
-      case "auth/weak-password":
-        return "Too many failed attempts. Please try again later.";
+      case "auth/weak-password": 
+        // Nota: Este mensaje en tu original decía "Too many failed attempts", 
+        // aunque el código de error suele referirse a contraseñas débiles.
+        return "Demasiados intentos fallidos. Por favor intenta de nuevo más tarde.";
 
       case "auth/network-request-failed":
-        return "Network error. Please check your internet connection.";
+        return "Error de red. Por favor verifica tu conexión a internet.";
         
       default:
-        return "An unexpected error occurred. Please try again.";
+        return "Ocurrió un error inesperado. Por favor intenta de nuevo.";
     }
   }
   console.log(error);
-  return "Unknown error.";
+  return "Error desconocido.";
 }
 
 export function getFirebaseRegisterError(error: unknown): string {
   if (error instanceof FirebaseError) {
     switch (error.code) {
       case "auth/email-already-in-use":
-        return "This email is already in use. Please use a different one.";
+        return "Este correo ya está en uso. Por favor utiliza otro.";
 
       case "auth/invalid-email":
-        return "The provided email address is invalid.";
+        return "La dirección de correo proporcionada es inválida.";
 
       case "auth/weak-password":
-        return "The password is too weak. Please choose a stronger one.";
+        return "La contraseña es muy débil. Por favor elige una más segura.";
 
       case "auth/operation-not-allowed":
-        return "Email/password accounts are not enabled for this project.";
+        return "El registro con correo y contraseña no está habilitado.";
 
       case "auth/network-request-failed":
-        return "Network error. Please check your internet connection.";
+        return "Error de red. Por favor verifica tu conexión a internet.";
 
       case "auth/too-many-requests":
-        return "Too many attempts. Please try again later.";
+        return "Demasiados intentos. Por favor intenta de nuevo más tarde.";
 
       case "auth/missing-email":
-        return "An email address is required.";
+        return "Se requiere una dirección de correo.";
 
       case "auth/missing-password":
-        return "A password is required.";
+        return "Se requiere una contraseña.";
 
       case "auth/internal-error":
-        return "An unexpected error occurred. Please try again.";
+        return "Ocurrió un error inesperado. Por favor intenta de nuevo.";
 
       default:
-        return "An unknown error occurred. Please try again.";
+        return "Ocurrió un error desconocido. Por favor intenta de nuevo.";
     }
   }
 
-  return "An unknown error occurred.";
+  return "Ocurrió un error desconocido.";
 }

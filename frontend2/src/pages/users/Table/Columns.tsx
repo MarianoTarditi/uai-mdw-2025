@@ -1,12 +1,59 @@
-// features/users/table/columns.tsx
 import { type ColumnDef } from "@tanstack/react-table";
-import { type IUserProfile } from "@/features/users/userSlice"; // O donde tengas tu interfaz
-import { UserActionsCell } from "./UserActionsCell"; // El componente que me pasaste arriba
+import { type IUserProfile } from "@/features/users/userSlice";
+import { UserActionsCell } from "./UserActionsCell";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
+
+const getImageUrl = (imagePath?: string | null) => {
+  if (!imagePath) return "/UserDefault.png";
+  return `${STATIC_BASE_URL}${imagePath}`;
+};
+
 export const columns: ColumnDef<IUserProfile>[] = [
+  {
+    accessorKey: "profileImage",
+    header: "Foto",
+    cell: ({ row }) => {
+      const imageUrl = getImageUrl(row.original.profileImage);
+
+      return (
+        <img
+          src={imageUrl}
+          alt="Foto del usuario"
+          className="w-10 h-10 rounded-full object-cover"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/UserDefault.png";
+          }}
+        />
+      );
+    },
+  },
+
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Usuario <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const name = row.original.name;
+      const lastName = row.original.lastName;
+      return (
+        <span className="font-medium">
+          {name} {lastName}
+        </span>
+      );
+    },
+  },
+
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -20,16 +67,6 @@ export const columns: ColumnDef<IUserProfile>[] = [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "name",
-    header: "Nombre",
-    cell: ({ row }) => {
-        // Combinamos nombre y apellido
-        const name = row.original.name;
-        const lastName = row.original.lastName;
-        return `${name} ${lastName}`;
-    }
   },
   {
     accessorKey: "roles",
@@ -47,13 +84,17 @@ export const columns: ColumnDef<IUserProfile>[] = [
       );
     },
   },
-  {
+ {
     accessorKey: "isActive",
     header: "Estado",
     cell: ({ row }) => {
       const active = row.getValue("isActive");
       return (
-        <Badge variant={active ? "default" : "destructive"}>
+        <Badge
+          // 👇 Si es activo, aplicamos verde. Si no, dejamos que el variant maneje el color.
+          className={active ? "bg-green-500 hover:bg-green-600" : ""} 
+          variant={active ? "default" : "destructive"}
+        >
           {active ? "Activo" : "Inactivo"}
         </Badge>
       );
@@ -61,6 +102,7 @@ export const columns: ColumnDef<IUserProfile>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <UserActionsCell user={row.original} />, // Nota: Tu componente espera prop "exercise", deberías renombrarlo a "user" dentro del componente ActionsCell para ser semántico, pero funcionará igual.
+    header: "Acciones",
+    cell: ({ row }) => <UserActionsCell user={row.original} />,
   },
 ];

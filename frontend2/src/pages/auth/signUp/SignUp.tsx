@@ -1,7 +1,6 @@
 import {
   Anchor,
   Button,
-  Checkbox,
   Container,
   Divider,
   Group,
@@ -9,7 +8,7 @@ import {
   PasswordInput,
   Stack,
   Text,
-  TextInput, // Usaremos este para todos los inputs de texto/número
+  TextInput,
   Title,
 } from "@mantine/core";
 import { GoogleButton } from "../signUp/GoogleButton";
@@ -22,8 +21,7 @@ import type { IRegisterUserData } from "../../../types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../../zodValidations/authSchema";
 import { useForm } from "react-hook-form";
-import { SpinnerButton } from "@/components/spinner/Spinner";
-// Eliminamos las importaciones de shadcn/ui que no se necesitan: Input, Label
+import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { SelectGender } from "../../../components/shadcn-studio/select/SelectGender";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,13 +44,13 @@ export function SignUp() {
       confirmPassword: "",
       birthDate: "",
       gender: "",
-      height: "" as unknown as number, // Cast para que TS acepte "" en un campo numérico
+      height: "" as unknown as number,
       weight: "" as unknown as number,
-    }, // Usamos 'as any' po
+    },
   });
 
   const { user, isLoading, isError, isSuccess } = useAppSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
 
   useEffect(() => {
@@ -63,8 +61,7 @@ export function SignUp() {
     if (isSuccess && user) {
       toast.success(`Registration successful, welcome! ${user.email}!`);
       navigate("/dashboard");
-    } // Es mejor resetear el estado después de los chequeos para evitar que se ejecute la limpieza
-    // y para asegurar que la navegación termine.
+    }
     return () => {
       dispatch(reset());
     };
@@ -75,7 +72,6 @@ export function SignUp() {
   };
 
   if (isLoading) {
-    // 🚨 BUG FIX: Debe retornar el componente en este punto
     return (
       <Container
         size="xs"
@@ -91,16 +87,16 @@ export function SignUp() {
     <Container size="xs" my={30}>
       <Paper radius="md" p="lg" withBorder>
         <Title size="h3" style={{ textAlign: "center", marginBottom: "1rem" }}>
-          Create Your Account
+          Crea tu cuenta
         </Title>
         <Text size="lg" fw={500} style={{ textAlign: "center" }}>
-          Register with
+          Registrarse con
         </Text>
         <Group grow mb="md" mt="md">
           <GoogleButton radius="xl">Google</GoogleButton>
         </Group>
         <Divider
-          label="Or continue with email"
+          label="O continúa con el email"
           labelPosition="center"
           my="lg"
         />
@@ -110,7 +106,7 @@ export function SignUp() {
             <TextInput
               required
               label="Name"
-              placeholder="Your name"
+              placeholder="Tu nombre"
               {...register("name")}
               error={errors.name?.message}
               radius="md"
@@ -118,7 +114,7 @@ export function SignUp() {
             <TextInput
               required
               label="Last name"
-              placeholder="Your last name"
+              placeholder="TuApellido"
               {...register("lastName")}
               error={errors.lastName?.message}
               radius="md"
@@ -126,14 +122,14 @@ export function SignUp() {
             <TextInput
               required
               label="Email"
-              placeholder="hello@example.com"
+              placeholder="tucorreo@gmail.com"
               {...register("email")}
               error={errors.email?.message}
               radius="md"
             />
 
             <TextInput
-              label="Birth Date (DD/MM/YYYY)"
+              label="Fecha de nacimiento (DD/MM/YYYY)"
               placeholder="01/01/2000"
               {...register("birthDate")}
               error={errors.birthDate?.message}
@@ -142,24 +138,23 @@ export function SignUp() {
             <SelectGender register={register} defaultValue={undefined} />
 
             <div className="grid gap-3">
-              <Label htmlFor="height">Height (cm)</Label>
+              <Label htmlFor="height">Altura (cm)</Label>
               <Input type="number" id="height" {...register("height")} />
               {errors.height && (
                 <p className="text-sm text-red-500">{errors.height?.message}</p>
               )}
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="weight">Weight (kg)</Label>
+              <Label htmlFor="weight">Peso (kg)</Label>
               <Input type="number" id="weight" {...register("weight")} />
               {errors.weight && (
                 <p className="text-sm text-red-500">{errors.weight?.message}</p>
               )}
             </div>
-            {/* Fin de Inputs convertidos */}
             <PasswordInput
               required
               label="Password"
-              placeholder="Your password"
+              placeholder="Tu contraseña"
               {...register("password")}
               error={errors.password?.message}
               radius="md"
@@ -167,12 +162,11 @@ export function SignUp() {
             <PasswordInput
               required
               label="Confirm password"
-              placeholder="Your confirm password"
+              placeholder="Confirma tu contraseña"
               {...register("confirmPassword")}
               error={errors.confirmPassword?.message}
               radius="md"
             />
-            <Checkbox label="I accept terms and conditions" />
           </Stack>
           <Group justify="space-between" mt="xl">
             <Anchor
@@ -182,15 +176,15 @@ export function SignUp() {
               c="dimmed"
               size="xs"
             >
-              Already have an account? Login
+              ¿Ya tienes una cuenta? Iniciar sesión
             </Anchor>
             <Button
               type="submit"
               radius="xl"
-              loading={isSubmitting} // Usamos la prop loading de Mantine
+              loading={isSubmitting}
               color="myColor.9"
             >
-              Register
+              Registrarse
             </Button>
           </Group>
         </form>

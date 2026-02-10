@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
-import { DataTablePagination } from "../../../components/exercises/table/DataTablePagination";
+import { DataTablePagination } from "../../../components/private/table/DataTablePagination";
 import type { Table as TableType } from "@tanstack/react-table";
 
 export function ExerciseTable({ table }: { table: TableType<any> }) {
@@ -28,7 +28,7 @@ export function ExerciseTable({ table }: { table: TableType<any> }) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -47,7 +47,7 @@ export function ExerciseTable({ table }: { table: TableType<any> }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

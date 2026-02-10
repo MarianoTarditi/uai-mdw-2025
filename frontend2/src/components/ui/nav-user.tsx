@@ -36,7 +36,7 @@ export function NavUser({ user }: NavUserProps) {
 
   const handleLogout = async () => {
     dispatch(logoutUser());
-    toast.success("Session closed successfully!");
+    toast.info("La sesión ha sido cerrada exitosamente.");
     navigate("/login");
   };
 
@@ -87,17 +87,17 @@ export function NavUser({ user }: NavUserProps) {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleProfile}>
                 <BadgeCheck />
-                Profile
+                Perfil
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                Notificationes
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log out
+              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

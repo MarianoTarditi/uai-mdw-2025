@@ -21,18 +21,18 @@ export const SelectGender = ({
 
   return (
     <div className="grid gap-3">
-      <Label htmlFor={id}>Gender</Label>
+      <Label htmlFor={id}>Género</Label>
       <SelectNative
         id={id}
         {...register("gender")}
         defaultValue={defaultValue || ""}
       >
         <option value="" disabled>
-          Please select a gender
+          Selecciona tu género
         </option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
+        <option value="male">Masculino</option>
+        <option value="female">Femenino</option>
+        <option value="other">Otro</option>
       </SelectNative>
       {error && <p className="text-sm text-red-500">{error.message}</p>}
     </div>

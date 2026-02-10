@@ -27,7 +27,7 @@ import { useAppSelector } from "@/app/reduxHooks";
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
 
-  const STATIC_BASE_URL = "http://localhost:3000";
+  const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
 
   const getImageUrl = (imagePath: string | null | undefined) => {
     if (!imagePath) return null;
@@ -35,21 +35,31 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
   };
 
+  const GymLogo = () => (
+    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+       <img 
+         src="/Logo.png" 
+         alt="Logo" 
+         className="size-6 object-contain" // Ajusta el tamaño según necesites
+       />
+    </div>
+  );
+
   const data = {
     user: {
       name: profile?.name ?? "Unknown",
       email: profile?.email ?? "No email",
       avatar: profile?.profileImage
         ? getImageUrl(profile.profileImage)
-        : "/default-avatar.png",
+        : "/UserDefault.png",
     },
-    teams: [
+   teams: 
       {
         name: "AgustinTurriEDF",
-        logo: GalleryVerticalEnd,
+        logo: GymLogo, // 3. ASÍGNALO AQUÍ (sin comillas)
         plan: "Entrenador de fuerza",
       },
-    ],
+   
     navMain: [
       {
         title: "Dashboard",
@@ -57,22 +67,22 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         icon: LayoutDashboard,
       },
       {
-        title: "Users",
+        title: "Usuarios",
         url: "/GetAllUsers",
         icon: User,
       },
       {
-        title: "Exercises",
+        title: "Ejercicios",
         url: "/Exercises",
         icon: Dumbbell,
       },
       {
-        title: "Routines",
-        url: "/Routines",
+        title: "Rutinas",
+        url: "/GetAllRoutines",
         icon: ListCheck,
       },
       {
-        title: "Payments",
+        title: "Pagos",
         url: "/Payments",
         icon: CreditCard,
       },
@@ -80,13 +90,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
     projects: [
       {
-        name: "FAQ",
-        url: "#",
+        name: "Preguntas frecuentes",
+        url: "/FAQ",
         icon: CircleQuestionMark,
       },
       {
-        name: "Settings",
-        url: "#",
+        name: "Ajustes",
+        url: "/Settings",
         icon: Settings,
       },
     ],

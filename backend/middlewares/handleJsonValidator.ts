@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 
-// Middleware para capturar errores de JSON malformado
 export const handleJsonError = (
   err: any,
   req: Request,

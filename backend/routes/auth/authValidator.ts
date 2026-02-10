@@ -1,27 +1,26 @@
-import { check, param, query } from "express-validator";
+import { check } from "express-validator";
 import validateResults from "../../middlewares/handleValidator";
 import { Request, Response, NextFunction } from "express";
 
 const registerValidator = [
   check("name")
-    .exists().withMessage("Name field is missing").bail()
-    .notEmpty().withMessage("Name is required").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 30 }).withMessage("Name must be 3-30 characters long"),
+    .exists().withMessage("El campo nombre no existe").bail()
+    .notEmpty().withMessage("El nombre es requerido").bail()
+    .isString().withMessage("El nombre debe ser una cadena de texto").bail()
+    .isLength({ min: 3, max: 30 }).withMessage("El nombre debe tener entre 3 y 30 caracteres"),
 
   check("lastName")
-    .exists().withMessage("Lastname field is missing").bail()
-    .notEmpty().withMessage("Lastname is required").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 30 }).withMessage("Lastname must be 3-30 characters long"),
+    .exists().withMessage("El campo apellido no existe").bail()
+    .notEmpty().withMessage("El apellido es requerido").bail()
+    .isString().withMessage("El apellido debe ser una cadena de texto").bail()
+    .isLength({ min: 3, max: 30 }).withMessage("El apellido debe tener entre 3 y 30 caracteres"),
 
   check("email")
-    .exists().withMessage("Email field is missing").bail()
-    .notEmpty().withMessage("Email is required").bail()
-    .isEmail().withMessage("Invalid email format").bail()
-    .isString().withMessage("Name must be a string").bail()
-    .isLength({ min: 3, max: 100 }).withMessage("Email must be 3-100 characters long"),
-
+    .exists().withMessage("El campo email no existe").bail()
+    .notEmpty().withMessage("El email es requerido").bail()
+    .isEmail().withMessage("El formato del email es inválido").bail()
+    .isString().withMessage("El email debe ser una cadena de texto").bail()
+    .isLength({ min: 3, max: 100 }).withMessage("El email debe tener entre 3 y 100 caracteres"),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
@@ -30,14 +29,14 @@ const registerValidator = [
 
 const loginValidator = [
   check("email")
-    .exists().withMessage("Email field is missing").bail()
-    .notEmpty().withMessage("Email is required").bail()
-    .isEmail().withMessage("Invalid email format").bail()
-    .isString().withMessage("Name must be a string").bail(),
+    .exists().withMessage("El campo email no existe").bail()
+    .notEmpty().withMessage("El email es requerido").bail()
+    .isEmail().withMessage("El formato del email es inválido").bail()
+    .isString().withMessage("El email debe ser una cadena de texto").bail(),
 
   check("password")
-    .exists().withMessage("Password field is missing").bail()
-    .notEmpty().withMessage("Password is required").bail(),
+    .exists().withMessage("El campo contraseña no existe").bail()
+    .notEmpty().withMessage("La contraseña es requerida").bail(),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
