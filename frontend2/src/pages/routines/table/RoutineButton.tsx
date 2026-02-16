@@ -4,6 +4,8 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
 import { CreateRoutine } from "@/pages/routines/components/CreateRoutine";
+import { useAppSelector } from "@/app/reduxHooks";
+import { UserRole } from "@/features/users/userSlice";
 
 export function RoutineButton() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -11,10 +13,13 @@ export function RoutineButton() {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
+  const { profile } = useAppSelector((state) => state.user);
+  const isTrainer = profile?.roles.includes(UserRole.Trainer);
+
   return (
     <>
-      {/* Botón para abrir el modal */}
       <Button
+        disabled={!isTrainer}
         onClick={openModal}
         variant="outline"
         size="sm"
@@ -24,7 +29,6 @@ export function RoutineButton() {
         Crear
       </Button>
 
-      {/* Modal de creación */}
       <CreateRoutine
         isOpen={isOpen}
         setIsOpen={setIsOpen}

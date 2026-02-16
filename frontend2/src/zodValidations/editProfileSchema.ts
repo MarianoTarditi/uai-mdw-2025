@@ -7,7 +7,6 @@ export const editProfileSchema = z.object({
   name: z.string().min(1, "El campo Nombre es requerido"),
   lastName: z.string().min(1, "El campo Apellido es requerido"),
 
-  // BIRTHDATE
   birthDate: z
     .string()
     .transform((val) => (val === "" ? null : val))
@@ -33,7 +32,6 @@ export const editProfileSchema = z.object({
       return age >= 10 && age <= 100;
     }, "Ingresa una fecha válida"),
 
-  // GENDER
   gender: z
     .string()
     .transform((val) => (val === "" ? null : val))
@@ -59,7 +57,6 @@ export const editProfileSchema = z.object({
     )
     .nullable(),
 
-  // WEIGHT
   weight: z
     .preprocess(
       (val) => (val === "" || val === null ? null : val),
@@ -76,7 +73,6 @@ export const editProfileSchema = z.object({
     )
     .nullable(),
 
-  // PROFILE IMAGE
   profileImage: z
     .union([z.string(), z.instanceof(FileList)])
     .nullable()
@@ -93,7 +89,7 @@ export const editProfileSchema = z.object({
       if (val === null) return true;
 
       if (val instanceof File) {
-        return val.type.startsWith("image/") && val.size <= 5 * 1024 * 1024; // 5MB
+        return val.type.startsWith("image/") && val.size <= 5 * 1024 * 1024; 
       }
 
       if (typeof val === "string") return true;

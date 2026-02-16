@@ -1,13 +1,11 @@
-// features/routines/routineTypes.ts
 
 export interface IExerciseAssignment {
   exerciseId: {
     _id: string;
     nombre: string;
     musculosPrincipales: string[];
-    // Agrega aquí otras propiedades del ejercicio si las necesitas (videoUrl, etc)
   };
-  _id: string; // 👈 NECESARIO
+  _id: string; 
 
   sets: number;
   reps: number;
@@ -20,6 +18,12 @@ export interface IRoutine {
   name: string;
   description?: string;
   trainerId: {
+    _id: string;
+    name: string;
+    lastName: string;
+    email: string;
+  };
+    studentId: {
     _id: string;
     name: string;
     lastName: string;

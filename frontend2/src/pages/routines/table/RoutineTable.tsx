@@ -61,7 +61,7 @@ export function RoutineTable<TData>({ table }: RoutineTableProps<TData>) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Sin resultados.
                 </TableCell>
               </TableRow>
             )}

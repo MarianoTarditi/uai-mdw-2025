@@ -154,5 +154,5 @@ export default {
   getAllExercises,
   getExerciseById,
   updateExercise,
-  deleteExercise
+  deleteExercise,
 };

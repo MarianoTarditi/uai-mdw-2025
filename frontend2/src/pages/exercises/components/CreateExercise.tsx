@@ -200,7 +200,7 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     key={`secondary-${watchedPrincipales.length}`}
-                    options={filteredSecondaryOptions} // <--- Usamos la lista filtrada
+                    options={filteredSecondaryOptions} 
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Seleccionar músculos"

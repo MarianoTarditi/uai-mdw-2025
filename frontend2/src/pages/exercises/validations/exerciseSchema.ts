@@ -3,7 +3,12 @@ import type { ZodType } from "zod";
 import type { Musculo, Material, Etiqueta } from "@/types/auth";
 
 export const exerciseSchema = z.object({
-  nombre: z.string().min(1, "El campo Nombre es requerido"),
+nombre: z
+  .string()
+  .trim()
+  .min(1, "El campo nombre es obligatorio")
+  .min(3, "El nombre debe tener al menos 3 letras"),
+
 
   musculosPrincipales: z
     .array(z.string())

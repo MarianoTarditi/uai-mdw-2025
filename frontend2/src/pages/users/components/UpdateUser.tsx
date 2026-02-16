@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// Importamos UseFormReturn para tipar si fuera necesario, pero simplificaremos
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";

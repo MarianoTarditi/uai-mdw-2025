@@ -1,11 +1,9 @@
-// @register user
-import { Musculo, Material, Etiqueta } from "@/pages/exercises/constants"; // Ajusta la ruta
+import { Musculo, Material, Etiqueta } from "@/pages/exercises/constants"; 
 
 type IRegisterUserData = z.infer<typeof registerSchema>;
 
 export type IEditProfileData = z.infer<typeof editProfileSchema>;
 
-// @login user
 export interface ILoginUserData {
   email: string;
   password: string;
@@ -100,5 +98,5 @@ export interface IExerciseState {
   isUpdatingLoading: boolean;
   isDeletingLoading: boolean;
 
-  deletedRoutine: boolean; // 👈 NUEVO
+  deletedRoutine: boolean; 
 }

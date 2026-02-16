@@ -17,23 +17,18 @@ export const updateUserSchema = z.object({
     .max(50, "El apellido es demasiado largo")
     .regex(onlyLettersRegex, "El apellido solo puede contener letras"),
 
-  // --- CAMBIO AQUÍ (ALTURA) ---
   height: z.coerce
     .number()
     .nullable()
     .optional()
     .refine((val) => {
-      // 1. Si es null o undefined, es válido (por el optional/nullable)
       if (val === null || val === undefined) return true
       
-      // 2. Lógica principal: O es 0, O está en el rango
       return val === 0 || (val >= 50 && val <= 250)
     }, {
-      // Mensaje de error si falla la condición
       message: "La altura debe ser 0 (sin definir) o estar entre 50 y 250 cm",
     }),
 
-  // --- CAMBIO AQUÍ (PESO) ---
   weight: z.coerce
     .number()
     .nullable()
@@ -41,10 +36,9 @@ export const updateUserSchema = z.object({
     .refine((val) => {
       if (val === null || val === undefined) return true
       
-      // 2. Lógica principal: O es 0, O está en el rango
-      return val === 0 || (val >= 20 && val <= 350)
+      return val === 0 || (val >= 20 && val <= 200)
     }, {
-      message: "El peso debe ser 0 (sin definir) o estar entre 20 y 350 kg",
+      message: "El peso debe ser 0 (sin definir) o estar entre 20 y 200 kg",
     }),
 
   birthDate: z

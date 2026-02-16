@@ -60,7 +60,7 @@ export function SignUp() {
 
     if (isSuccess && user) {
       toast.success(`Registration successful, welcome! ${user.email}!`);
-      navigate("/dashboard");
+      navigate("/");
     }
     return () => {
       dispatch(reset());
@@ -89,17 +89,7 @@ export function SignUp() {
         <Title size="h3" style={{ textAlign: "center", marginBottom: "1rem" }}>
           Crea tu cuenta
         </Title>
-        <Text size="lg" fw={500} style={{ textAlign: "center" }}>
-          Registrarse con
-        </Text>
-        <Group grow mb="md" mt="md">
-          <GoogleButton radius="xl">Google</GoogleButton>
-        </Group>
-        <Divider
-          label="O continúa con el email"
-          labelPosition="center"
-          my="lg"
-        />
+        <Divider label="Continúa con tu email" labelPosition="center" my="lg" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack>
@@ -139,14 +129,24 @@ export function SignUp() {
 
             <div className="grid gap-3">
               <Label htmlFor="height">Altura (cm)</Label>
-              <Input type="number" id="height" {...register("height")} />
+              <Input
+                placeholder="175 (opcional)"
+                type="number"
+                id="height"
+                {...register("height")}
+              />
               {errors.height && (
                 <p className="text-sm text-red-500">{errors.height?.message}</p>
               )}
             </div>
             <div className="grid gap-3">
               <Label htmlFor="weight">Peso (kg)</Label>
-              <Input type="number" id="weight" {...register("weight")} />
+              <Input
+                placeholder="75 (opcional)"
+                type="number"
+                id="weight"
+                {...register("weight")}
+              />
               {errors.weight && (
                 <p className="text-sm text-red-500">{errors.weight?.message}</p>
               )}

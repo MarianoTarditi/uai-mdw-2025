@@ -2,14 +2,12 @@
 
 import * as React from "react";
 import {
-  GalleryVerticalEnd,
-  CreditCard,
   User,
   Dumbbell,
   LayoutDashboard,
   ListCheck,
   CircleQuestionMark,
-  Settings
+  UserRoundCog 
 } from "lucide-react";
 import { NavMain } from "@/components/ui/nav-main";
 import { NavProjects } from "@/components/ui/nav-projects";
@@ -81,11 +79,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         url: "/GetAllRoutines",
         icon: ListCheck,
       },
-      {
-        title: "Pagos",
-        url: "/Payments",
-        icon: CreditCard,
-      },
     ],
 
     projects: [
@@ -94,10 +87,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         url: "/FAQ",
         icon: CircleQuestionMark,
       },
-      {
-        name: "Ajustes",
-        url: "/Settings",
-        icon: Settings,
+            {
+        name: "Perfil",
+        url: "/UserProfile",
+        icon: UserRoundCog,
       },
     ],
   };

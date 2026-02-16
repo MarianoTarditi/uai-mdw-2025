@@ -28,7 +28,6 @@ export function DeleteRoutine({
 }: DeleteRoutineProps) {
   const dispatch = useAppDispatch();
 
-  // 👇 usamos el loading global del slice
   const { isActionLoading } = useAppSelector(
     (state) => state.routine
   );

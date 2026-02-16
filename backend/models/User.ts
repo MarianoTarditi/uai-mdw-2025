@@ -1,5 +1,6 @@
 import { Schema, model, InferSchemaType } from "mongoose";
 import { UserRole } from "../types";
+import { auditPlugin } from "../utils/auditPlugin";
 
 const userSchema = new Schema(
   {
@@ -25,6 +26,9 @@ const userSchema = new Schema(
     versionKey: false,
   }
 );
+
+userSchema.plugin(auditPlugin);
+
 
 type UserType = InferSchemaType<typeof userSchema>;
 const User = model<UserType>("User", userSchema);

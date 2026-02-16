@@ -14,11 +14,12 @@ import type {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, AlertCircle } from "lucide-react"; // Agregué icono de alerta
+import { ArrowUpDown, AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { RoutineActionsCell } from "./RoutineActionsCell";
 import type { IRoutine } from "../../../features/routines/routineTypes";
+import { useAppSelector } from "@/app/reduxHooks";
 
 export function useRoutineTable(routines: IRoutine[]) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -28,6 +29,9 @@ export function useRoutineTable(routines: IRoutine[]) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+
+  const { profile } = useAppSelector((state) => state.user);
+  const isStudent = profile?.roles?.includes("student");
 
   const columns = React.useMemo<ColumnDef<IRoutine>[]>(
     () => [
@@ -61,7 +65,7 @@ export function useRoutineTable(routines: IRoutine[]) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Nombre Rutina <ArrowUpDown className="ml-2 h-4 w-4" />
+            Nombre rutina <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
         cell: ({ row }) => (
@@ -70,13 +74,66 @@ export function useRoutineTable(routines: IRoutine[]) {
       },
 
       {
+        accessorKey: isStudent ? "trainerId" : "studentId",
+
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {isStudent ? "Entrenador" : "Estudiante"}{" "}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+
+        cell: ({ row }) => {
+          const data = isStudent
+            ? row.original.trainerId
+            : row.original.studentId;
+          const isTemplate = row.original.isTemplate;
+
+          if (!isStudent) {
+            if (isTemplate || !data) {
+              return (
+                <Badge
+                  variant="outline"
+                  className="text-muted-foreground border-dashed"
+                >
+                  Plantilla
+                </Badge>
+              );
+            }
+          }
+
+          if (typeof data === "object" && data !== null && "name" in data) {
+            const { name, lastName } = data as {
+              name: string;
+              lastName?: string;
+            };
+
+            return (
+              <div className="flex flex-col">
+                <span className="font-medium text-sm">
+                  {name} {lastName}
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <span className="text-xs text-muted-foreground">
+              {data ? String(data) : "-"}
+            </span>
+          );
+        },
+      },
+
+      {
         accessorKey: "exerciseAssignments",
         header: "Ejercicios",
         cell: ({ row }) => {
-          // 1. Obtenemos el array de asignaciones
           const exercises = row.original.exerciseAssignments;
 
-          // 2. Validación básica de array
           if (
             !exercises ||
             !Array.isArray(exercises) ||
@@ -92,24 +149,21 @@ export function useRoutineTable(routines: IRoutine[]) {
           return (
             <div className="flex flex-wrap gap-1">
               {exercises.map((ea, index) => {
-                // 3. LÓGICA DE PROTECCIÓN (Defensive Programming)
-
-                // Extraemos la info del ejercicio
                 const exInfo = ea.exerciseId;
-
-                // Verificamos si es un objeto válido (Populado)
                 const isPopulated = exInfo && typeof exInfo === "object";
 
-                // Obtenemos el nombre de forma segura (soportando 'name' o 'nombre')
+                type PopulatedExercise = {
+                  nombre?: string;
+                  name?: string;
+                };
+
+                const exerciseData = exInfo as PopulatedExercise;
+
                 const exerciseName = isPopulated
-                  ? (exInfo as any).nombre ||
-                    (exInfo as any).name ||
-                    "Sin nombre"
+                  ? exerciseData.nombre || exerciseData.name || "Sin nombre"
                   : null;
 
-                // Definimos el estado visual
                 if (!exInfo) {
-                  // Caso: Ejercicio eliminado de la BD (es null)
                   return (
                     <Badge
                       key={index}
@@ -122,7 +176,6 @@ export function useRoutineTable(routines: IRoutine[]) {
                 }
 
                 if (!isPopulated) {
-                  // Caso: Solo tenemos el ID (string), no se hizo populate
                   return (
                     <Badge
                       key={index}
@@ -134,7 +187,6 @@ export function useRoutineTable(routines: IRoutine[]) {
                   );
                 }
 
-                // Caso: Todo OK
                 return (
                   <Badge
                     key={index}
@@ -163,7 +215,7 @@ export function useRoutineTable(routines: IRoutine[]) {
         cell: ({ row }) => <RoutineActionsCell routine={row.original} />,
       },
     ],
-    [],
+    [isStudent],
   );
 
   const table = useReactTable({

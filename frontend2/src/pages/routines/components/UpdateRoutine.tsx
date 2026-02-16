@@ -17,17 +17,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch, useAppSelector } from "@/app/reduxHooks";
-// Asegúrate de importar la acción para obtener ejercicios
 import { getAllExercises } from "@/features/exercises/exerciseSlice";
-import { updateRoutine, reset } from "@/features/routines/routineSlice";
-import { routineSchema } from "@/zodValidations/routineSchema";
+import {
+  updateRoutine,
+  reset,
+  getStudents,
+} from "@/features/routines/routineSlice";
+import { routineSchema } from "@/pages/routines/validations/routineSchema";
 import type { IRoutine } from "@/features/routines/routineTypes";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
-// Iconos necesarios
 import { Plus, Trash, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-// Componentes Shadcn
 import {
   Command,
   CommandEmpty,
@@ -49,6 +50,12 @@ interface UpdateRoutineProps {
   setIsOpen: (open: boolean) => void;
 }
 
+interface IStudentOption {
+  _id: string;
+  name: string;
+  lastName: string;
+}
+
 type RoutineFormValues = z.infer<typeof routineSchema>;
 
 export function UpdateRoutine({
@@ -57,8 +64,9 @@ export function UpdateRoutine({
   setIsOpen,
 }: UpdateRoutineProps) {
   const dispatch = useAppDispatch();
-  const { isActionLoading } = useAppSelector((state) => state.routine);
-  // 1. OBTENEMOS LOS EJERCICIOS DEL STATE
+  const { isActionLoading, students } = useAppSelector(
+    (state) => state.routine,
+  );
   const { exercises } = useAppSelector((state) => state.exercise);
 
   const {
@@ -66,12 +74,13 @@ export function UpdateRoutine({
     handleSubmit,
     control,
     reset: resetForm,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useForm<RoutineFormValues>({
     resolver: zodResolver(routineSchema),
     defaultValues: {
       name: "",
       description: "",
+      studentId: "",
       exerciseAssignments: [],
     },
   });
@@ -81,36 +90,42 @@ export function UpdateRoutine({
     name: "exerciseAssignments",
   });
 
-  // 2. CARGAR EJERCICIOS AL ABRIR EL MODAL
   useEffect(() => {
     if (isOpen) {
       dispatch(getAllExercises());
+      dispatch(getStudents());
     }
   }, [isOpen, dispatch]);
 
-  // 3. RELLENAR EL FORMULARIO CON DATOS EXISTENTES
   useEffect(() => {
-    if (isOpen && routine) {
-      const formattedAssignments = routine.exerciseAssignments.map(
-        (assign) => ({
-          // Si el ejercicio viene populado (objeto), extraemos el _id, si no, usamos el string
-          exerciseId:
-            typeof assign.exerciseId === "string"
-              ? assign.exerciseId
-              : (assign.exerciseId as any)._id,
-          sets: assign.sets,
-          reps: assign.reps,
-          restTime: assign.restTime || 60,
-        }),
-      );
+    // 🔥 Quitamos "students.length === 0" de la condición
+    if (!isOpen || !routine) return;
 
-      resetForm({
-        name: routine.name,
-        description: routine.description || "",
-        exerciseAssignments: formattedAssignments,
-      });
-    }
-  }, [isOpen, routine, resetForm]);
+    const formattedAssignments = routine.exerciseAssignments.map((assign) => ({
+      exerciseId:
+        typeof assign.exerciseId === "string"
+          ? assign.exerciseId
+          : assign.exerciseId?._id,
+      sets: assign.sets,
+      reps: assign.reps,
+      restTime: assign.restTime || 60,
+    }));
+
+    // Normalizamos el ID del estudiante
+    const studentIdValue =
+      typeof routine.studentId === "object" && routine.studentId !== null
+        ? routine.studentId._id
+        : routine.studentId || "";
+
+    console.log("Seteando studentId inicial:", studentIdValue);
+
+    resetForm({
+      name: routine.name,
+      description: routine.description || "",
+      studentId: studentIdValue, // ✅ Ahora el formulario SIEMPRE tendrá el ID
+      exerciseAssignments: formattedAssignments,
+    });
+  }, [isOpen, routine, resetForm]); // 🔥 Quitamos "students" de las dependencias
 
   const onSubmit = async (data: RoutineFormValues) => {
     if (!routine?._id) return;
@@ -131,6 +146,8 @@ export function UpdateRoutine({
     }
   };
 
+  const [openStudentCombo, setOpenStudentCombo] = useState(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
@@ -143,7 +160,85 @@ export function UpdateRoutine({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            {/* NOMBRE */}
+            {/* 🔥 COMBOBOX DE ESTUDIANTES */}
+            <div className="grid gap-2">
+              <Label>Asignar a Estudiante</Label>
+              <Controller
+                control={control}
+                name="studentId"
+                render={({ field }) => {
+                  // Buscamos el estudiante. Si students es [] aún, será undefined.
+                  const selectedStudent = students?.find(
+                    (s) => String(s._id) === String(field.value),
+                  );
+
+                  return (
+                    <>
+                      <Popover
+                        open={openStudentCombo}
+                        onOpenChange={setOpenStudentCombo}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between font-normal",
+                              errors.studentId && "border-destructive",
+                            )}
+                          >
+                            {selectedStudent
+                              ? `${selectedStudent.name} ${selectedStudent.lastName}`
+                              : field.value
+                                ? "Cargando nombre..."
+                                : "Seleccionar alumno"}
+
+                            <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[400px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Buscar alumno..." />
+                            <CommandList>
+                              <CommandEmpty>
+                                No se encontró el alumno.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {students.map((student: IStudentOption) => (
+                                  <CommandItem
+                                    key={student._id}
+                                    value={`${student.name} ${student.lastName}`}
+                                    onSelect={() => {
+                                      field.onChange(student._id);
+                                      setOpenStudentCombo(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        field.value === student._id
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {student.name} {student.lastName}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {errors.studentId && (
+                        <p className="text-sm text-destructive">
+                          {errors.studentId.message as string}
+                        </p>
+                      )}
+                    </>
+                  );
+                }}
+              />
+            </div>
             <div className="grid gap-2">
               <Label>Nombre</Label>
               <Input {...register("name")} placeholder="Ej: Rutina de Pecho" />
@@ -152,7 +247,6 @@ export function UpdateRoutine({
               )}
             </div>
 
-            {/* DESCRIPCIÓN */}
             <div className="grid gap-2">
               <Label>Descripción</Label>
               <Textarea
@@ -162,91 +256,170 @@ export function UpdateRoutine({
               />
             </div>
 
-            {/* LISTA DE EJERCICIOS */}
             <div className="grid gap-3">
               <Label className="font-semibold">Ejercicios Asignados</Label>
 
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="grid grid-cols-12 gap-2 items-start border p-3 rounded-lg bg-slate-50 dark:bg-slate-900"
-                >
-                  {/* --- COMBOBOX CONTROLADO --- */}
-                  <div className="col-span-12 sm:col-span-5">
-                    <Label className="text-xs mb-1 block">Ejercicio</Label>
+              {fields.map((field, index) => {
+                const rowErrors = errors.exerciseAssignments?.[index];
 
-                    <Controller
-                      control={control}
-                      name={`exerciseAssignments.${index}.exerciseId`}
-                      render={({ field: { value, onChange } }) => (
-                        <ExerciseCombobox
-                          value={value}
-                          onChange={onChange}
-                          exercises={exercises}
-                        />
+                return (
+                  <div
+                    key={field.id}
+                    className="grid grid-cols-12 gap-2 items-start border p-3 rounded-lg bg-slate-50 dark:bg-slate-900"
+                  >
+                    <div className="col-span-12 sm:col-span-5">
+                      <Label className="text-xs mb-1 block">Ejercicio</Label>
+
+                      <Controller
+                        control={control}
+                        name={`exerciseAssignments.${index}.exerciseId`}
+                        render={({ field }) => {
+                          // eslint-disable-next-line
+                          const [open, setOpen] = useState(false);
+
+                          const selectedExercise = exercises.find(
+                            (ex) => ex._id === field.value,
+                          );
+
+                          return (
+                            <Popover open={open} onOpenChange={setOpen}>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={open}
+                                  className={cn(
+                                    "w-full justify-between font-normal",
+                                    !field.value && "text-muted-foreground",
+                                    rowErrors?.exerciseId &&
+                                      "border-destructive focus:ring-destructive",
+                                  )}
+                                >
+                                  {selectedExercise
+                                    ? selectedExercise.nombre
+                                    : "Seleccionar..."}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-[300px] p-0"
+                                align="start"
+                              >
+                                <Command>
+                                  <CommandInput placeholder="Buscar ejercicio..." />
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      No se encontró el ejercicio.
+                                    </CommandEmpty>
+                                    <CommandGroup>
+                                      {exercises.map((exercise) => (
+                                        <CommandItem
+                                          key={exercise._id}
+                                          value={exercise.nombre}
+                                          onSelect={() => {
+                                            field.onChange(exercise._id);
+                                            setOpen(false);
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              "mr-2 h-4 w-4",
+                                              field.value === exercise._id
+                                                ? "opacity-100"
+                                                : "opacity-0",
+                                            )}
+                                          />
+                                          {exercise.nombre}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          );
+                        }}
+                      />
+
+                      {rowErrors?.exerciseId && (
+                        <p className="text-[10px] text-destructive mt-1">
+                          Requerido
+                        </p>
                       )}
-                    />
+                    </div>
 
-                    {errors.exerciseAssignments?.[index]?.exerciseId && (
-                      <p className="text-[10px] text-red-500 mt-1">Requerido</p>
-                    )}
-                  </div>
+                    <div className="col-span-3 sm:col-span-2">
+                      <Label className="text-xs mb-1 block">Sets</Label>
+                      <Input
+                        type="number"
+                        placeholder="3"
+                        className={cn(rowErrors?.sets && "border-destructive")}
+                        {...register(`exerciseAssignments.${index}.sets`, {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      {rowErrors?.sets && (
+                        <p className="text-[10px] text-destructive mt-1 leading-tight">
+                          {rowErrors.sets.message as string}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* SETS */}
-                  <div className="col-span-3 sm:col-span-2">
-                    <Label className="text-xs mb-1 block">Sets</Label>
-                    <Input
-                      type="number"
-                      placeholder="3"
-                      {...register(`exerciseAssignments.${index}.sets`, {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </div>
+                    <div className="col-span-3 sm:col-span-2">
+                      <Label className="text-xs mb-1 block">Reps</Label>
+                      <Input
+                        type="number"
+                        placeholder="10"
+                        className={cn(rowErrors?.reps && "border-destructive")}
+                        {...register(`exerciseAssignments.${index}.reps`, {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      {rowErrors?.reps && (
+                        <p className="text-[10px] text-destructive mt-1 leading-tight">
+                          {rowErrors.reps.message as string}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* REPS */}
-                  <div className="col-span-3 sm:col-span-2">
-                    <Label className="text-xs mb-1 block">Reps</Label>
-                    <Input
-                      type="number"
-                      placeholder="10"
-                      {...register(`exerciseAssignments.${index}.reps`, {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </div>
+                    <div className="col-span-4 sm:col-span-2">
+                      <Label className="text-xs mb-1 block">Descanso(s)</Label>
+                      <Input
+                        type="number"
+                        placeholder="60"
+                        className={cn(
+                          rowErrors?.restTime && "border-destructive",
+                        )}
+                        {...register(`exerciseAssignments.${index}.restTime`, {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      {rowErrors?.restTime && (
+                        <p className="text-[10px] text-destructive mt-1 leading-tight">
+                          {rowErrors.restTime.message as string}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* REST TIME */}
-                  <div className="col-span-4 sm:col-span-2">
-                    <Label className="text-xs mb-1 block">Descanso(s)</Label>
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      {...register(`exerciseAssignments.${index}.restTime`, {
-                        valueAsNumber: true,
-                      })}
-                    />
+                    <div className="col-span-2 sm:col-span-1 flex items-end justify-center pt-6">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-
-                  {/* BORRAR */}
-                  <div className="col-span-2 sm:col-span-1 flex items-end justify-center pt-6">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
 
               <Button
                 type="button"
                 variant="outline"
-                className="mt-2 border-dashed w-full"
+                className="mt-2 border-dashed"
                 onClick={() =>
                   append({ exerciseId: "", sets: 3, reps: 10, restTime: 60 })
                 }
@@ -254,12 +427,9 @@ export function UpdateRoutine({
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar ejercicio
               </Button>
-
-              {errors.exerciseAssignments && (
-                <p className="text-sm text-red-500">
-                  {Array.isArray(errors.exerciseAssignments)
-                    ? "Error en los ejercicios"
-                    : errors.exerciseAssignments.message}
+              {isSubmitted && fields.length === 0 && (
+                <p className="text-sm text-destructive mt-2">
+                  La rutina debe tener al menos un ejercicio
                 </p>
               )}
             </div>
@@ -284,71 +454,5 @@ export function UpdateRoutine({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-// --- SUBCOMPONENTE PARA EL COMBOBOX ---
-// Esto aísla el estado 'open' de cada fila y evita re-renders innecesarios
-interface ExerciseComboboxProps {
-  value: string;
-  onChange: (value: string) => void;
-  exercises: any[]; // Usa tu tipo IExercise[] aquí si lo tienes importado
-}
-
-function ExerciseCombobox({
-  value,
-  onChange,
-  exercises,
-}: ExerciseComboboxProps) {
-  const [open, setOpen] = useState(false);
-
-  // Buscamos el ejercicio seleccionado para mostrar su nombre
-  const selectedExercise = exercises.find((ex) => ex._id === value);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            "w-full justify-between font-normal px-3",
-            !value && "text-muted-foreground",
-          )}
-        >
-          {selectedExercise ? selectedExercise.nombre : "Seleccionar..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] sm:w-[250px] p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Buscar..." />
-          <CommandList>
-            <CommandEmpty>No encontrado.</CommandEmpty>
-            <CommandGroup>
-              {exercises.map((exercise) => (
-                <CommandItem
-                  key={exercise._id}
-                  value={exercise.nombre} // El buscador filtra por este valor
-                  onSelect={() => {
-                    onChange(exercise._id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === exercise._id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {exercise.nombre}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
   );
 }

@@ -4,6 +4,8 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
 import { AddExercise } from "@/pages/exercises/components/CreateExercise";
+import { useAppSelector } from "@/app/reduxHooks";
+import { UserRole } from "@/features/users/userSlice";
 
 export function ExerciseButton() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -11,9 +13,13 @@ export function ExerciseButton() {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
+  const { profile } = useAppSelector((state) => state.user);
+  const isTrainer = profile?.roles.includes(UserRole.Trainer);
+
   return (
     <>
       <Button
+        disabled={!isTrainer}
         onClick={openModal}
         variant="outline"
         size="sm"

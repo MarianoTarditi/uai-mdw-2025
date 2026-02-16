@@ -2,17 +2,16 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
-  DialogContent, // <--- Asegúrate que venga de @/components/ui/dialog
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  // DialogTrigger, // <-- A veces falta este si lo usas, pero aquí lo controlas por estado
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge"; // Necesitas importar esto
+import { Badge } from "@/components/ui/badge"; 
 import type { IExercise } from "@/types/auth";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { useEffect } from "react";
@@ -44,10 +43,8 @@ export function DetailExercise({
     if (isOpen && exercise?._id) {
       dispatch(getExercise(exercise._id));
     }
-    // No reseteamos en error aquí para permitir ver el toast, se resetea al cerrar
   }, [isOpen, exercise?._id, dispatch]);
 
-  // Manejo de errores visual
   useEffect(() => {
     if (isError && isOpen) {
       toast.error(message || "Error cargando ejercicio");
@@ -61,30 +58,22 @@ export function DetailExercise({
     }
   };
 
-  // Helper para evitar crasheos si el array viene undefined
-  // Helper para evitar crasheos
   const renderList = (items: string[] | undefined | string) => {
-    // Aceptamos string también por si acaso
-    // 1. Si es null o undefined
     if (!items)
       return <span className="text-muted-foreground text-sm">N/A</span>;
 
-    // 2. BLOQUE DE SEGURIDAD: Si viene un STRING (Dato viejo de la BD), lo mostramos directo
     if (typeof items === "string") {
       return <Badge variant="secondary">{items}</Badge>;
     }
 
-    // 3. Si es un Array pero está vacío
     if (Array.isArray(items) && items.length === 0) {
       return <span className="text-muted-foreground text-sm">N/A</span>;
     }
 
-    // 4. Si NO es un array (y no era string), evitamos el crash del map
     if (!Array.isArray(items)) {
       return <span className="text-red-500 text-xs">Error de datos</span>;
     }
 
-    // 5. Renderizado normal de Array
     return (
       <div className="flex flex-wrap gap-1">
         {items.map((item, idx) => (

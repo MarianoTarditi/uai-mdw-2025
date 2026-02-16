@@ -64,12 +64,8 @@ export function Login() {
           Bienvenido a AgustinTurriEDF
         </Text>
 
-        <Group grow mb="md" mt="md">
-          <GoogleButton radius="xl">Google</GoogleButton>
-        </Group>
-
         <Divider
-          label="O continúa con el email"
+          label="Ingrse con su email y contraseña"
           labelPosition="center"
           my="lg"
         />

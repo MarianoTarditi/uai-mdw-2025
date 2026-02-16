@@ -46,10 +46,7 @@ export function DeleteExercise({
 
       setIsOpen(false);
 
-      // Nota: El Padre detectará el cambio de estado en Redux y
-      // refrescará la tabla automáticamente.
-    } catch (error: any) {
-      // Manejo de errores directo en el click
+    } catch (error: unknown) {
       toast.error(
         typeof error === "string" ? error : "Failed to delete exercise",
       );
@@ -81,7 +78,7 @@ export function DeleteExercise({
 
           <AlertDialogAction
             className="bg-destructive text-white hover:bg-destructive/80"
-            onClick={handleDelete} // 👈 Llamamos a la nueva función async
+            onClick={handleDelete} 
             disabled={isDeletingLoading}
           >
             {isDeletingLoading ? <SpinnerButton variant="sizes" /> : "Delete"}

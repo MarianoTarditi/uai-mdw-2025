@@ -9,17 +9,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Eye, Pencil, Trash } from "lucide-react";
-
 import { DetailExercise } from "@/pages/exercises/components/DetailExercise";
 import { UpdateExercise } from "@/pages/exercises/components/UpdateExercise";
 import { DeleteExercise } from "@/pages/exercises/components/DeleteExercise";
-
+import { useAppSelector } from "@/app/reduxHooks";
+import { UserRole } from "@/features/users/userSlice";
 import type { IExercise } from "@/types/auth";
 
 export function ExerciseActionsCell({ exercise }: { exercise: IExercise }) {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+
+  const { profile } = useAppSelector((state) => state.user);
+  const isTrainer = profile?.roles.includes(UserRole.Trainer);
 
   return (
     <>
@@ -42,14 +45,24 @@ export function ExerciseActionsCell({ exercise }: { exercise: IExercise }) {
             <Eye className="mr-2 h-4 w-4" />
             Ver Detalle
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+          <DropdownMenuItem
+            disabled={!isTrainer}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditOpen(true);
+            }}
+          >
             <Pencil className="mr-2 h-4 w-4" />
             Editar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            onClick={() => setIsDeleteOpen(true)}
+            disabled={!isTrainer}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDeleteOpen(true);
+            }}
             className="text-red-600 focus:text-red-600"
           >
             <Trash className="mr-2 h-4 w-4" />

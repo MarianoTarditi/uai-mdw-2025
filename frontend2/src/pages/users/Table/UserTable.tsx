@@ -1,4 +1,3 @@
-// features/users/table/UserTable.tsx
 import {
   Table,
   TableBody,

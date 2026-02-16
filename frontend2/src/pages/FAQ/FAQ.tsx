@@ -4,10 +4,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button"; // Asumiendo que tienes el botón
+import { Button } from "@/components/ui/button"; 
 import { Mail } from "lucide-react";
 
-// Datos de las preguntas (puedes mover esto a un archivo separado o recibirlo por props)
 const faqData = [
   {
     id: "item-1",

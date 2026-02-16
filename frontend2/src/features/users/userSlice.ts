@@ -19,6 +19,12 @@ export interface IUserProfile {
   updatedAt: string;
 }
 
+export enum UserRole {
+  Admin = "admin",
+  Trainer = "trainer",
+  Student = "student",
+}
+
 interface UserState {
   profile: IUserProfile | null;
   users: IUserProfile[];
@@ -168,6 +174,28 @@ export const activateUser = createAsyncThunk<
   }
 });
 
+export const setUserRole = createAsyncThunk<
+  IUserProfile,
+  { userId: string; roles: UserRole[] },
+  { rejectValue: string }
+>("user/setUserRole", async ({ userId, roles }, { rejectWithValue }) => {
+  try {
+    const res = await axiosPrivate.patch(`/user/setUserRole/${userId}`, {
+      roles,
+    });
+
+    return res.data.data;
+  } catch (error) {
+    let message = "Error al actualizar el rol del usuario";
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
+    }
+
+    return rejectWithValue(message);
+  }
+});
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -290,13 +318,43 @@ const userSlice = createSlice({
         state.isError = true;
         state.message = action.payload as string;
       });
-    builder.addCase(activateUser.fulfilled, (state, action) => {
-      const updatedUser = action.payload;
+    builder
+      .addCase(activateUser.fulfilled, (state, action) => {
+        const updatedUser = action.payload;
 
-      state.users = state.users.map((user) =>
-        user._id === updatedUser._id ? updatedUser : user,
-      );
-    });
+        state.users = state.users.map((user) =>
+          user._id === updatedUser._id ? updatedUser : user,
+        );
+      })
+      // SET USER ROLE
+      .addCase(setUserRole.pending, (state) => {
+        state.isUpdatingLoading = true;
+        state.isUpdatingSuccess = false;
+        state.isError = false;
+      })
+      .addCase(setUserRole.fulfilled, (state, action) => {
+        state.isUpdatingLoading = false;
+        state.isUpdatingSuccess = true;
+
+        const updatedUser = action.payload;
+
+        state.users = state.users.map((u) =>
+          u._id === updatedUser._id ? updatedUser : u,
+        );
+
+        if (state.profile?._id === updatedUser._id) {
+          state.profile = updatedUser;
+        }
+
+        if (state.selectedUser?._id === updatedUser._id) {
+          state.selectedUser = updatedUser;
+        }
+      })
+      .addCase(setUserRole.rejected, (state, action) => {
+        state.isUpdatingLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
   },
 });
 

@@ -2,12 +2,11 @@ import { z } from "zod";
 
 const dateRegex = /^([0-2]?\d|3[01])\/([0]?\d|1[0-2])\/(19|20)\d{2}$/;
 
-// @register user
 export const registerSchema = z
   .object({
     name: z
       .string("El nombre es requerido")
-      .min(1, "El nombre es requerido") // .nonempty es legacy, mejor usar min(1)
+      .min(1, "El nombre es requerido") 
       .min(3, "El nombre debe tener al menos 3 caracteres")
       .max(30, "El nombre debe tener menos de 30 caracteres"),
     lastName: z
@@ -42,7 +41,7 @@ export const registerSchema = z
 
         const [day, month, year] = val.split("/").map(Number);
         const birth = new Date(year, month - 1, day);
-        const today = new Date(); //
+        const today = new Date();
 
         let age = today.getFullYear() - birth.getFullYear();
         const m = today.getMonth() - birth.getMonth();
@@ -54,7 +53,6 @@ export const registerSchema = z
         return age >= 10 && age <= 100;
       }, "Fecha inválida (debes tener entre 10 y 100 años)"),
 
-    // GENDER
     gender: z
       .string()
       .transform((val) => (val === "" ? null : val))
@@ -64,7 +62,6 @@ export const registerSchema = z
         "Género inválido",
       ),
 
-    // HEIGHT
     height: z
       .preprocess(
         (val) => (val === "" || val === null ? undefined : val),
@@ -83,7 +80,6 @@ export const registerSchema = z
       )
       .nullable(),
 
-    // WEIGHT
     weight: z
       .preprocess(
         (val) => (val === "" || val === null ? undefined : val),
@@ -107,7 +103,6 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-// @login user
 export const loginSchema = z.object({
   email: z
     .string("El email es requerido")

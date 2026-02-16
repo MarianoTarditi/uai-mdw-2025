@@ -20,6 +20,8 @@ import { clearProfile } from "../users/userSlice";
 import type { IRegisterUserData } from "@/types/auth";
 import axiosPrivate from "../../config/axios";
 import { toast } from "sonner";
+import type { IUserProfile } from "@/features/users/userSlice";
+import axios from "axios";
 
 interface IAuthUser {
   uid: string;
@@ -34,6 +36,7 @@ interface IAuthState {
   errorMessage: string;
   isSuccess: boolean;
   isCheckingAuth: boolean;
+  profile: IUserProfile | null;
 }
 
 const initialState: IAuthState = {
@@ -43,6 +46,7 @@ const initialState: IAuthState = {
   isSuccess: false,
   isCheckingAuth: true,
   errorMessage: "",
+  profile: null,
 };
 
 export const registerUser = createAsyncThunk<
@@ -60,7 +64,6 @@ export const registerUser = createAsyncThunk<
     const user = userCredential.user;
     const firebaseToken = await user.getIdToken();
 
-    // 2. Preparar payload para MongoDB
     const dbPayload = {
       firebaseUid: user.uid,
       email: formData.email,
@@ -89,11 +92,22 @@ export const registerUser = createAsyncThunk<
       email: user.email,
       token: firebaseToken,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log("Error en registerUser thunk:", error);
-    const errorMessage =
-      error.response?.data?.message || getFirebaseRegisterError(error);
-    return rejectWithValue(errorMessage);
+
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || error.message;
+      return rejectWithValue(errorMessage);
+    }
+
+    const firebaseErrorMessage = getFirebaseRegisterError(error);
+
+    const fallbackMessage =
+      error instanceof Error
+        ? error.message
+        : "Error inesperado al registrar usuario";
+
+    return rejectWithValue(firebaseErrorMessage || fallbackMessage);
   }
 });
 

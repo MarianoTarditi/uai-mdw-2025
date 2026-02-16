@@ -13,7 +13,7 @@ export const AuthLayout = () => {
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (

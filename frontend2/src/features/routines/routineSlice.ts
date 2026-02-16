@@ -4,17 +4,30 @@ import { type IRoutine } from "./routineTypes";
 import axios from "axios";
 import { deleteExercise } from "../exercises/exerciseSlice";
 
+export interface IStudent {
+  _id: string;
+  name: string;
+  lastName: string;
+  email?: string;
+  profileImage?: string;
+}
+
+
 interface RoutineState {
   routines: IRoutine[];
+  students: IStudent[];
+
   selectedRoutine: IRoutine | null;
 
   isFetchingLoading: boolean;
   isDetailLoading: boolean;
   isActionLoading: boolean;
+  isStudentsLoading: boolean;
 
   isError: boolean;
   message: string;
 }
+
 
 interface DeleteAssignmentResponse {
   assignmentId: string;
@@ -24,11 +37,13 @@ interface DeleteAssignmentResponse {
 
 const initialState: RoutineState = {
   routines: [],
+  students: [],
   selectedRoutine: null,
 
   isFetchingLoading: false,
   isDetailLoading: false,
   isActionLoading: false,
+  isStudentsLoading: false,
 
   isError: false,
   message: "",
@@ -83,6 +98,8 @@ export const createRoutine = createAsyncThunk<
   { rejectValue: string }
 >("routines/create", async (data, thunkAPI) => {
   try {
+    console.log(data);
+
     return await routineService.createRoutine(data);
   } catch (error: unknown) {
     let message = "Error al crear la rutina";
@@ -151,6 +168,26 @@ export const deleteRoutine = createAsyncThunk<
   }
 });
 
+export const getStudents = createAsyncThunk(
+  "user/getStudents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const students = await routineService.getStudents();
+      return students;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data?.message || error.message);
+      }
+
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+
+      return rejectWithValue("Ocurrió un error al obtener los estudiantes");
+    }
+  },
+);
+
 const routineSlice = createSlice({
   name: "routines",
   initialState,
@@ -182,7 +219,7 @@ const routineSlice = createSlice({
         state.message = action.payload as string;
       });
 
-    // 1. FETCH
+    // FETCH
     builder
       .addCase(fetchRoutines.pending, (state) => {
         state.isFetchingLoading = true;
@@ -197,7 +234,7 @@ const routineSlice = createSlice({
         state.message = action.payload as string;
       });
 
-    // 3. GET BY ID
+    // GET BY ID
     builder
       .addCase(getRoutineById.pending, (state) => {
         state.isDetailLoading = true;
@@ -309,7 +346,6 @@ const routineSlice = createSlice({
       state.routines.forEach((routine) => {
         routine.exerciseAssignments = routine.exerciseAssignments.filter(
           (assignment) => {
-            // Chequeo seguro por si es objeto o string
             const currentExId =
               typeof assignment.exerciseId === "string"
                 ? String(assignment.exerciseId)
@@ -337,6 +373,23 @@ const routineSlice = createSlice({
         }
       }
     });
+
+    // GET STUDENTS
+    builder
+      .addCase(getStudents.pending, (state) => {
+        state.isStudentsLoading = true;
+        state.isError = false;
+        state.message = "";
+      })
+      .addCase(getStudents.fulfilled, (state, action) => {
+        state.isStudentsLoading = false;
+        state.students = action.payload;
+      })
+      .addCase(getStudents.rejected, (state, action) => {
+        state.isStudentsLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
   },
 });
 

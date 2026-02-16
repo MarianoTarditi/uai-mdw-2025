@@ -1,4 +1,3 @@
-// components/exercises/table/useExerciseTable.ts
 
 import * as React from "react";
 import {
@@ -65,7 +64,6 @@ export function useExerciseTable(exercises: IExercise[]) {
             Nombre Ejercicio <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
-        // 👇 Agregamos la propiedad cell para aplicar el estilo
         cell: ({ row }) => (
           <div className="font-medium">{row.getValue("nombre")}</div>
         ),

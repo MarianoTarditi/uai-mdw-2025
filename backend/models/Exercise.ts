@@ -1,4 +1,5 @@
 import { Schema, model, InferSchemaType, Types } from "mongoose";
+import { auditPlugin } from "../utils/auditPlugin";
 
 const exerciseSchema = new Schema(
   {
@@ -111,6 +112,9 @@ const exerciseSchema = new Schema(
     versionKey: false,
   }
 );
+
+exerciseSchema.plugin(auditPlugin);
+
 
 type ExerciseType = InferSchemaType<typeof exerciseSchema>;
 const Exercise = model<ExerciseType>("Exercise", exerciseSchema);

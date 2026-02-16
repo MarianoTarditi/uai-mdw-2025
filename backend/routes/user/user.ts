@@ -8,11 +8,25 @@ import { uploadProfileImage } from "../../utils/multer";
 
 const router = express.Router();
 
-router.get("/", authenticateFirebase, controllers.getAllUsers);
+router.get(
+  "/",
+  authenticateFirebase,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.getAllUsers,
+);
 
-router.get("/profile", authenticateFirebase, controllers.getProfile); 
+router.get(
+  "/profile",
+  authenticateFirebase,
+  controllers.getProfile,
+);
 
-router.get("/:id", authenticateFirebase, controllers.getUserById);
+router.get(
+  "/:id",
+  authenticateFirebase,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.getUserById,
+);
 
 router.put(
   "/:id",
@@ -20,28 +34,32 @@ router.put(
   uploadProfileImage.single("profileImage"),
   validator.UpdateUserValidator,
   validator.getUserValidator,
-  controllers.updateUser
+  checkRol([UserRole.Admin, UserRole.Trainer, UserRole.Student]),
+  controllers.updateUser,
 );
 
 router.patch(
   "/soft/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  controllers.softDeleteUser
+  checkRol([UserRole.Admin]),
+  controllers.softDeleteUser,
 );
 
 router.patch(
   "/activate/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  controllers.activateUser
+  checkRol([UserRole.Admin]),
+  controllers.activateUser,
 );
 
 router.patch(
   "/setUserRole/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  controllers.setUserRole
+  checkRol([UserRole.Admin]),
+  controllers.setUserRole,
 );
 
 export default router;

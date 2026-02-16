@@ -89,10 +89,6 @@ export function NavUser({ user }: NavUserProps) {
                 <BadgeCheck />
                 Perfil
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notificationes
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

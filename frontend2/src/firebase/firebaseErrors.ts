@@ -15,14 +15,12 @@ export function getFirebaseLoginErrorMessage(error: unknown): string {
       case "auth/invalid-email":
         return "El formato del correo es inválido.";
 
-      case "auth/weak-password": 
-        // Nota: Este mensaje en tu original decía "Too many failed attempts", 
-        // aunque el código de error suele referirse a contraseñas débiles.
+      case "auth/weak-password":
         return "Demasiados intentos fallidos. Por favor intenta de nuevo más tarde.";
 
       case "auth/network-request-failed":
         return "Error de red. Por favor verifica tu conexión a internet.";
-        
+
       default:
         return "Ocurrió un error inesperado. Por favor intenta de nuevo.";
     }

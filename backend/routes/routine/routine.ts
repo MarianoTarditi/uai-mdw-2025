@@ -1,15 +1,48 @@
 import express from "express";
 import controllers from "./controller";
-import checkRol from "../../middlewares/checkRole";
-import { authenticateFirebase } from "../../middlewares/authenticateFirebase"; // <--- Importar
-import {UserRole} from "../../types"
+import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
+import checkRole from "../../middlewares/checkRole";
+import { UserRole } from "../../types";
 
 const router = express.Router();
 
-router.post("/", authenticateFirebase, controllers.createRoutine);
-router.get("/", authenticateFirebase, controllers.getAllRoutines); 
-router.get("/:id", authenticateFirebase, controllers.getRoutineById);
-router.put("/:id", authenticateFirebase, controllers.updateRoutine);
-router.delete('/:id', authenticateFirebase, controllers.deleteRoutine);
+router.get(
+  "/students",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer]),
+  controllers.getStudents,
+);
+
+router.post(
+  "/",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer]),
+  controllers.createRoutine,
+);
+router.get(
+  "/",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer, UserRole.Student]),
+  controllers.getAllRoutines,
+);
+router.get(
+  "/:id",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer, UserRole.Student]),
+  controllers.getRoutineById,
+);
+
+router.put(
+  "/:id",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer]),
+  controllers.updateRoutine,
+);
+router.delete(
+  "/:id",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer]),
+  controllers.deleteRoutine,
+);
 
 export default router;

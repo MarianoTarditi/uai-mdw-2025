@@ -274,7 +274,7 @@ export function UpdateExercise({
                 <TabsContent value="upload" className="mt-4">
                   <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors border-muted-foreground/25">
                     <label
-                      htmlFor="dropzone-file-edit" // ID único para evitar conflictos
+                      htmlFor="dropzone-file-edit"
                       className="flex flex-col items-center justify-center w-full h-full pt-5 pb-6"
                     >
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">

@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import admin from "../utils/firebase";
+import User from "../models/User";
+
 
 export const authenticateFirebase = async (
   req: Request,
@@ -13,12 +15,11 @@ export const authenticateFirebase = async (
       return res.status(401).json({
         error: true,
         code: 401,
-        message: "No token provided",
+        message: "Ningún token proporcionado",
       });
     }
 
     const token = authHeader.split(" ")[1];
-
     const decodedToken = await admin.auth().verifyIdToken(token);
 
     (req as any).user = decodedToken;
@@ -30,7 +31,7 @@ export const authenticateFirebase = async (
     return res.status(401).json({
       error: true,
       code: 401,
-      message: "User not authenticated",
+      message: "Usuario no autenticado",
     });
   }
 };

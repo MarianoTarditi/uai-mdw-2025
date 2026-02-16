@@ -14,17 +14,21 @@ import { UpdateRoutine } from "@/pages/routines/components/UpdateRoutine";
 import { DeleteRoutine } from "@/pages/routines/components/DeleteRoutine";
 import { DetailRoutine } from "@/pages/routines/components/DetailRoutine";
 import type { IRoutine } from "@/features/routines/routineTypes";
+import { useAppSelector } from "@/app/reduxHooks";
+import { UserRole } from "@/features/users/userSlice";
 
 export function RoutineActionsCell({ routine }: { routine: IRoutine }) {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
 
+  const { profile } = useAppSelector((state) => state.user);
+  const isTrainer = profile?.roles.includes(UserRole.Trainer);
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          {/* 1. IMPORTANTE: Agregamos type="button" para que no envíe formularios accidentalmente */}
           <Button variant="ghost" className="h-8 w-8 p-0" type="button">
             <MoreHorizontal />
           </Button>
@@ -33,11 +37,10 @@ export function RoutineActionsCell({ routine }: { routine: IRoutine }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          
-          {/* 2. Usamos onClick en lugar de onSelect */}
+
           <DropdownMenuItem
             onClick={(e) => {
-              e.stopPropagation(); // ⛔ Detiene la propagación del click hacia filas o formularios padres
+              e.stopPropagation();
               setIsDetailOpen(true);
             }}
           >
@@ -45,19 +48,21 @@ export function RoutineActionsCell({ routine }: { routine: IRoutine }) {
             Ver Detalle
           </DropdownMenuItem>
 
-          <DropdownMenuItem 
+          <DropdownMenuItem
+            disabled={!isTrainer}
             onClick={(e) => {
-              e.stopPropagation(); 
+              e.stopPropagation();
               setIsEditOpen(true);
             }}
           >
             <Pencil className="mr-2 h-4 w-4" />
             Editar
           </DropdownMenuItem>
-          
+
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
+            disabled={!isTrainer}
             onClick={(e) => {
               e.stopPropagation();
               setIsDeleteOpen(true);
@@ -70,7 +75,6 @@ export function RoutineActionsCell({ routine }: { routine: IRoutine }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* MODALES - Se renderizan fuera del DropdownMenu para evitar problemas de foco (Pointer Events) */}
       <DetailRoutine
         isOpen={isDetailOpen}
         setIsOpen={setIsDetailOpen}

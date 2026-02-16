@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   Container,
+  Divider,
   Group,
   Paper,
   Text,
@@ -56,9 +57,11 @@ export function ForgotPassword() {
       <Title className={classes.title} ta="center">
         ¿Olvidaste tu contraseña?{" "}
       </Title>
-      <Text c="dimmed" fz="sm" ta="center">
-        Ingresa tu email para obtener un enlace de restablecimiento
-      </Text>
+      <Divider
+        label="Ingresa tu email para obtener un enlace de restablecimiento"
+        labelPosition="center"
+        my="lg"
+      />
 
       <Paper withBorder shadow="md" p={30} radius="md" mt="xl">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>

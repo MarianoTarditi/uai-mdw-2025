@@ -91,7 +91,6 @@ export const columns: ColumnDef<IUserProfile>[] = [
       const active = row.getValue("isActive");
       return (
         <Badge
-          // 👇 Si es activo, aplicamos verde. Si no, dejamos que el variant maneje el color.
           className={active ? "bg-green-500 hover:bg-green-600" : ""} 
           variant={active ? "default" : "destructive"}
         >

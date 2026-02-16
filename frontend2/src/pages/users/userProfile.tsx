@@ -96,7 +96,7 @@ export default function UserProfile() {
               Género
             </label>
             <p className="text-sm capitalize">
-              {profile.gender ?? "Not provided"}
+              {profile.gender ?? "Sin asignar"}
             </p>
           </div>
           <div className="space-y-1">
@@ -105,7 +105,7 @@ export default function UserProfile() {
               Altura
             </label>
             <p className="text-sm">
-              {profile.height ? `${profile.height} cm` : "Not provided"}
+              {profile.height ? `${profile.height} cm` : "Sin asignar"}
             </p>
           </div>
           <div className="space-y-1">
@@ -114,7 +114,7 @@ export default function UserProfile() {
               Peso
             </label>
             <p className="text-sm">
-              {profile.weight ? `${profile.weight} kg` : "Not provided"}
+              {profile.weight ? `${profile.weight} kg` : "Sin asignar"}
             </p>
           </div>
           <div className="space-y-1">

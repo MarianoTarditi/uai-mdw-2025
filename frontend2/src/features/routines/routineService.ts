@@ -11,7 +11,7 @@ const createRoutine = async (data: any): Promise<IRoutine> => {
 
 const getAllRoutines = async () => {
   const res = await axiosPrivate.get(ROUTINE_URL);
-  return res.data.data; // 🔥 SOLO ARRAY
+  return res.data.data; 
 };
 
 const getRoutineById = async (id: string): Promise<IRoutine> => {
@@ -34,6 +34,11 @@ const deleteExerciseAssignment = async (id: string) => {
   return res.data;
 };
 
+const getStudents = async () => {
+  const res = await axiosPrivate.get("/routines/students");
+  return res.data.data;
+};
+
 export default {
   createRoutine,
   getAllRoutines,
@@ -41,4 +46,5 @@ export default {
   deleteRoutine,
   updateRoutine,
   deleteExerciseAssignment,
+  getStudents
 };

@@ -35,7 +35,7 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
         paddingTop: '56.25%', // Aspect Ratio 16:9
         borderRadius: '12px', 
         overflow: 'hidden',
-        backgroundColor: '#000', // Fondo negro mientras carga
+        backgroundColor: '#000', 
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
       }}
     >
@@ -66,7 +66,7 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
             left: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover' // Asegura que cubra el recuadro
+            objectFit: 'cover' 
           }}
         >
           <source src={localUrl} type="video/mp4" />

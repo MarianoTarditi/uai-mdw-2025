@@ -10,13 +10,23 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Eye, Pencil, Trash, CheckCircle } from "lucide-react";
+import {
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Trash,
+  CheckCircle,
+  UserCog,
+} from "lucide-react";
 
-import type { IUserProfile } from "@/features/users/userSlice";
+import { type IUserProfile } from "@/features/users/userSlice";
 import { DetailUser } from "@/pages/users/components/DetailUser";
 import { DeleteUser } from "@/pages/users/components/DeleteUser";
 import { UpdateUser } from "@/pages/users/components/UpdateUser";
 import { ActivateUser } from "@/pages/users/components/ActivateUser";
+import { SetUserRole } from "@/pages/users/components/SetUserRole";
+import { useAppSelector } from "@/app/reduxHooks"; 
+import { UserRole } from "@/features/users/userSlice";
 
 interface UserActionsProps {
   user: IUserProfile;
@@ -27,6 +37,12 @@ export function UserActionsCell({ user }: UserActionsProps) {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isActivateOpen, setIsActivateOpen] = React.useState(false);
+  const [isRoleOpen, SetIsRoleOpen] = React.useState(false);
+
+  const { profile } = useAppSelector((state) => state.user);
+  const isAdmin = profile?.roles.includes(UserRole.Admin);
+
+  const isOwnProfile = profile?._id === user._id;
 
   return (
     <>
@@ -49,23 +65,36 @@ export function UserActionsCell({ user }: UserActionsProps) {
             }}
           >
             <Eye className="mr-2 h-4 w-4" />
-            Ver Detalle
+            Ver detalle
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            disabled={!user.isActive}
+            disabled={!user.isActive || (!isAdmin && !isOwnProfile)}
             onSelect={(e) => {
               e.preventDefault();
               setIsEditOpen(true);
             }}
           >
             <Pencil className="mr-2 h-4 w-4" />
-            Editar
+            Editar usuario
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            disabled={!user.isActive || !isAdmin || isOwnProfile}
+            onSelect={(e) => {
+              e.preventDefault();
+              SetIsRoleOpen(true);
+            }}
+          >
+            <UserCog className="mr-2 h-4 w-4" />
+            Cambiar rol
+          </DropdownMenuItem>
+
           {user.isActive ? (
             <DropdownMenuItem
+              disabled={!isAdmin || isOwnProfile} 
               onSelect={(e) => {
                 e.preventDefault();
                 setIsDeleteOpen(true);
@@ -77,6 +106,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
+              disabled={!isAdmin} 
               onSelect={(e) => {
                 e.preventDefault();
                 setIsActivateOpen(true);
@@ -109,6 +139,14 @@ export function UserActionsCell({ user }: UserActionsProps) {
         <ActivateUser
           isOpen={isActivateOpen}
           setIsOpen={setIsActivateOpen}
+          user={user}
+        />
+      )}
+
+      {isRoleOpen && user && (
+        <SetUserRole
+          isOpen={isRoleOpen}
+          setIsOpen={SetIsRoleOpen}
           user={user}
         />
       )}

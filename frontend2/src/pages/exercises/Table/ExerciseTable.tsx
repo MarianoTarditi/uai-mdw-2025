@@ -1,5 +1,3 @@
-// components/exercises/table/ExerciseTable.tsx
-
 import {
   Table,
   TableBody,
@@ -12,7 +10,11 @@ import { flexRender } from "@tanstack/react-table";
 import { DataTablePagination } from "../../../components/private/table/DataTablePagination";
 import type { Table as TableType } from "@tanstack/react-table";
 
-export function ExerciseTable({ table }: { table: TableType<any> }) {
+interface ExerciseTableProps<TData> {
+  table: TableType<TData>;
+}
+
+export function ExerciseTable<TData>({ table }: ExerciseTableProps<TData>) {
   const columns = table.getAllColumns();
 
   return (
