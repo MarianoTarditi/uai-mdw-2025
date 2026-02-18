@@ -8,7 +8,6 @@ import {
   Divider,
   Group,
   Paper,
-  Text,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -55,7 +54,7 @@ export function ForgotPassword() {
   return (
     <Container size={460} my={170}>
       <Title className={classes.title} ta="center">
-        ¿Olvidaste tu contraseña?{" "}
+        ¿Olvidaste tu contraseña?
       </Title>
       <Divider
         label="Ingresa tu email para obtener un enlace de restablecimiento"

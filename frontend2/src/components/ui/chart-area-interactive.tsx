@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { useAppDispatch, useAppSelector } from "@/app/reduxHooks";
 import { getChartData } from "@/features/admin/adminSlice";
 
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
   CardAction,
@@ -41,33 +40,25 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartAreaInteractive() {
-  const isMobile = useIsMobile();
   const dispatch = useAppDispatch();
 
-  // 1. Estado para controlar qué tipo de datos estamos viendo
   const [dataType, setDataType] = React.useState("users");
 
-  // 2. Obtenemos los datos de Redux
   const { chartData, isChartLoading } = useAppSelector((state) => state.admin);
 
-  // 3. Efecto: Cuando cambia el dataType, pedimos los datos nuevos
   React.useEffect(() => {
     dispatch(getChartData(dataType));
   }, [dataType, dispatch]);
 
-  // Labels dinámicos para el título
   const titleMap: Record<string, string> = {
     users: "Usuarios Registrados",
     routines: "Rutinas Creadas",
     exercises: "Ejercicios Creados",
   };
 
-  // Función para corregir el desfase de zona horaria
   const parseDateLocal = (dateString: string) => {
     if (!dateString) return new Date();
-    // Divide "2024-02-13" en [2024, 2, 13]
     const [year, month, day] = dateString.split("-").map(Number);
-    // Crea la fecha en hora local (Mes es base 0 en JS, por eso month - 1)
     return new Date(year, month - 1, day);
   };
 
@@ -170,7 +161,7 @@ export function ChartAreaInteractive() {
               />
               <Area
                 dataKey="count"
-                type="monotone" // Curva suave
+                type="monotone" 
                 fill="url(#fillCount)"
                 stroke="var(--color-count)"
                 strokeWidth={2}

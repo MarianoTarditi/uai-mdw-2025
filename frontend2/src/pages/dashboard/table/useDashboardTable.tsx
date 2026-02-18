@@ -49,21 +49,17 @@ export function useDashboardTable(data: IAuditLog[]) {
         accessorKey: "entity",
         header: "Entidad",
         cell: ({ row }) => {
-          // 1. Obtenemos el nombre crudo de la entidad ("Routine")
           const rawEntity =
             row.original.entity ||
             (row.getValue("action") as string).split(" ")[1];
 
-          // 2. Obtenemos la etiqueta traducida ("Rutina")
           const { label } = entityMap[rawEntity] || entityMap.default;
 
-          // 🔥 3. Extraemos los detalles del registro original ("Pecho")
           const details = row.original.details;
 
           return (
             <div className="flex flex-col text-sm">
               <span className="font-medium text-primary">
-                {/* 🔥 4. Mostramos "Rutina: Pecho" si hay detalles, si no, solo "Rutina" */}
                 {details ? `${label}: ${details}` : label}
               </span>
             </div>

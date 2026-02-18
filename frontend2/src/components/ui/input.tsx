@@ -5,7 +5,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
-        ref={ref} // ✅ ahora acepta ref
+        ref={ref} 
         type={type}
         data-slot="input"
         className={cn(
@@ -20,6 +20,6 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   }
 );
 
-Input.displayName = "Input"; // importante para devtools
+Input.displayName = "Input"; 
 
 export { Input };

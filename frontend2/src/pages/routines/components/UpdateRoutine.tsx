@@ -98,7 +98,6 @@ export function UpdateRoutine({
   }, [isOpen, dispatch]);
 
   useEffect(() => {
-    // 🔥 Quitamos "students.length === 0" de la condición
     if (!isOpen || !routine) return;
 
     const formattedAssignments = routine.exerciseAssignments.map((assign) => ({
@@ -111,7 +110,6 @@ export function UpdateRoutine({
       restTime: assign.restTime || 60,
     }));
 
-    // Normalizamos el ID del estudiante
     const studentIdValue =
       typeof routine.studentId === "object" && routine.studentId !== null
         ? routine.studentId._id
@@ -122,10 +120,10 @@ export function UpdateRoutine({
     resetForm({
       name: routine.name,
       description: routine.description || "",
-      studentId: studentIdValue, // ✅ Ahora el formulario SIEMPRE tendrá el ID
+      studentId: studentIdValue, 
       exerciseAssignments: formattedAssignments,
     });
-  }, [isOpen, routine, resetForm]); // 🔥 Quitamos "students" de las dependencias
+  }, [isOpen, routine, resetForm]); 
 
   const onSubmit = async (data: RoutineFormValues) => {
     if (!routine?._id) return;
@@ -160,14 +158,12 @@ export function UpdateRoutine({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            {/* 🔥 COMBOBOX DE ESTUDIANTES */}
             <div className="grid gap-2">
               <Label>Asignar a Estudiante</Label>
               <Controller
                 control={control}
                 name="studentId"
                 render={({ field }) => {
-                  // Buscamos el estudiante. Si students es [] aún, será undefined.
                   const selectedStudent = students?.find(
                     (s) => String(s._id) === String(field.value),
                   );

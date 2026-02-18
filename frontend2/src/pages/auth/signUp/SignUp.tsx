@@ -7,11 +7,9 @@ import {
   Paper,
   PasswordInput,
   Stack,
-  Text,
   TextInput,
   Title,
 } from "@mantine/core";
-import { GoogleButton } from "../signUp/GoogleButton";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { Link, useNavigate } from "react-router-dom";
@@ -153,7 +151,7 @@ export function SignUp() {
             </div>
             <PasswordInput
               required
-              label="Password"
+              label="Contraseña"
               placeholder="Tu contraseña"
               {...register("password")}
               error={errors.password?.message}
@@ -161,7 +159,7 @@ export function SignUp() {
             />
             <PasswordInput
               required
-              label="Confirm password"
+              label="Confirmar contraseña"
               placeholder="Confirma tu contraseña"
               {...register("confirmPassword")}
               error={errors.confirmPassword?.message}

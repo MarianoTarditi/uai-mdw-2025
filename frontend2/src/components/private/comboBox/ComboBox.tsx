@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -12,28 +12,27 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
-// Definimos la estructura de las opciones
 interface Option {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface ComboBoxProps {
-  options: Option[]
-  value?: string
-  onChange: (value: string) => void
-  placeholder?: string
-  searchPlaceholder?: string
-  emptyMessage?: string
-  className?: string
-  disabled?: boolean
+  options: Option[];
+  value?: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+  className?: string;
+  disabled?: boolean;
 }
 
 export function ComboBox({
@@ -44,9 +43,9 @@ export function ComboBox({
   searchPlaceholder = "Search...",
   emptyMessage = "No results found.",
   className,
-  disabled = false
+  disabled = false,
 }: ComboBoxProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
@@ -73,16 +72,19 @@ export function ComboBox({
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.label} // Usamos label para búsqueda más natural en Shadcn
+                  value={option.label}
                   onSelect={(currentValue) => {
-                    // Buscamos el value real basado en el label seleccionado o el value interno
-                    // Nota: CommandItem a veces normaliza el texto a minúsculas, por eso buscamos en options
                     const selectedOption = options.find(
-                       o => o.label.toLowerCase() === currentValue.toLowerCase()
+                      (o) =>
+                        o.label.toLowerCase() === currentValue.toLowerCase(),
                     );
                     if (selectedOption) {
-                        onChange(selectedOption.value === value ? "" : selectedOption.value)
-                        setOpen(false)
+                      onChange(
+                        selectedOption.value === value
+                          ? ""
+                          : selectedOption.value,
+                      );
+                      setOpen(false);
                     }
                   }}
                 >
@@ -90,7 +92,7 @@ export function ComboBox({
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>
@@ -100,5 +102,5 @@ export function ComboBox({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

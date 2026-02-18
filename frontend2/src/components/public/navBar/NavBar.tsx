@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
-import { Link } from "react-router-dom"; // Asumimos que estás usando react-router-dom
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,21 +13,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/public/themeProvider/ThemeProvider";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-// Importar el componente Avatar reutilizable
 import { UserAvatar } from "../../private/userAvatar/UserAvatar";
 import { useAppSelector } from "@/app/reduxHooks";
 
 const Navbar = () => {
   const { profile } = useAppSelector((state) => state.user);
-  const { setTheme } = useTheme(); // Definir el tamaño estándar del avatar para la barra de navegación
+  const { setTheme } = useTheme();
 
   return (
     <nav className="p-4 flex items-center justify-between sticky top-0 bg-background z-10 border-b">
       <SidebarTrigger />
       <div className="flex items-center gap-4">
-        {/* Enlace al Dashboard, aunque está vacío en tu código original */}
         <Link to="/dashboard" aria-label="Dashboard"></Link>
-        {/* 1. Menú de Tema (sin cambios) */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
@@ -46,7 +43,6 @@ const Navbar = () => {
         </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            {/* Usamos Button para mejor accesibilidad y hover state */}
             <Button
               variant="ghost"
               className="relative h-10 w-10 rounded-full p-0"
@@ -59,7 +55,7 @@ const Navbar = () => {
                 }
                 name={profile?.name ?? "U"}
                 lastName={profile?.lastName ?? "A"}
-                className="w-8 h-8" // Usar el tamaño estándar
+                className="w-8 h-8"
               />
             </Button>
           </DropdownMenuTrigger>

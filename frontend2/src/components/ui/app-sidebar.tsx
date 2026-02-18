@@ -38,7 +38,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
        <img 
          src="/Logo.png" 
          alt="Logo" 
-         className="size-6 object-contain" // Ajusta el tamaño según necesites
+         className="size-6 object-contain" 
        />
     </div>
   );
@@ -54,7 +54,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
    teams: 
       {
         name: "AgustinTurriEDF",
-        logo: GymLogo, // 3. ASÍGNALO AQUÍ (sin comillas)
+        logo: GymLogo,
         plan: "Entrenador de fuerza",
       },
    

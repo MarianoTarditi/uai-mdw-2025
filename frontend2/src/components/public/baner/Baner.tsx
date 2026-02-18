@@ -1,27 +1,42 @@
-import { Marquee } from '@gfazioli/mantine-marquee';
+import { Marquee } from "@gfazioli/mantine-marquee";
 import {
-  IconBrand4chan,
-  IconBrandAmazon,
-  IconBrandBing,
-  IconBrandGithub,
-  IconBrandMantine,
-  IconBrandWhatsapp,
-  IconBrandWordpress,
+  IconBarbell, 
+  IconRun, 
+  IconBottle, 
+  IconHeartRateMonitor, 
+  IconScale, 
+  IconShoe, 
+  IconTrophy, 
+  IconStopwatch, 
+  IconActivity, 
 } from "@tabler/icons-react";
-import '@gfazioli/mantine-marquee/styles.css';
-import '@gfazioli/mantine-marquee/styles.layer.css';
-import { ThemeIcon } from "@mantine/core";
+import "@gfazioli/mantine-marquee/styles.css";
+import "@gfazioli/mantine-marquee/styles.layer.css";
+import { ThemeIcon, useMantineColorScheme } from "@mantine/core";
 import { type ReactNode, type ComponentPropsWithoutRef } from "react";
 
 export function Baner() {
-  const iconsBrand = [
-    <IconBrand4chan style={{ width: '50%', height: '70%' }} />,
-    <IconBrandWhatsapp style={{ width: '50%', height: '70%' }} />,
-    <IconBrandWordpress style={{ width: '50%', height: '70%' }} />,
-    <IconBrandBing style={{ width: '70%', height: '70%' }} />,
-    <IconBrandGithub style={{ width: '70%', height: '70%' }} />,
-    <IconBrandMantine style={{ width: '70%', height: '70%' }} />,
-    <IconBrandAmazon style={{ width: '70%', height: '70%' }} />,
+  const { colorScheme } = useMantineColorScheme();
+
+  const iconStyle = {
+    width: "50%",
+    height: "50%",
+    color:
+      colorScheme === "dark"
+        ? "var(--mantine-color-gray-0)"
+        : "var(--mantine-color-gray-9)",
+  };
+
+  const iconsGym = [
+    <IconBarbell style={iconStyle} stroke={1.5} key="barbell" />,
+    <IconRun style={iconStyle} stroke={1.5} key="run" />,
+    <IconHeartRateMonitor style={iconStyle} stroke={1.5} key="heart" />,
+    <IconBottle style={iconStyle} stroke={1.5} key="bottle" />,
+    <IconStopwatch style={iconStyle} stroke={1.5} key="stopwatch" />,
+    <IconScale style={iconStyle} stroke={1.5} key="scale" />,
+    <IconShoe style={iconStyle} stroke={1.5} key="shoe" />,
+    <IconTrophy style={iconStyle} stroke={1.5} key="trophy" />,
+    <IconActivity style={iconStyle} stroke={1.5} key="activity" />,
   ];
 
   function BoxComponent({
@@ -43,10 +58,13 @@ export function Baner() {
         alignItems: "center",
         width: "100%",
         margin: "0 auto",
+        marginTop: 40,
+        marginBottom: 40,
+        background: "transparent",
       }}
     >
       <Marquee w={792} pauseOnHover fadeEdges>
-        {iconsBrand.map((icon, index) => (
+        {iconsGym.map((icon, index) => (
           <BoxComponent key={index}>{icon}</BoxComponent>
         ))}
       </Marquee>

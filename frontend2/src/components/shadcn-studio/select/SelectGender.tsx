@@ -1,7 +1,6 @@
-// src/components/shadcn-studio/select/SelectGender.tsx
 
 import { useId } from "react";
-import { type UseFormRegister, type FieldError } from "react-hook-form"; // 👈 Importar FieldError
+import { type UseFormRegister, type FieldError } from "react-hook-form"; 
 import { Label } from "@/components/ui/label";
 import { SelectNative } from "@/components/ui/select-native";
 import type { IEditProfileData } from "@/types/auth";
@@ -9,7 +8,7 @@ import type { IEditProfileData } from "@/types/auth";
 interface SelectGenderProps {
   register: UseFormRegister<IEditProfileData>;
   defaultValue: IEditProfileData["gender"] | undefined;
-  error?: FieldError; // 👈 1. Añadir la prop opcional de error
+  error?: FieldError; 
 }
 
 export const SelectGender = ({

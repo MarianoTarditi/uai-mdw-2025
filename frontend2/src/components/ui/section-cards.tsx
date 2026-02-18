@@ -3,7 +3,7 @@ import {
   Dumbbell, 
   ClipboardList, 
   UserCheck 
-} from "lucide-react"; // Usamos iconos de Lucide que son estándar en Shadcn
+} from "lucide-react"; 
 
 import {
   Card,
@@ -12,14 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAppSelector } from "@/app/reduxHooks"; // Importa tu hook
+import { useAppSelector } from "@/app/reduxHooks"; 
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function SectionCards() {
-  // Obtenemos los datos del estado de Redux
   const { stats, isLoading } = useAppSelector((state) => state.admin);
 
-  // Datos para mapear las tarjetas
   const cardData = [
     {
       title: "Estudiantes",

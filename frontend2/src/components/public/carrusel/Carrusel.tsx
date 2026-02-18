@@ -1,67 +1,151 @@
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
+import { useState, useRef, useEffect } from "react";
 import { Image } from "@mantine/core";
-import { useRef } from "react";
-import Autoplay from "embla-carousel-autoplay";
 
-export function Carrusel() {
-  const autoplay = useRef(Autoplay({ delay: 2000 }));
+interface MediaItem {
+  src: string;
+  alt: string;
+  type?: "video" | "image";
+}
+
+interface CarruselProps {
+  media: MediaItem[];
+}
+
+const CarouselVideo = ({
+  src,
+  isActive,
+  onEnded,
+}: {
+  src: string;
+  isActive: boolean;
+  onEnded: () => void;
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isActive) {
+        videoRef.current.currentTime = 0; 
+        videoRef.current
+          .play()
+          .catch((e) => console.log("Autoplay prevenido", e));
+      } else {
+        videoRef.current.pause(); 
+      }
+    }
+  }, [isActive]);
 
   return (
-    <div style={{ height: 400 }}>
+    <video
+      ref={videoRef}
+      src={src}
+      muted
+      playsInline
+      onEnded={onEnded}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
+  );
+};
+
+export function Carrusel({ media }: CarruselProps) {
+  const [embla, setEmbla] = useState<any | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const imageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isVideo = (src: string) => {
+    return (
+      src.toLowerCase().endsWith(".mp4") || src.toLowerCase().endsWith(".webm")
+    );
+  };
+
+  const goToNextSlide = () => {
+    if (embla) {
+      if (embla.canScrollNext()) {
+        embla.scrollNext();
+      } else {
+        embla.scrollTo(0);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!embla || media.length === 0) return;
+
+    const currentMedia = media[currentSlide];
+    const isCurrentVideo =
+      currentMedia.type === "video" || isVideo(currentMedia.src);
+
+    if (imageTimerRef.current) {
+      clearTimeout(imageTimerRef.current);
+    }
+
+    if (!isCurrentVideo) {
+      imageTimerRef.current = setTimeout(() => {
+        goToNextSlide();
+      }, 4000);
+    }
+
+    return () => {
+      if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
+    };
+  }, [currentSlide, embla, media]);
+
+  return (
+    <div
+      style={{ maxWidth: 350, height: 600, margin: "0 auto", width: "100%" }}
+    >
       <Carousel
+        getEmblaApi={setEmbla}
+        onSlideChange={(index) => setCurrentSlide(index)}
+        loop
         withIndicators
         height="100%"
-        plugins={[autoplay.current]}
-        onMouseEnter={autoplay.current.stop}
-        onMouseLeave={() => autoplay.current.play()}
         styles={{
           root: {
             position: "relative",
+            borderRadius: "20px",
+            overflow: "hidden",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
           },
           control: {
             color: "black",
             backgroundColor: "white",
-            borderRadius: "50%",
-            width: 36,
-            height: 36,
             top: "50%",
-            transform: "translateY(-200%)",
-            "&:hover": {
-              backgroundColor: "rgba(255,255,255,0.8)",
-            },
-          },
-          indicator: {
-            backgroundColor: "white",
           },
         }}
       >
-        <Carousel.Slide>
-          <Image
-            src="/images/gym1.jpeg"
-            h="100%"
-            fit="cover"
-            alt="Slide 1"
-          />
-        </Carousel.Slide>
+        {media.map((item, index) => {
+          const isItemVideo = item.type === "video" || isVideo(item.src);
 
-        <Carousel.Slide>
-          <Image
-            src="/images/photoGym.jpeg"
-            h="100%"
-            fit="cover"
-            alt="Slide 2"
-          />
-        </Carousel.Slide>
-
-        <Carousel.Slide>
-          <Image
-            src="/images/sentadilla-con-barra.jpg"
-            h="100%"
-            fit="cover"
-            alt="Slide 3"
-          />
-        </Carousel.Slide>
+          return (
+            <Carousel.Slide key={index}>
+              {isItemVideo ? (
+                <CarouselVideo
+                  src={item.src}
+                  isActive={currentSlide === index}
+                  onEnded={goToNextSlide}
+                />
+              ) : (
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
+            </Carousel.Slide>
+          );
+        })}
       </Carousel>
     </div>
   );

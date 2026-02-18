@@ -1,39 +1,115 @@
-.title {
-  font-size: 34px;
-  font-weight: 500;
+.sectionBackground {
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-9)
+  );
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: relative;
 
-  @media (max-width: $mantine-breakpoint-sm) {
-    font-size: 24px;
-  }
 }
 
-.description {
-  max-width: 600px;
-  margin: auto;
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: light-dark(rgba(255, 255, 255, 0.91), rgba(0, 0, 0, 0.85));
+  z-index: 1;
+}
 
-  &::after {
-    content: '';
-    display: block;
-    background-color: var(--mantine-color-blue-filled);
-    width: 45px;
-    height: 2px;
-    margin-top: var(--mantine-spacing-sm);
-    margin-left: auto;
-    margin-right: auto;
-  }
+.content {
+  position: relative;
+  z-index: 2;
 }
 
 .card {
-  border: 1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+  background: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-7)
+  );
+  border: 1px solid
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  cursor: default;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: light-dark(
+      0 12px 24px rgba(0, 0, 0, 0.15),
+      0 12px 24px rgba(0, 0, 0, 0.4)
+    );
+    border-color: light-dark(
+      var(--mantine-color-blue-3),
+      var(--mantine-color-blue-7)
+    );
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--mantine-color-blue-6);
+    outline-offset: 2px;
+  }
 }
 
 .cardTitle {
-  &::after {
-    content: '';
-    display: block;
-    background-color: var(--mantine-color-blue-filled);
-    width: 45px;
-    height: 2px;
-    margin-top: var(--mantine-spacing-sm);
+  color: light-dark(
+    var(--mantine-color-gray-9),
+    var(--mantine-color-gray-0)
+  ) !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1.2;
+  transition: color 0.2s ease;
+
+  .card:hover & {
+    color: var(--mantine-color-blue-6);
+  }
+}
+
+.icon {
+  color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
+  transition: color 0.2s ease;
+
+  .card:hover & {
+    color: var(--mantine-color-blue-7);
+  }
+}
+
+.badge {
+  background-color: light-dark(
+    var(--mantine-color-blue-6),
+    var(--mantine-color-blue-7)
+  );
+  color: var(--mantine-color-white);
+}
+
+.button {
+  background-color: light-dark(
+    var(--mantine-color-blue-6),
+    var(--mantine-color-blue-7)
+  );
+  color: var(--mantine-color-white);
+  font-weight: 800 !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-blue-7),
+      var(--mantine-color-blue-6)
+    );
+    box-shadow: light-dark(
+      0 4px 12px rgba(37, 99, 235, 0.3),
+      0 4px 12px rgba(37, 99, 235, 0.5)
+    );
   }
 }

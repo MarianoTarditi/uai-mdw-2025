@@ -1,175 +1,163 @@
-import {
-  IconBook,
-  IconChartPie3,
-  IconChevronDown,
-  IconCode,
-  IconCoin,
-  IconFingerprint,
-  IconNotification,
-} from "@tabler/icons-react";
-import {
-  Anchor,
-  Box,
-  Burger,
-  Button,
-  Center,
-  Collapse,
-  Divider,
-  Drawer,
-  Group,
-  HoverCard,
-  ScrollArea,
-  SimpleGrid,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-  useMantineTheme,
-} from "@mantine/core";
+import { Box, Burger, Divider, Drawer, Group, ScrollArea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { MantineLogo } from "@mantinex/mantine-logo";
+import { useEffect, useState } from "react";
 import classes from "./Header.module.css";
-import { DarkMode } from "../../public/darkMode/DarkMode";
+import { DarkMode } from "../darkMode/DarkMode";
 import { Link } from "react-router-dom";
-
-const mockdata = [
-  {
-    icon: IconCode,
-    title: "Open source",
-    description: "This Pokémon’s cry is very loud and distracting",
-  },
-  {
-    icon: IconCoin,
-    title: "Free for everyone",
-    description: "The fluid of Smeargle’s tail secretions changes",
-  },
-  {
-    icon: IconBook,
-    title: "Documentation",
-    description: "Yanma is capable of seeing 360 degrees without",
-  },
-  {
-    icon: IconFingerprint,
-    title: "Security",
-    description: "The shell’s rounded shape and the grooves on its.",
-  },
-  {
-    icon: IconChartPie3,
-    title: "Analytics",
-    description: "This Pokémon uses its flying ability to quickly chase",
-  },
-  {
-    icon: IconNotification,
-    title: "Notifications",
-    description: "Combusken battles with the intensely hot flames it spews",
-  },
-];
 
 export function Header() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
-  const theme = useMantineTheme();
+  const [scrolled, setScrolled] = useState(false);
 
-  const links = mockdata.map((item) => (
-    <UnstyledButton className={classes.subLink} key={item.title}>
-      <Group wrap="nowrap" align="flex-start">
-        <ThemeIcon size={34} variant="default" radius="md">
-          <item.icon size={22} color={theme.colors.blue[6]} />
-        </ThemeIcon>
-        <div>
-          <Text size="sm" fw={500}>
-            {item.title}
-          </Text>
-          <Text size="xs" c="dimmed">
-            {item.description}
-          </Text>
-        </div>
-      </Group>
-    </UnstyledButton>
-  ));
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <Box>
-      <header className={classes.header}>
-        <Group justify="space-between" h="100%">
-          <Link to="/">
-            <MantineLogo size={30} className="linkResetLogo" />
-          </Link>
-
+      <header
+        className={`${classes.header} ${scrolled ? classes.scrolled : ""}`}
+        role="banner"
+      >
+        <nav
+          aria-label="Navegación principal"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <Group
+            justify="space-between"
             h="100%"
-            gap={0}
-            visibleFrom="sm"
-            className={classes.navCenter}
+            style={{ width: "100%", height: "100%" }}
           >
-            <a href="#" className={classes.link}>
-              Home
-            </a>
-            <HoverCard
-              width={600}
-              position="bottom"
-              radius="md"
-              shadow="md"
-              withinPortal
+            <div className={classes.logoContainer}>
+              <Link
+                to="/"
+                className="linkResetLogo"
+                aria-label="Ir al inicio - Turri Gym"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToTop();
+                }}
+              >
+                <img
+                  src="/Logo.png"
+                  alt="Turri Gym - Logo"
+                  className={classes.logoImage}
+                />
+              </Link>
+            </div>
+
+            <Group
+              h="100%"
+              gap={0}
+              visibleFrom="sm"
+              className={classes.navCenter}
+              role="list"
             >
-              <HoverCard.Target>
-                <a href="#" className={classes.link}>
-                  <Center inline>
-                    <Box component="span" mr={5}>
-                      Features
-                    </Box>
-                    <IconChevronDown size={16} color={theme.colors.blue[6]} />
-                  </Center>
-                </a>
-              </HoverCard.Target>
+              <a
+                href="#inicio"
+                className={classes.link}
+                role="listitem"
+                aria-label="Ir a la sección de inicio"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("inicio")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Inicio
+              </a>
+              <a
+                href="#planes"
+                className={classes.link}
+                role="listitem"
+                aria-label="Ir a la sección de planes"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("planes")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Planes
+              </a>
+              <a
+                href="#instalaciones"
+                className={classes.link}
+                role="listitem"
+                aria-label="Ir a la sección de instalaciones"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("instalaciones")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Instalaciones
+              </a>
+              <a
+                href="#faq"
+                className={classes.link}
+                role="listitem"
+                aria-label="Ir a la sección de preguntas frecuentes"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("faq")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                FAQ
+              </a>
+              <a
+                href="#contact"
+                className={classes.link}
+                role="listitem"
+                aria-label="Ir a la sección de contacto"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Contacto
+              </a>
+            </Group>
 
-              <HoverCard.Dropdown style={{ overflow: "hidden" }}>
-                <Group justify="space-between" px="md">
-                  <Text fw={500}>Features</Text>
-                  <Anchor href="#" fz="xs">
-                    View all
-                  </Anchor>
-                </Group>
+            <Group visibleFrom="sm">
+              <DarkMode />
+            </Group>
 
-                <Divider my="sm" />
-
-                <SimpleGrid cols={2} spacing={0}>
-                  {links}
-                </SimpleGrid>
-
-                <div className={classes.dropdownFooter}>
-                  <Group justify="space-between">
-                    <div>
-                      <Text fw={500} fz="sm">
-                        Get started
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        Their food sources have decreased, and their numbers
-                      </Text>
-                    </div>
-                    <Button variant="default">Get started</Button>
-                  </Group>
-                </div>
-              </HoverCard.Dropdown>
-            </HoverCard>
-            <a href="#" className={classes.link}>
-              Learn
-            </a>
-            <a href="#" className={classes.link}>
-              Academy
-            </a>
+            <Burger
+              opened={drawerOpened}
+              onClick={toggleDrawer}
+              hiddenFrom="sm"
+              color="white"
+              size="md"
+              aria-label="Abrir menú de navegación"
+              aria-expanded={drawerOpened}
+            />
           </Group>
-
-          <Group visibleFrom="sm">
-            <DarkMode />
-          </Group>
-
-          <Burger
-            opened={drawerOpened}
-            onClick={toggleDrawer}
-            hiddenFrom="sm"
-          />
-        </Group>
+        </nav>
       </header>
 
       <Drawer
@@ -177,37 +165,99 @@ export function Header() {
         onClose={closeDrawer}
         size="100%"
         padding="md"
-        title="Navigation"
+        title="Menú de navegación"
         hiddenFrom="sm"
         zIndex={1000000}
+        aria-label="Menú de navegación móvil"
       >
-        <ScrollArea h="calc(100vh - 80px" mx="-md">
+        <ScrollArea h={`calc(100vh - ${80}px)`} mx="-md">
           <Divider my="sm" />
 
-          <a href="#" className={classes.link}>
-            Home
+          <a
+            href="#inicio"
+            className={classes.link}
+            onClick={(e) => {
+              e.preventDefault();
+              closeDrawer();
+              setTimeout(() => {
+                document
+                  .getElementById("inicio")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            Inicio
           </a>
-          <UnstyledButton className={classes.link} onClick={toggleLinks}>
-            <Center inline>
-              <Box component="span" mr={5}>
-                Features
-              </Box>
-              <IconChevronDown size={16} color={theme.colors.blue[6]} />
-            </Center>
-          </UnstyledButton>
-          <Collapse in={linksOpened}>{links}</Collapse>
-          <a href="#" className={classes.link}>
-            Learn
+          <a
+            href="#planes"
+            className={classes.link}
+            onClick={(e) => {
+              e.preventDefault();
+              closeDrawer();
+              setTimeout(() => {
+                document
+                  .getElementById("planes")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            Planes
           </a>
-          <a href="#" className={classes.link}>
-            Academy
+          <a
+            href="#instalaciones"
+            className={classes.link}
+            onClick={(e) => {
+              e.preventDefault();
+              closeDrawer();
+              setTimeout(() => {
+                document
+                  .getElementById("instalaciones")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            Instalaciones
+          </a>
+          <a
+            href="#faq"
+            className={classes.link}
+            onClick={(e) => {
+              e.preventDefault();
+              closeDrawer();
+              setTimeout(() => {
+                document
+                  .getElementById("faq")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            FAQ
+          </a>
+          <a
+            href="#contact"
+            className={classes.link}
+            onClick={(e) => {
+              e.preventDefault();
+              closeDrawer();
+              setTimeout(() => {
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            Contacto
           </a>
 
           <Divider my="sm" />
 
-          <Group justify="center" grow pb="xl" px="md">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
+          <Group
+            justify="center"
+            pb="xl"
+            px="md"
+            className={classes.mobileThemeToggle}
+          >
+            <DarkMode />
           </Group>
         </ScrollArea>
       </Drawer>

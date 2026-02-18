@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-// 1. CAMBIO: Usamos useLocation de react-router-dom
 import { useLocation, Link } from "react-router-dom";
 import { Moon, Sun } from "lucide-react";
 import {
@@ -56,7 +55,6 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          {/* IZQUIERDA */}
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -64,12 +62,9 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
 
-            {/* BREADCRUMB DINÁMICO */}
             <Breadcrumb>
               <BreadcrumbList>
-                {/* Item Inicio fijo */}
                 <BreadcrumbItem className="hidden md:block">
-                  {/* Usamos 'asChild' o pasamos el Link de react-router para no recargar la página */}
                   <BreadcrumbLink asChild>
                     <Link to="/dashboard">Home</Link>
                   </BreadcrumbLink>
@@ -83,13 +78,10 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
                   const isLast = index === pathSegments.length - 1;
                   const href = `/${pathSegments.slice(0, index + 1).join("/")}`;
 
-                  // Formatear nombre: Buscar en mapa o Capitalizar
                   const displayName =
                     routeNameMap[segment] ||
                     segment.charAt(0).toUpperCase() + segment.slice(1);
 
-                  // Ocultar IDs largos (opcional, por si la URL es /users/123456)
-                  // Si el segmento es muy largo y parece un ID, podemos mostrar "Detalle" o cortarlo
                   if (segment.length > 20) return null;
 
                   return (

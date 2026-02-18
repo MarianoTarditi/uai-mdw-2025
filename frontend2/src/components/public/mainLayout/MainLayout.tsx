@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-// import { Footer } from "../footer/Footer";
 import Sidebar from "../../private/sidebar/SideBar";
 import { ThemeProvider } from "../../public/themeProvider/ThemeProvider";
 

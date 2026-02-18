@@ -1,7 +1,7 @@
-import { Container, Grid, SimpleGrid, Skeleton } from '@mantine/core';
-import { type ReactNode } from 'react';
+import { Container, Grid, SimpleGrid, Skeleton } from "@mantine/core";
+import { type ReactNode } from "react";
 
-const PRIMARY_COL_HEIGHT = '400px';
+const PRIMARY_COL_HEIGHT = "400px";
 
 interface LeadGridProps {
   children?: ReactNode;
@@ -16,9 +16,9 @@ export function LeadGrid({ children }: LeadGridProps) {
         <div
           style={{
             height: PRIMARY_COL_HEIGHT,
-            width: '100%',
-            borderRadius: 'var(--mantine-radius-md)',
-            overflow: 'hidden',
+            width: "100%",
+            borderRadius: "var(--mantine-radius-md)",
+            overflow: "hidden",
           }}
         >
           {children}
@@ -26,13 +26,25 @@ export function LeadGrid({ children }: LeadGridProps) {
 
         <Grid gutter="md">
           <Grid.Col>
-            <Skeleton height={SECONDARY_COL_HEIGHT} radius="md" animate={false} />
+            <Skeleton
+              height={SECONDARY_COL_HEIGHT}
+              radius="md"
+              animate={false}
+            />
           </Grid.Col>
           <Grid.Col span={6}>
-            <Skeleton height={SECONDARY_COL_HEIGHT} radius="md" animate={false} />
+            <Skeleton
+              height={SECONDARY_COL_HEIGHT}
+              radius="md"
+              animate={false}
+            />
           </Grid.Col>
           <Grid.Col span={6}>
-            <Skeleton height={SECONDARY_COL_HEIGHT} radius="md" animate={false} />
+            <Skeleton
+              height={SECONDARY_COL_HEIGHT}
+              radius="md"
+              animate={false}
+            />
           </Grid.Col>
         </Grid>
       </SimpleGrid>

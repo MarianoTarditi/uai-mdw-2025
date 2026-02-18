@@ -7,7 +7,6 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
-      // 👇 Evita que frameworks externos (como Radix) apliquen aria-hidden erróneamente
       aria-hidden={undefined}
     >
       <table

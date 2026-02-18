@@ -1,39 +1,60 @@
-import {} from "@tabler/icons-react";
 import { Box, Group } from "@mantine/core";
-import classes from "./AuthHeader.module.css";
-import { DarkMode } from "../../public/darkMode/DarkMode";
+import { useEffect, useState } from "react";
+import classes from "./Header.module.css";
+import { DarkMode } from "../darkMode/DarkMode";
 import { Link } from "react-router-dom";
 
 export function AuthHeader() {
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <Box>
-      <header className={classes.header}>
-        <Group justify="space-between" align="center" h="100%">
-          
-          <Link 
-            to="/home" 
-            onClick={scrollToTop}
-            style={{ display: "flex", alignItems: "center" }} 
+      <header
+        className={`${classes.header} ${scrolled ? classes.scrolled : ""}`}
+        role="banner"
+      >
+        <nav
+          aria-label="Navegación principal"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Group
+            justify="space-between"
+            h="100%"
+            style={{ width: "100%", height: "100%" }}
           >
-            <img 
-              src="/Logo.png" 
-              alt="Logo" 
-              className="linkResetLogo"
-              style={{ height: '70px', width: 'auto' }} 
-            />
-          </Link>
+            <div className={classes.logoContainer}>
+              <Link
+                to="/home"
+                className="linkResetLogo"
+                aria-label="Ir al inicio - Turri Gym"
+              >
+                <img
+                  src="/Logo.png"
+                  alt="Turri Gym - Logo"
+                  className={classes.logoImage}
+                />
+              </Link>
+            </div>
 
-          <Group visibleFrom="sm">
-            <DarkMode />
+            <Group visibleFrom="sm">
+              <DarkMode />
+            </Group>
           </Group>
-        </Group>
+        </nav>
       </header>
     </Box>
   );

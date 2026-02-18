@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
-import { cn } from "@/lib/utils"; // Asegúrate de que esta ruta sea correcta para ti
+import { cn } from "@/lib/utils"; 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,8 +19,8 @@ import {
 
 interface MultiSelectProps {
   options: { value: string; label: string }[];
-  value?: string[]; // El valor actual (array de strings)
-  onChange: (value: string[]) => void; // Función para actualizar el estado
+  value?: string[]; 
+  onChange: (value: string[]) => void; 
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
@@ -91,13 +91,12 @@ export function ComboBoxMultiSelect({
                 return (
                   <CommandItem
                     key={option.value}
-                    value={option.value} // shadcn usa el label para filtrar por defecto, a veces conviene poner label aquí también
+                    value={option.value} 
                     onSelect={() => {
                       const newValues = isSelected
                         ? selectedValues.filter((v) => v !== option.value)
                         : [...selectedValues, option.value];
                       onChange(newValues);
-                      // setOpen(false); // Descomenta si quieres que se cierre al elegir
                     }}
                   >
                     <Check
