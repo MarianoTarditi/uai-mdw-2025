@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { connectDB } from "./config/server"; 
+import { connectDB } from "./config/server";
 import router from "./routes";
 import { handleJsonError } from "./middlewares/handleJsonValidator";
 import path from "path";
@@ -14,7 +14,10 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://uai-mdw-2025-38xdenivb-mariano-tarditis-projects.vercel.app",
+    ],
     credentials: true,
   }),
 );
