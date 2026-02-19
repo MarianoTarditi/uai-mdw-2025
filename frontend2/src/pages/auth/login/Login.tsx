@@ -10,7 +10,6 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { GoogleButton } from "../signUp/GoogleButton";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../../zodValidations/authSchema";
@@ -58,8 +57,8 @@ export function Login() {
   }
 
   return (
-    <Container size="xs" my={135}>
-      <Paper radius="md" p="lg" withBorder>
+    <Container size={480} my="auto" style={{ width: "100%" }}>
+      <Paper radius="md" p={45} withBorder shadow="xl">
         <Text size="lg" fw={500} style={{ textAlign: "center" }}>
           Bienvenido a AgustinTurriEDF
         </Text>

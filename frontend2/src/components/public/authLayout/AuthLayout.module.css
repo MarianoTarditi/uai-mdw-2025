@@ -5,6 +5,17 @@
 }
 
 .main {
-  flex: 1;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 2rem 0;
+  width: 100%;
+}
+
+.main > * {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

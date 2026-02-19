@@ -9,6 +9,7 @@ import {
   Stack,
   TextInput,
   Title,
+  SimpleGrid
 } from "@mantine/core";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
@@ -82,7 +83,8 @@ export function SignUp() {
   }
 
   return (
-    <Container size="xs" my={30}>
+    // Cambié a size="sm" para dar espacio a las dos columnas
+    <Container size="sm" my={30}>
       <Paper radius="md" p="lg" withBorder>
         <Title size="h3" style={{ textAlign: "center", marginBottom: "1rem" }}>
           Crea tu cuenta
@@ -91,22 +93,27 @@ export function SignUp() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack>
-            <TextInput
-              required
-              label="Name"
-              placeholder="Tu nombre"
-              {...register("name")}
-              error={errors.name?.message}
-              radius="md"
-            />
-            <TextInput
-              required
-              label="Last name"
-              placeholder="TuApellido"
-              {...register("lastName")}
-              error={errors.lastName?.message}
-              radius="md"
-            />
+            {/* 🔥 Fila 1: Nombre y Apellido */}
+            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <TextInput
+                required
+                label="Nombre"
+                placeholder="Tu nombre"
+                {...register("name")}
+                error={errors.name?.message}
+                radius="md"
+              />
+              <TextInput
+                required
+                label="Apellido"
+                placeholder="Tu apellido"
+                {...register("lastName")}
+                error={errors.lastName?.message}
+                radius="md"
+              />
+            </SimpleGrid>
+
+            {/* Fila 2: Email (Ocupa todo el ancho por ser un dato principal) */}
             <TextInput
               required
               label="Email"
@@ -116,56 +123,67 @@ export function SignUp() {
               radius="md"
             />
 
-            <TextInput
-              label="Fecha de nacimiento (DD/MM/YYYY)"
-              placeholder="01/01/2000"
-              {...register("birthDate")}
-              error={errors.birthDate?.message}
-              radius="md"
-            />
-            <SelectGender register={register} defaultValue={undefined} />
+            {/* 🔥 Fila 3: Fecha de nacimiento y Género */}
+            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <TextInput
+                label="Fecha de nacimiento"
+                placeholder="DD/MM/YYYY"
+                {...register("birthDate")}
+                error={errors.birthDate?.message}
+                radius="md"
+              />
+              <SelectGender register={register} defaultValue={undefined} />
+            </SimpleGrid>
 
-            <div className="grid gap-3">
-              <Label htmlFor="height">Altura (cm)</Label>
-              <Input
-                placeholder="175 (opcional)"
-                type="number"
-                id="height"
-                {...register("height")}
+            {/* 🔥 Fila 4: Altura y Peso (Tus componentes personalizados) */}
+            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <div className="grid gap-2">
+                <Label htmlFor="height">Altura (cm)</Label>
+                <Input
+                  placeholder="Ej: 175"
+                  type="number"
+                  id="height"
+                  {...register("height")}
+                />
+                {errors.height && (
+                  <p className="text-sm text-red-500 m-0">{errors.height?.message as string}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="weight">Peso (kg)</Label>
+                <Input
+                  placeholder="Ej: 75"
+                  type="number"
+                  id="weight"
+                  {...register("weight")}
+                />
+                {errors.weight && (
+                  <p className="text-sm text-red-500 m-0">{errors.weight?.message as string}</p>
+                )}
+              </div>
+            </SimpleGrid>
+
+            {/* 🔥 Fila 5: Contraseñas */}
+            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <PasswordInput
+                required
+                label="Contraseña"
+                placeholder="Tu contraseña"
+                {...register("password")}
+                error={errors.password?.message}
+                radius="md"
               />
-              {errors.height && (
-                <p className="text-sm text-red-500">{errors.height?.message}</p>
-              )}
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="weight">Peso (kg)</Label>
-              <Input
-                placeholder="75 (opcional)"
-                type="number"
-                id="weight"
-                {...register("weight")}
+              <PasswordInput
+                required
+                label="Confirmar contraseña"
+                placeholder="Confirma tu contraseña"
+                {...register("confirmPassword")}
+                error={errors.confirmPassword?.message}
+                radius="md"
               />
-              {errors.weight && (
-                <p className="text-sm text-red-500">{errors.weight?.message}</p>
-              )}
-            </div>
-            <PasswordInput
-              required
-              label="Contraseña"
-              placeholder="Tu contraseña"
-              {...register("password")}
-              error={errors.password?.message}
-              radius="md"
-            />
-            <PasswordInput
-              required
-              label="Confirmar contraseña"
-              placeholder="Confirma tu contraseña"
-              {...register("confirmPassword")}
-              error={errors.confirmPassword?.message}
-              radius="md"
-            />
+            </SimpleGrid>
           </Stack>
+
           <Group justify="space-between" mt="xl">
             <Anchor
               component={Link}
@@ -190,3 +208,4 @@ export function SignUp() {
     </Container>
   );
 }
+

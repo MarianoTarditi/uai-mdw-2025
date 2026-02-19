@@ -6,7 +6,6 @@ import {
   Dumbbell,
   LayoutDashboard,
   ListCheck,
-  CircleQuestionMark,
   UserRoundCog 
 } from "lucide-react";
 import { NavMain } from "@/components/ui/nav-main";
@@ -82,11 +81,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     ],
 
     projects: [
-      {
-        name: "Preguntas frecuentes",
-        url: "/FAQ",
-        icon: CircleQuestionMark,
-      },
+     
             {
         name: "Perfil",
         url: "/UserProfile",

@@ -18,7 +18,6 @@ import { observeUser } from "./features/auth/authSlice";
 import UserProfile from "./pages/users/userProfile";
 import { GetAllUsers } from "./pages/users/GetAllUsers";
 import { GetAllRoutines } from "./pages/routines/GetAllRoutines";
-import { FAQ } from "./pages/FAQ/FAQ";
 import { SpinnerButton } from "./components/private/spinner/Spinner";
 import { UserRole } from "./features/users/userSlice";
 
@@ -76,7 +75,6 @@ const router = createBrowserRouter([
       { path: "/UserProfile", element: <UserProfile /> },
       { path: "/GetAllUsers", element: <GetAllUsers /> },
       { path: "/GetAllRoutines", element: <GetAllRoutines /> },
-      { path: "/FAQ", element: <FAQ /> },
     ],
   },
 ]);
