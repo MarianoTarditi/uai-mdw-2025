@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "./src/app/reduxHooks";
-import { SpinnerButton } from "@/components/private/spinner/Spinner";
+import { SpinnerButton } from "./src/components/private/spinner/Spinner";
 
 export const RoleRedirect = () => {
   const { user, profile, isLoading } = useAppSelector(

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
 import handleHttpError from "../../utils/handleError";
-import { data } from "react-router-dom";
 
 const sanitizeUser = (user: any) => {
   if (!user) return null;
