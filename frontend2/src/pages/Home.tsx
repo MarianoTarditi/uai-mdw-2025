@@ -16,20 +16,12 @@ function Home() {
           <Hero />
         </ScrollAnimation>
       </section>
-      <section
-        className="section"
-        id="planes"
-        aria-label="Sección de planes de entrenamiento"
-      >
+      <section id="planes" aria-label="Sección de planes de entrenamiento">
         <ScrollAnimation animation="fadeInUp" delay={0.1}>
           <CardFeature />
         </ScrollAnimation>
       </section>
-      <section
-        className="section"
-        id="instalaciones"
-        aria-label="Sección de instalaciones"
-      >
+      <section id="instalaciones" aria-label="Sección de instalaciones">
         <ScrollAnimation animation="fadeInUp" delay={0.2}>
           <TercerHero />
         </ScrollAnimation>

@@ -7,6 +7,8 @@ import { IconSun, IconMoon } from "@tabler/icons-react";
 
 export function DarkMode() {
   const { setColorScheme } = useMantineColorScheme();
+  
+  // El valor computado nos dice el estado REAL actual
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -19,11 +21,13 @@ export function DarkMode() {
       onClick={() =>
         setColorScheme(computedColorScheme === "light" ? "dark" : "light")
       }
+      aria-label="Cambiar tema de color"
     >
+      {/* 🔥 INVERTIDO: Si es light, mostramos la luna para cambiar a dark */}
       {computedColorScheme === "light" ? (
-        <IconSun stroke={1.5} />
-      ) : (
         <IconMoon stroke={1.5} />
+      ) : (
+        <IconSun stroke={1.5} />
       )}
     </ActionIcon>
   );

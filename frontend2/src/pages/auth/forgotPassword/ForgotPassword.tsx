@@ -51,18 +51,21 @@ export function ForgotPassword() {
     }
   };
 
-  return (
-    <Container size={460} my={170}>
-      <Title className={classes.title} ta="center">
-        ¿Olvidaste tu contraseña?
-      </Title>
-      <Divider
-        label="Ingresa tu email para obtener un enlace de restablecimiento"
-        labelPosition="center"
-        my="lg"
-      />
+return (
+    /* 🔥 1. Aseguramos el ancho de 460 y quitamos el margen vertical excesivo (my={170}) 
+          ya que el AuthLayout se encarga de centrarlo verticalmente */
+    <Container size={460} style={{ width: '100%' }}>
+      <Paper withBorder shadow="md" p={40} radius="md"> {/* 🔥 Padding aumentado a 40 */}
+        <Title className={classes.title} ta="center" order={2}>
+          ¿Olvidaste tu contraseña?
+        </Title>
+        
+        <Divider
+          label="Ingresa tu email para obtener el enlace"
+          labelPosition="center"
+          my="lg"
+        />
 
-      <Paper withBorder shadow="md" p={30} radius="md" mt="xl">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <TextInput
             label="Tu email"
@@ -73,18 +76,20 @@ export function ForgotPassword() {
             error={errors.email?.message}
           />
 
-          <Group justify="space-between" mt="lg">
+          <Group justify="space-between" mt="xl">
             <Anchor c="dimmed" size="sm" component="div">
               <Center inline>
-                <IconArrowLeft size={12} stroke={1.5} />
-                <Box ml={5} component={Link} to="/login">
-                  Volver a inicio de sesión
+                <IconArrowLeft size={16} stroke={1.5} />
+                <Box ml={5}>
+                  <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Volver al login
+                  </Link>
                 </Box>
               </Center>
             </Anchor>
 
-            <Button type="submit" loading={isSubmitting}>
-              Restablecer contraseña
+            <Button type="submit"  radius="xl" loading={isSubmitting}>
+              Restablecer
             </Button>
           </Group>
         </form>
