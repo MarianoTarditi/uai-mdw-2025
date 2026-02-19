@@ -1,0 +1,161 @@
+import {
+  Container,
+  Overlay,
+  Title,
+  Text,
+  Badge,
+  Group,
+  SimpleGrid,
+} from "@mantine/core";
+import { IconUsers, IconClock, IconCheck } from "@tabler/icons-react";
+import classes from "./TercerHero.module.css";
+import { Titles } from "./title/Titles";
+import { Carrusel } from "../carrusel/Carrusel";
+
+export function TercerHero() {
+  return (
+    <section className={classes.hero} aria-labelledby="instalaciones-title">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className={classes.videoBackground}
+        aria-hidden="true"
+      >
+        <source src="/images/Video5.mp4" type="video/mp4" />
+      </video>
+
+      <Overlay
+        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)"
+        opacity={0.85}
+        zIndex={1}
+      />
+
+      <Container className={classes.contentContainer} size="xl">
+        <div className={classes.contentWrapper}>
+          <Badge
+            size="lg"
+            variant="light"
+            color="blue"
+            mb="md"
+            className={classes.badge}
+          >
+            Entrenamientos personalizados
+          </Badge>
+
+          <Title
+            id="instalaciones-title"
+            order={2}
+            className={classes.title}
+            ta="center"
+          >
+            Instalaciones
+          </Title>
+
+          <div
+            style={{
+              width: "60px",
+              height: "3px",
+              backgroundColor: "var(--mantine-color-blue-5)",
+              margin: "0 auto 30px auto",
+              borderRadius: "2px",
+            }}
+          />
+
+          <Text className={classes.description} ta="center" mt="md">
+            El entrenamiento es personalizado, con grupos reducidos para
+            asegurar que cada alumno reciba atención individualizada.
+          </Text>
+
+          <Group justify="center" gap="xl" mt="xl" className={classes.features}>
+            <div className={classes.featureItem}>
+              <IconUsers size={24} stroke={2} className={classes.featureIcon} />
+              <Text size="sm" fw={600} c="white">
+                1 Profesor
+              </Text>
+              <Text size="xs" c="dimmed">
+                Cada 5 alumnos
+              </Text>
+            </div>
+            <div className={classes.featureDivider} />
+            <div className={classes.featureItem}>
+              <IconClock size={24} stroke={2} className={classes.featureIcon} />
+              <Text size="sm" fw={600} c="white">
+                Horarios
+              </Text>
+              <Text size="xs" c="dimmed">
+                Fijos
+              </Text>
+            </div>
+            <div className={classes.featureDivider} />
+            <div className={classes.featureItem}>
+              <IconCheck size={24} stroke={2} className={classes.featureIcon} />
+              <Text size="sm" fw={600} c="white">
+                Cupo
+              </Text>
+              <Text size="xs" c="dimmed">
+                Limitado
+              </Text>
+            </div>
+          </Group>
+        </div>
+
+        <Titles description="Un profesor cada 5 alumnos, adaptando el plan de entrenamiento a los objetivos específicos de cada persona. Horarios fijos y cupo limitado, para garantizar una atención verdaderamente personalizada." />
+
+        <Title
+          order={3}
+          ta="center"
+          c="white"
+          mt={60}
+          mb={10}
+          style={{
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "1px",
+            fontSize: "clamp(1.5rem, 3vw, 2rem)",
+          }}
+        >
+          Entrenamiento en acción
+        </Title>
+
+        <div
+          style={{
+            width: "60px",
+            height: "3px",
+            backgroundColor: "var(--mantine-color-blue-5)",
+            margin: "0 auto 30px auto",
+            borderRadius: "2px",
+          }}
+        />
+
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          {" "}
+          <Carrusel
+            media={[
+              { src: "/images/Video1.mp4", alt: "Video 1" },
+              { src: "/images/Video2.mp4", alt: "Video 2" },
+              { src: "/images/Video3.mp4", alt: "Video 3" },
+              { src: "/images/Lugar1.jpeg", alt: "Video 3" },
+            ]}
+          />
+          <Carrusel
+            media={[
+              { src: "/images/Recopilacion.mp4", alt: "Video 4" },
+              { src: "/images/Planificando.mp4", alt: "Video 5" },
+              { src: "/images/Lugar2.jpeg", alt: "Video 3" },
+            ]}
+          />
+          <Carrusel
+            media={[
+              { src: "/images/Video4.mp4", alt: "Video 7" },
+              { src: "/images/Lugar4.jpeg", alt: "Foto del lugar" },
+              { src: "/images/Tecla.mp4", alt: "Video 9" },
+              { src: "/images/Lugar3.jpeg", alt: "Video 3" },
+            ]}
+          />
+        </SimpleGrid>
+      </Container>
+    </section>
+  );
+}

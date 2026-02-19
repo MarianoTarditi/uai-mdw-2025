@@ -1,0 +1,198 @@
+.footer {
+  background: linear-gradient(
+    180deg,
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-9)) 0%,
+    light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8)) 100%
+  );
+  border-top: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
+  padding-top: calc(var(--mantine-spacing-xl) * 2);
+  padding-bottom: calc(var(--mantine-spacing-xl) * 1.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5)) 50%,
+    transparent 100%
+  );
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-xl);
+  padding-bottom: var(--mantine-spacing-xl);
+
+  @media (max-width: $mantine-breakpoint-md) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--mantine-spacing-lg);
+  }
+}
+
+.brandSection {
+  flex: 1;
+  max-width: 400px;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
+  }
+}
+
+.brandName {
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6) 0%,
+    var(--mantine-color-cyan-6) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1.5px;
+  font-size: 28px;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  line-height: 1.2;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+}
+
+.tagline {
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4));
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.divider {
+  height: 60px;
+  border-color: light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-5)
+  );
+
+  @media (max-width: $mantine-breakpoint-md) {
+    display: none;
+  }
+}
+
+.socialSection {
+  align-items: flex-end;
+  min-width: 200px;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.socialTitle {
+  color: light-dark(
+    var(--mantine-color-gray-7),
+    var(--mantine-color-gray-4)
+  ) !important;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 800 !important;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+.links {
+  @media (max-width: $mantine-breakpoint-md) {
+    justify-content: center;
+  }
+}
+
+.socialIcon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--mantine-radius-md);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+  }
+
+  &[data-social="instagram"] {
+    color: #e4405f;
+
+    &:hover {
+      color: white;
+      background: linear-gradient(
+        45deg,
+        #f09433 0%,
+        #e6683c 25%,
+        #dc2743 50%,
+        #cc2366 75%,
+        #bc1888 100%
+      );
+    }
+  }
+
+  &[data-social="youtube"] {
+    color: #ff0000;
+
+    &:hover {
+      color: white;
+      background: #ff0000;
+      transform: translateY(-4px) scale(1.1);
+    }
+  }
+
+  &[data-social="whatsapp"] {
+    color: #25d366;
+
+    &:hover {
+      color: white;
+      background: #25d366;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    }
+  }
+}
+
+.bottomDivider {
+  margin: var(--mantine-spacing-xl) 0;
+  border-color: light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-5)
+  );
+}
+
+.copyright {
+  text-align: center;
+  padding-top: var(--mantine-spacing-md);
+}
+
+.copyrightText {
+  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-5));
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}

@@ -1,0 +1,136 @@
+/* TercerHero.module.css */
+
+/* ==========================================================================
+   1. Contenedor Principal (Hero)
+   ========================================================================== */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 80px var(--mantine-spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #000; /* Fallback por si el video no carga */
+}
+
+.videoBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.6); 
+  transition: filter 0.3s ease;
+}
+
+.hero:hover .videoBackground {
+  filter: brightness(0.75);
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px; 
+}
+
+.contentWrapper {
+  text-align: center;
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.title {
+  color: var(--mantine-color-white);
+  font-size: clamp(2rem, 6vw, 3.5rem); 
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--mantine-spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.description {
+  max-width: 700px;
+  margin: 0 auto;
+  color: white;
+  font-size: var(--mantine-font-size-lg);
+  line-height: 1.6;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-xl);
+}
+
+.badge {
+  animation: fadeInDown 0.6s ease-out;
+  margin-bottom: var(--mantine-spacing-md);
+}
+
+.features {
+  margin-top: 40px;
+  padding: 24px 40px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  animation: fadeInUp 1s ease-out 0.2s both;
+
+  @media (max-width: 48em) {
+    flex-direction: column;
+    padding: 20px;
+    gap: var(--mantine-spacing-md) !important;
+  }
+}
+
+.featureItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 140px;
+  gap: 8px;
+}
+
+.featureIcon {
+  color: var(--mantine-color-blue-4);
+}
+
+.featureDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+
+  @media (max-width: 48em) {
+    display: none;
+  }
+}
+
+.gridWrapper {
+  margin-top: 50px;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
