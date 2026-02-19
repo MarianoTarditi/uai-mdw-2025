@@ -1,13 +1,14 @@
 {
-	"compilerOptions": {
-	"target": "ES2020",
-	"module": "CommonJS",
-	"rootDir": "./",
-	"outDir": "dist",
-	"strict": true,
-	"esModuleInterop": true,
-	"forceConsistentCasingInFileNames": true,
-	"resolveJsonModule": true 
-	},
-	  "exclude": ["node_modules", "frontend", "frontend2"]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": "./",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "frontend", "frontend2"]
 }
