@@ -14,10 +14,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://uai-mdw-2025-38xdenivb-mariano-tarditis-projects.vercel.app",
-    ],
+    origin: ["http://localhost:5173", "https://uai-mdw-2025.vercel.app"],
     credentials: true,
   }),
 );
