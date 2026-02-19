@@ -1,18 +1,19 @@
-import { Box, Text } from '@mantine/core';
+import { Box, Text } from "@mantine/core";
 
 interface VideoPlayerProps {
   url: string;
 }
 
 export const VideoPlayer = ({ url }: VideoPlayerProps) => {
-  const API_URL = "http://localhost:3001"; 
+  const API_URL = import.meta.env.VITE_STATIC_URL;
 
   // 1. Función para extraer ID de YouTube (Soporta links cortos, largos, etc.)
   const getYoutubeId = (url: string) => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    return match && match[2].length === 11 ? match[2] : null;
   };
 
   // 2. Lógica para obtener la URL local limpia
@@ -29,14 +30,14 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
   const localUrl = getLocalUrl(url);
 
   return (
-    <Box 
-      style={{ 
-        position: 'relative', 
-        paddingTop: '56.25%', // Aspect Ratio 16:9
-        borderRadius: '12px', 
-        overflow: 'hidden',
-        backgroundColor: '#000', 
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+    <Box
+      style={{
+        position: "relative",
+        paddingTop: "56.25%", // Aspect Ratio 16:9
+        borderRadius: "12px",
+        overflow: "hidden",
+        backgroundColor: "#000",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
       }}
     >
       {isYoutube ? (
@@ -48,11 +49,11 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         />
       ) : (
@@ -61,12 +62,12 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
           controls
           controlsList="nodownload"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover' 
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
         >
           <source src={localUrl} type="video/mp4" />

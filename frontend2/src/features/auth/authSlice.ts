@@ -75,15 +75,11 @@ export const registerUser = createAsyncThunk<
       height: formData.height,
     };
 
-    await axiosPrivate.post(
-      "http://localhost:3001/api/auth/saveUser/",
-      dbPayload,
-      {
-        headers: {
-          Authorization: `Bearer ${firebaseToken}`,
-        },
+    await axiosPrivate.post("/auth/saveUser", dbPayload, {
+      headers: {
+        Authorization: `Bearer ${firebaseToken}`,
       },
-    );
+    });
 
     console.log("user: ", user);
 
@@ -127,14 +123,11 @@ export const loginUser = createAsyncThunk<
     const token = await user.getIdToken();
 
     try {
-      const response = await axiosPrivate.get(
-        "http://localhost:3001/api/user/profile",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axiosPrivate.get("/user/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const userProfile = response.data.data;
 
