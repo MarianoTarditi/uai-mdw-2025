@@ -1,90 +1,87 @@
-🏋️‍♂️ Personal Trainer App
-Gestión de rutinas, clientes y ejercicios — MERN + Firebase + shadcn/ui
+# 🏋️‍♂️ AgustínTurriEDF APP
 
-Este proyecto es una aplicación web creada para personal trainers que necesitan llevar un control eficiente de sus clientes, rutinas, ejercicios y progreso físico.
+Gestión de rutinas, clientes y ejercicios — **MERN + Firebase + shadcn/ui**
+
+Este proyecto es una aplicación web creada para un personal trainer que necesita llevar un control eficiente de sus clientes, rutinas, ejercicios y progreso físico.
+
 La plataforma combina un stack moderno y escalable, con autenticación segura y una interfaz profesional.
 
-🚀 Tecnologías utilizadas
-Frontend
+---
 
-⚛️ React + Vite
+# 🚀 Tecnologías utilizadas
 
-🎨 shadcn/ui (UI moderna, accesible y altamente personalizable)
+## 🎨 Frontend
 
-🧭 React Router
+- ⚛️ React + Vite
+- 🎨 shadcn/ui - MantineUI (UI moderna, accesible y altamente personalizable)
+- 🧭 React Router
+- 📝 React Hook Form + Zod (formularios y validaciones)
+- 🗂️ Redux Toolkit (manejo global de estado)
 
-📝 React Hook Form + Zod (formularios y validaciones)
+---
 
-🗂️ Redux Toolkit (manejo global de estado)
+## 🔧 Backend
 
-Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- Middlewares de seguridad (validaciónes firebase en backend - ckeckeo de roles)
 
-🔧 Node.js + Express
+---
 
-🗄️ MongoDB + Mongoose
+## 🔐 Autenticación
 
-🔐 Middlewares de seguridad (JWT, validación, sanitización)
+- 🔥 Firebase Authentication (Email/Password)
+- Manejo seguro de sesiones
+- Verificación de identidad
 
-Autenticación
+---
 
-🔥 Firebase Authentication (Email/Password)
-Manejo seguro de sesiones y verificación de identidad.
+# 📌 Funcionalidades principales
 
-📌 Funcionalidades principales
-🔐 Autenticación
+## 🔐 Autenticación
 
-Registro y login con Firebase Auth
+- Registro y login con Firebase Auth
+- Protección de rutas en frontend y backend
+- Roles de usuario (admin, trainer, client)
 
-Protección de rutas en frontend y backend
+---
 
-Roles de usuario (admin, trainer, client)
+## 🧑‍🤝‍🧑 Gestión de Usuarios / Clientes
 
-🧑‍🤝‍🧑 Gestión de Usuarios / Clientes
+- Crear, editar y eliminar clientes
+- Activar/desactivar usuarios (soft delete)
+- Actualización de perfil:
+  - Foto
+  - Altura
+  - Peso
+  - Fecha de nacimiento
+  - Género
 
-Crear, editar y eliminar clientes
+---
 
-Activar/desactivar usuarios (soft delete)
+## 🏋️‍♀️ Gestión de Ejercicios
 
-Actualización de perfil
-
-Foto
-
-Altura
-
-Peso
-
-Fecha de nacimiento
-
-Género
-
-🏋️‍♀️ Gestión de Ejercicios
-
-Crear, editar, listar y eliminar ejercicios
+- Crear, editar, listar y eliminar ejercicios
 
 Cada ejercicio incluye:
+- Descripción
+- Grupo muscular
+- Imagen
+- Video (opcional)
 
-Descripción
+---
 
-Grupo muscular
+## 📅 Rutinas de entrenamiento
 
-Imagen
+- Asignación de rutinas a clientes
+- Rutinas personalizadas por día
+- Historial de rutinas y progresos
 
-Video (opcional)
+---
 
-📅 Rutinas de entrenamiento
+## 📊 Dashboard del Trainer
 
-Asignación de rutinas a clientes
-
-Rutinas personalizadas por día
-
-Historial de rutinas y progresos
-
-📊 Dashboard del Trainer
-
-Estadísticas de clientes activos
-
-Ejercicios creados
-
-Rutinas asignadas
-
-Información general rápida
+- Estadísticas de clientes activos
+- Ejercicios creados
+- Rutinas asignadas
+- Información general rápida
