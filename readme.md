@@ -85,3 +85,10 @@ Cada ejercicio incluye:
 - Ejercicios creados
 - Rutinas asignadas
 - Información general rápida
+
+---
+
+# 🔗 Links del Proyecto
+
+- 🌐 **Aplicación Web:** [https://TU-LINK-DEPLOY.com](https://uai-mdw-2025.vercel.app/home)
+
