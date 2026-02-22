@@ -105,7 +105,6 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
             </Breadcrumb>
           </div>
 
-          {/* DERECHA */}
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

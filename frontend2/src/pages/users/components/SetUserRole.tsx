@@ -97,7 +97,6 @@ export const SetUserRole = ({ user, isOpen, setIsOpen }: SetUserRoleProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        {/* SELECT */}
         <div className="py-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Rol del usuario</label>

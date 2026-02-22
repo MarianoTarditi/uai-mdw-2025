@@ -71,7 +71,6 @@ export function ChartAreaInteractive() {
         </div>
 
         <CardAction>
-          {/* CONTROL TIPO TOGGLE (Visible en pantallas medianas/grandes) */}
           <ToggleGroup
             type="single"
             value={dataType}
@@ -90,7 +89,6 @@ export function ChartAreaInteractive() {
             </ToggleGroupItem>
           </ToggleGroup>
 
-          {/* CONTROL TIPO SELECT (Visible en móviles) */}
           <Select value={dataType} onValueChange={setDataType}>
             <SelectTrigger className="flex w-40 @[767px]/card:hidden" size="sm">
               <SelectValue placeholder="Seleccionar..." />

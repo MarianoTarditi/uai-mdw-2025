@@ -68,7 +68,6 @@ export function ComboBoxMultiSelect({
                     handleUnselect(item);
                   }}
                 >
-                  {/* Buscamos el label correspondiente al value, o mostramos el value si no se encuentra */}
                   {options.find((opt) => opt.value === item)?.label || item}
                   <X className="ml-1 h-3 w-3 hover:text-red-500 cursor-pointer" />
                 </Badge>

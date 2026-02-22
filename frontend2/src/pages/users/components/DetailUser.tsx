@@ -116,7 +116,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
           </div>
         ) : (
           <div className="grid gap-6 py-2">
-            {/* SECCIÓN SUPERIOR */}
             <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
               <div className="flex-shrink-0 flex flex-col items-center">
                 <Avatar className="w-24 h-24 border-2 border-muted">
@@ -143,7 +142,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="grid gap-1.5">
                     <Label>Nombre</Label>
-                    {/* CAMBIO 1: disabled y clases para mejorar contraste */}
                     <Input
                       disabled
                       value={detailedUser?.name || ""}
@@ -152,7 +150,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
                   </div>
                   <div className="grid gap-1.5">
                     <Label>Apellido</Label>
-                    {/* CAMBIO 2: disabled */}
                     <Input
                       disabled
                       value={detailedUser?.lastName || ""}
@@ -163,7 +160,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
 
                 <div className="grid gap-1.5">
                   <Label>Email</Label>
-                  {/* CAMBIO 3: disabled */}
                   <Input
                     disabled
                     value={detailedUser?.email || ""}
@@ -182,7 +178,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
 
             <Separator />
 
-            {/* SECCIÓN DATOS FÍSICOS (Ya estaban "bloqueados" porque son Divs) */}
             <div>
               <h3 className="text-sm font-medium mb-3 text-muted-foreground">
                 Información Personal & Física
@@ -218,7 +213,6 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
               </div>
             </div>
 
-            {/* INFO DE SISTEMA */}
             <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground mt-2 bg-muted/20 p-2 rounded">
               <p>
                 <strong>ID:</strong>{" "}

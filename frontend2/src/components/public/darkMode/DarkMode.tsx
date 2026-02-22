@@ -23,7 +23,6 @@ export function DarkMode() {
       }
       aria-label="Cambiar tema de color"
     >
-      {/* 🔥 INVERTIDO: Si es light, mostramos la luna para cambiar a dark */}
       {computedColorScheme === "light" ? (
         <IconMoon stroke={1.5} />
       ) : (

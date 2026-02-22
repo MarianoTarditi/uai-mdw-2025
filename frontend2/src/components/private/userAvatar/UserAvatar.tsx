@@ -38,7 +38,6 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
         }}
       />
 
-      {/* SOLO si incluso la imagen default falla */}
       <AvatarFallback>{fallbackText}</AvatarFallback>
     </Avatar>
   );

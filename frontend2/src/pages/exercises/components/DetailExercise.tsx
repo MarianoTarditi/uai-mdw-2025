@@ -96,17 +96,15 @@ export function DetailExercise({
 
         {isFetchingLoading ? (
           <div className="flex justify-center items-center py-10">
-            <SpinnerButton />
+            <SpinnerButton variant="sizes"/>
           </div>
         ) : (
           <div className="grid gap-4 py-2">
-            {/* NOMBRE */}
             <div className="grid gap-2">
               <Label>Nombre</Label>
               <Input readOnly value={detailedExercise?.nombre || ""} />
             </div>
 
-            {/* MÚSCULOS PRINCIPALES (Aquí estaba el error) */}
             <div className="grid gap-2">
               <Label>Músculos Principales</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
@@ -114,7 +112,6 @@ export function DetailExercise({
               </div>
             </div>
 
-            {/* MÚSCULOS SECUNDARIOS */}
             <div className="grid gap-2">
               <Label>Músculos Secundarios</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
@@ -122,7 +119,6 @@ export function DetailExercise({
               </div>
             </div>
 
-            {/* MATERIALES */}
             <div className="grid gap-2">
               <Label>Materiales Necesarios</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
@@ -130,7 +126,6 @@ export function DetailExercise({
               </div>
             </div>
 
-            {/* ETIQUETAS */}
             <div className="grid gap-2">
               <Label>Etiquetas</Label>
               <div className="p-2 border rounded-md bg-muted/20 min-h-[40px] flex items-center">
@@ -138,7 +133,6 @@ export function DetailExercise({
               </div>
             </div>
 
-            {/* COMENTARIO */}
             <div className="grid gap-2">
               <Label>Comentario</Label>
               <Textarea
@@ -148,11 +142,9 @@ export function DetailExercise({
               />
             </div>
 
-            {/* VIDEO & IMAGEN */}
             <div className="mt-4">
               <DialogTitle className="mb-2">Video explicativo</DialogTitle>
 
-              {/* CORRECCIÓN 1: Usamos detailedExercise y agregamos '|| ""' */}
               <VideoPlayer url={detailedExercise?.videoUrl || ""} />
             </div>
           </div>

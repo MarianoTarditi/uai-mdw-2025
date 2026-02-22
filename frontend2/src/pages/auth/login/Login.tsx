@@ -48,13 +48,7 @@ export function Login() {
     dispatch(loginUser(data));
   };
 
-  if (isLoading) {
-    return (
-      <Center style={{ width: "100vw", height: "100vh" }}>
-        <SpinnerButton variant="sizes" />
-      </Center>
-    );
-  }
+
 
   return (
     <Container size={480} my="auto" style={{ width: "100%" }}>
@@ -101,7 +95,7 @@ export function Login() {
               ¿No tienes una cuenta? Registráte
             </Anchor>
 
-            <Button type="submit" radius="xl" disabled={isSubmitting}>
+            <Button type="submit" radius="xl" disabled={isSubmitting} loading={isLoading}>
               Iniciar sesión
             </Button>
           </Group>

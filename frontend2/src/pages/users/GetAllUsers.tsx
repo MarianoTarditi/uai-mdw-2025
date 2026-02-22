@@ -23,13 +23,10 @@ export const GetAllUsers = () => {
 
   return (
     <div className="relative w-full space-y-4">
-      {/* 🔒 OVERLAY SI HAY ERROR */}
       {isError && (
         <div className="relative flex h-screen items-center justify-center bg-background">
-          {/* Fondo desenfocado */}
           <div className="absolute inset-0 backdrop-blur-sm" />
 
-          {/* Card central */}
           <div className="relative z-10 w-full max-w-md rounded-2xl border bg-card p-8 shadow-xl text-center">
             <div className="mb-4 flex justify-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/5">
@@ -46,7 +43,6 @@ export const GetAllUsers = () => {
         </div>
       )}
 
-      {/* 📊 CONTENIDO PRINCIPAL */}
       <div className={isError ? "pointer-events-none opacity-30" : ""}>
         <div className="flex items-center justify-between py-4">
           <Input

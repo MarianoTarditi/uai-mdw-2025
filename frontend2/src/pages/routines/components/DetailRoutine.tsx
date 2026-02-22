@@ -204,7 +204,6 @@ export function DetailRoutine({
                             className="overflow-hidden border-l-4 border-l-primary/50 shadow-sm"
                           >
                             <CardContent className="p-4">
-                              {/* HEADER: Nombre y Botón */}
                               <div className="flex justify-between items-start mb-3">
                                 <h4 className="font-bold text-base flex items-center gap-2">
                                   <span className="text-muted-foreground text-sm">

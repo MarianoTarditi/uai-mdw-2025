@@ -70,20 +70,9 @@ export function SignUp() {
     dispatch(registerUser(data));
   };
 
-  if (isLoading) {
-    return (
-      <Container
-        size="xs"
-        my={30}
-        className="flex justify-center items-center h-screen"
-      >
-        <SpinnerButton variant="sizes" />
-      </Container>
-    );
-  }
+
 
   return (
-    // Cambié a size="sm" para dar espacio a las dos columnas
     <Container size="sm" my={30}>
       <Paper radius="md" p="lg" withBorder>
         <Title size="h3" style={{ textAlign: "center", marginBottom: "1rem" }}>
@@ -93,7 +82,6 @@ export function SignUp() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack>
-            {/* 🔥 Fila 1: Nombre y Apellido */}
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <TextInput
                 required
@@ -113,7 +101,6 @@ export function SignUp() {
               />
             </SimpleGrid>
 
-            {/* Fila 2: Email (Ocupa todo el ancho por ser un dato principal) */}
             <TextInput
               required
               label="Email"
@@ -123,7 +110,6 @@ export function SignUp() {
               radius="md"
             />
 
-            {/* 🔥 Fila 3: Fecha de nacimiento y Género */}
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <TextInput
                 label="Fecha de nacimiento"
@@ -135,7 +121,6 @@ export function SignUp() {
               <SelectGender register={register} defaultValue={undefined} />
             </SimpleGrid>
 
-            {/* 🔥 Fila 4: Altura y Peso (Tus componentes personalizados) */}
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <div className="grid gap-2">
                 <Label htmlFor="height">Altura (cm)</Label>
@@ -163,7 +148,6 @@ export function SignUp() {
               </div>
             </SimpleGrid>
 
-            {/* 🔥 Fila 5: Contraseñas */}
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <PasswordInput
                 required
@@ -197,7 +181,7 @@ export function SignUp() {
             <Button
               type="submit"
               radius="xl"
-              loading={isSubmitting}
+              loading={isLoading}
               color="myColor.9"
             >
               Registrarse

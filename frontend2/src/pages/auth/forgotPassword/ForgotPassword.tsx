@@ -52,10 +52,9 @@ export function ForgotPassword() {
   };
 
 return (
-    /* 🔥 1. Aseguramos el ancho de 460 y quitamos el margen vertical excesivo (my={170}) 
-          ya que el AuthLayout se encarga de centrarlo verticalmente */
+
     <Container size={460} style={{ width: '100%' }}>
-      <Paper withBorder shadow="md" p={40} radius="md"> {/* 🔥 Padding aumentado a 40 */}
+      <Paper withBorder shadow="md" p={40} radius="md"> 
         <Title className={classes.title} ta="center" order={2}>
           ¿Olvidaste tu contraseña?
         </Title>

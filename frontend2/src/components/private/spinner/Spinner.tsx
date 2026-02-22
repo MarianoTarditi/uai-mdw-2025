@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 
 type SpinnerVariant = "default" | "outline" | "secondary" | "sizes";
@@ -10,7 +10,7 @@ export function SpinnerButton({
 }) {
   return (
     <div className="flex items-center justify-center w-full h-screen">
-      {variant === "default" && (
+      {/* {variant === "default" && (
         <Button disabled size="sm">
           <Spinner className="mr-2" />
           Loading...
@@ -29,7 +29,7 @@ export function SpinnerButton({
           <Spinner className="mr-2" />
           Processing
         </Button>
-      )}
+      )} */}
 
       {variant === "sizes" && (
         <div className="flex items-center gap-6">

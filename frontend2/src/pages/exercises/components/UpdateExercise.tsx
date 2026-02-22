@@ -143,7 +143,6 @@ export function UpdateExercise({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            {/* NOMBRE */}
             <div className="grid gap-3">
               <Label htmlFor="nombre">Nombre del ejercicio</Label>
               <Input
