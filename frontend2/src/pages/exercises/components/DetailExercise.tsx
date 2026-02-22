@@ -84,6 +84,9 @@ export function DetailExercise({
       </div>
     );
   };
+
+  const shouldShowSpinner = isFetchingLoading || !detailedExercise || detailedExercise._id !== exercise?._id;
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-background text-foreground p-6">
@@ -94,7 +97,7 @@ export function DetailExercise({
           </DialogDescription>
         </DialogHeader>
 
-        {isFetchingLoading ? (
+        {shouldShowSpinner ? (
           <div className="flex justify-center items-center py-10">
             <SpinnerButton variant="sizes"/>
           </div>

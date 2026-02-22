@@ -8,7 +8,7 @@ export const routineSchema = z.object({
     .min(3, "El nombre debe tener al menos 3 letras"),
   description: z.string().optional(),
 
-  studentId: z.string().min(1, "Debe asignar un estudiante a la rutina"),
+  studentId: z.string().min(1, "Debe la rutina a un estudiante"),
 
 exerciseAssignments: z
     .array(

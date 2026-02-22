@@ -12,23 +12,26 @@ export interface IStudent {
   profileImage?: string;
 }
 
-
 interface RoutineState {
   routines: IRoutine[];
   students: IStudent[];
-
   selectedRoutine: IRoutine | null;
 
   isFetchingLoading: boolean;
+  isCreatingLoading: boolean;
+  isUpdatingLoading: boolean;
+  isDeletingLoading: boolean;
   isDetailLoading: boolean;
-  isActionLoading: boolean;
   isStudentsLoading: boolean;
+
+  isFetchingSuccess: boolean;
+  isCreatingSuccess: boolean;
+  isUpdatingSuccess: boolean;
+  isDeletingSuccess: boolean;
 
   isError: boolean;
   message: string;
 }
-
-
 interface DeleteAssignmentResponse {
   assignmentId: string;
   routineId: string;
@@ -41,9 +44,16 @@ const initialState: RoutineState = {
   selectedRoutine: null,
 
   isFetchingLoading: false,
+  isCreatingLoading: false,
+  isUpdatingLoading: false,
+  isDeletingLoading: false,
   isDetailLoading: false,
-  isActionLoading: false,
   isStudentsLoading: false,
+
+  isFetchingSuccess: false,
+  isCreatingSuccess: false,
+  isUpdatingSuccess: false,
+  isDeletingSuccess: false,
 
   isError: false,
   message: "",
@@ -196,36 +206,26 @@ const routineSlice = createSlice({
       state.selectedRoutine = null;
     },
     reset(state) {
-      state.selectedRoutine = null;
-      state.isDetailLoading = false;
+      state.isFetchingSuccess = false;
+      state.isCreatingSuccess = false;
+      state.isUpdatingSuccess = false;
+      state.isDeletingSuccess = false;
       state.isError = false;
       state.message = "";
+      state.selectedRoutine = null;
     },
   },
   extraReducers: (builder) => {
-    // CREATE ROUTINE
-    builder
-      .addCase(createRoutine.pending, (state) => {
-        state.isActionLoading = true;
-        state.isError = false;
-      })
-      .addCase(createRoutine.fulfilled, (state, action) => {
-        state.isActionLoading = false;
-        state.routines.push(action.payload);
-      })
-      .addCase(createRoutine.rejected, (state, action) => {
-        state.isActionLoading = false;
-        state.isError = true;
-        state.message = action.payload as string;
-      });
-
-    // FETCH
+    // 1. FETCH ROUTINE
     builder
       .addCase(fetchRoutines.pending, (state) => {
         state.isFetchingLoading = true;
+        state.isFetchingSuccess = false;
+        state.isError = false;
       })
       .addCase(fetchRoutines.fulfilled, (state, action) => {
         state.isFetchingLoading = false;
+        state.isFetchingSuccess = true;
         state.routines = action.payload;
       })
       .addCase(fetchRoutines.rejected, (state, action) => {
@@ -234,12 +234,29 @@ const routineSlice = createSlice({
         state.message = action.payload as string;
       });
 
-    // GET BY ID
+    // 2. CREATE ROUTINE
+    builder
+      .addCase(createRoutine.pending, (state) => {
+        state.isCreatingLoading = true;
+        state.isCreatingSuccess = false;
+        state.isError = false;
+      })
+      .addCase(createRoutine.fulfilled, (state, action) => {
+        state.isCreatingLoading = false;
+        state.isCreatingSuccess = true;
+        state.routines.push(action.payload);
+      })
+      .addCase(createRoutine.rejected, (state, action) => {
+        state.isCreatingLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
+
+    // 3. GET BY ID
     builder
       .addCase(getRoutineById.pending, (state) => {
         state.isDetailLoading = true;
         state.isError = false;
-        state.message = "";
       })
       .addCase(getRoutineById.fulfilled, (state, action) => {
         state.isDetailLoading = false;
@@ -251,95 +268,101 @@ const routineSlice = createSlice({
         state.message = action.payload as string;
       });
 
-    // UPDATE RUTINE
+    // 4. UPDATE ROUTINE
     builder
       .addCase(updateRoutine.pending, (state) => {
-        state.isActionLoading = true;
+        state.isUpdatingLoading = true;
+        state.isUpdatingSuccess = false;
         state.isError = false;
       })
       .addCase(updateRoutine.fulfilled, (state, action) => {
-        state.isActionLoading = false;
-
-        const updatedRoutine = action.payload as IRoutine;
-
-        const index = state.routines.findIndex(
-          (r) => r._id === updatedRoutine._id,
-        );
-
-        if (index !== -1) {
-          state.routines[index] = updatedRoutine;
-        }
-
-        if (state.selectedRoutine?._id === updatedRoutine._id) {
-          state.selectedRoutine = updatedRoutine;
-        }
+        state.isUpdatingLoading = false;
+        state.isUpdatingSuccess = true;
+        const updated = action.payload;
+        const index = state.routines.findIndex((r) => r._id === updated._id);
+        if (index !== -1) state.routines[index] = updated;
+        if (state.selectedRoutine?._id === updated._id)
+          state.selectedRoutine = updated;
       })
       .addCase(updateRoutine.rejected, (state, action) => {
-        state.isActionLoading = false;
+        state.isUpdatingLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       });
 
-    // DELETE ROUTINE
+    // 5. DELETE ROUTINE
     builder
       .addCase(deleteRoutine.pending, (state) => {
-        state.isActionLoading = true;
+        state.isDeletingLoading = true;
+        state.isDeletingSuccess = false;
         state.isError = false;
       })
       .addCase(deleteRoutine.fulfilled, (state, action) => {
-        state.isActionLoading = false;
-
+        state.isDeletingLoading = false;
+        state.isDeletingSuccess = true;
         const idDeleted = action.meta.arg;
-
         state.routines = state.routines.filter((r) => r._id !== idDeleted);
-
-        if (state.selectedRoutine?._id === idDeleted) {
+        if (state.selectedRoutine?._id === idDeleted)
           state.selectedRoutine = null;
-        }
       })
       .addCase(deleteRoutine.rejected, (state, action) => {
-        state.isActionLoading = false;
+        state.isDeletingLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       });
 
-    // DELETE EXERCISE ASSIGNMENT
-    builder.addCase(deleteExerciseAssignment.pending, (state) => {
-      state.isActionLoading = true;
-    });
-
-    builder.addCase(deleteExerciseAssignment.fulfilled, (state, action) => {
-      state.isActionLoading = false;
-      const { assignmentId, routineId, routineDeleted } = action.payload;
-
-      if (routineDeleted) {
-        state.routines = state.routines.filter((r) => r._id !== routineId);
-        if (state.selectedRoutine?._id === routineId) {
-          state.selectedRoutine = null;
-        }
-      } else {
-        const routine = state.routines.find((r) => r._id === routineId);
-        if (routine) {
-          routine.exerciseAssignments = routine.exerciseAssignments.filter(
-            (a) => a._id !== assignmentId,
-          );
-        }
-        if (state.selectedRoutine?._id === routineId) {
-          state.selectedRoutine.exerciseAssignments =
-            state.selectedRoutine.exerciseAssignments.filter(
+    // 6. DELETE EXERCISE ASSIGNMENT
+    builder
+      .addCase(deleteExerciseAssignment.pending, (state) => {
+        state.isDeletingLoading = true;
+      })
+      .addCase(deleteExerciseAssignment.fulfilled, (state, action) => {
+        state.isDeletingLoading = false;
+        state.isDeletingSuccess = true;
+        const { assignmentId, routineId, routineDeleted } = action.payload;
+        if (routineDeleted) {
+          state.routines = state.routines.filter((r) => r._id !== routineId);
+          if (state.selectedRoutine?._id === routineId)
+            state.selectedRoutine = null;
+        } else {
+          const routine = state.routines.find((r) => r._id === routineId);
+          if (routine) {
+            routine.exerciseAssignments = routine.exerciseAssignments.filter(
               (a) => a._id !== assignmentId,
             );
+          }
+          if (state.selectedRoutine?._id === routineId) {
+            state.selectedRoutine.exerciseAssignments =
+              state.selectedRoutine.exerciseAssignments.filter(
+                (a) => a._id !== assignmentId,
+              );
+          }
         }
-      }
-    });
+      })
+      .addCase(deleteExerciseAssignment.rejected, (state, action) => {
+        state.isDeletingLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
 
-    builder.addCase(deleteExerciseAssignment.rejected, (state, action) => {
-      state.isActionLoading = false;
-      state.isError = true;
-      state.message = action.payload as string;
-    });
+    // 7. GET STUDENTS 
+    builder
+      .addCase(getStudents.pending, (state) => {
+        state.isStudentsLoading = true;
+        state.isError = false;
+        state.message = "";
+      })
+      .addCase(getStudents.fulfilled, (state, action) => {
+        state.isStudentsLoading = false;
+        state.students = action.payload;
+      })
+      .addCase(getStudents.rejected, (state, action) => {
+        state.isStudentsLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
 
-    // 5. DELETE EXERCISE (GLOBAL)
+    // 8. DELETE EXERCISE 
     builder.addCase(deleteExercise.fulfilled, (state, action) => {
       const { id: deletedExerciseId, routineDeleted } = action.payload;
 
@@ -373,23 +396,6 @@ const routineSlice = createSlice({
         }
       }
     });
-
-    // GET STUDENTS
-    builder
-      .addCase(getStudents.pending, (state) => {
-        state.isStudentsLoading = true;
-        state.isError = false;
-        state.message = "";
-      })
-      .addCase(getStudents.fulfilled, (state, action) => {
-        state.isStudentsLoading = false;
-        state.students = action.payload;
-      })
-      .addCase(getStudents.rejected, (state, action) => {
-        state.isStudentsLoading = false;
-        state.isError = true;
-        state.message = action.payload as string;
-      });
   },
 });
 

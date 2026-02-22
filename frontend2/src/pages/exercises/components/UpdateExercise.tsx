@@ -127,10 +127,6 @@ export function UpdateExercise({
     }
   };
 
-  if (isUpdatingLoading) {
-    return <SpinnerButton variant="sizes" />;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
@@ -323,7 +319,15 @@ export function UpdateExercise({
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button type="submit">Guardar Cambios</Button>
+            <Button type="submit" disabled={isUpdatingLoading}>
+              {isUpdatingLoading ? (
+                <>
+                  <SpinnerButton variant="sizes" /> Guardando...
+                </>
+              ) : (
+                "Guardar Cambios"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

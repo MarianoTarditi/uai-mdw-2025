@@ -60,7 +60,7 @@ export function CreateRoutine({
   onSubmit: onAfterSubmit,
 }: Props) {
   const dispatch = useAppDispatch();
-  const { isActionLoading, students } = useAppSelector(
+  const { isCreatingLoading, students } = useAppSelector(
     (state) => state.routine,
   );
   const { exercises } = useAppSelector((state) => state.exercise);
@@ -124,8 +124,6 @@ export function CreateRoutine({
       toast.error(errorMessage);
     }
   };
-
-  if (isActionLoading) return <SpinnerButton variant="sizes" />;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -426,7 +424,20 @@ export function CreateRoutine({
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button type="submit">Crear rutina</Button>
+            <Button
+              type="submit"
+              disabled={isCreatingLoading}
+              className="min-w-[120px]"
+            >
+              {isCreatingLoading ? (
+                <>
+                  <SpinnerButton variant="sizes" />
+                  Creando...
+                </>
+              ) : (
+                "Crear rutina"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

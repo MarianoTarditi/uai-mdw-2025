@@ -141,10 +141,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
     }
   };
 
-  if (isCreatingLoading) {
-    return <SpinnerButton variant="sizes" />;
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
@@ -156,7 +152,10 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div
+            className={`grid gap-4 py-4 ${isCreatingLoading ? "opacity-70 pointer-events-none" : ""}`}
+          >
+            {" "}
             <div className="grid gap-3">
               <Label htmlFor="nombre">Nombre del ejercicio</Label>
               <Input
@@ -168,7 +167,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 <p className="text-sm text-red-500">{errors.nombre.message}</p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label>Músculos principales</Label>
               <Controller
@@ -191,7 +189,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 </p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label>Músculos secundarios (Opcional)</Label>
               <Controller
@@ -200,7 +197,7 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     key={`secondary-${watchedPrincipales.length}`}
-                    options={filteredSecondaryOptions} 
+                    options={filteredSecondaryOptions}
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Seleccionar músculos"
@@ -208,7 +205,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 )}
               />
             </div>
-
             <div className="grid gap-3">
               <Label>Materiales necesarios</Label>
               <Controller
@@ -229,7 +225,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 </p>
               )}
             </div>
-
             <div className="grid gap-3">
               <Label>Etiquetas</Label>
               <Controller
@@ -250,7 +245,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 </p>
               )}
             </div>
-
             <div className="grid gap-3 mt-2 p-4 border rounded-lg bg-muted/10">
               <Label className="text-base font-semibold">Elige tu video</Label>
               <p className="text-xs text-muted-foreground mb-2">
@@ -330,7 +324,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 </TabsContent>
               </Tabs>
             </div>
-
             <div className="grid gap-3">
               <Label htmlFor="comentario">Comentario (opcional)</Label>
               <Textarea
@@ -348,7 +341,20 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Guardar ejercicio</Button>
+            <Button
+              type="submit"
+              disabled={isCreatingLoading}
+              className="min-w-[140px]"
+            >
+              {isCreatingLoading ? (
+                <div className="flex items-center gap-2">
+                  <SpinnerButton variant="sizes" />
+                  <span>Creando...</span>
+                </div>
+              ) : (
+                "Crear ejercicio"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

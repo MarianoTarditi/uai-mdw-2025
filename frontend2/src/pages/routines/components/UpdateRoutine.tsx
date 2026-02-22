@@ -64,7 +64,7 @@ export function UpdateRoutine({
   setIsOpen,
 }: UpdateRoutineProps) {
   const dispatch = useAppDispatch();
-  const { isActionLoading, students } = useAppSelector(
+  const { isUpdatingLoading, students } = useAppSelector(
     (state) => state.routine,
   );
   const { exercises } = useAppSelector((state) => state.exercise);
@@ -120,10 +120,10 @@ export function UpdateRoutine({
     resetForm({
       name: routine.name,
       description: routine.description || "",
-      studentId: studentIdValue, 
+      studentId: studentIdValue,
       exerciseAssignments: formattedAssignments,
     });
-  }, [isOpen, routine, resetForm]); 
+  }, [isOpen, routine, resetForm]);
 
   const onSubmit = async (data: RoutineFormValues) => {
     if (!routine?._id) return;
@@ -437,8 +437,8 @@ export function UpdateRoutine({
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isActionLoading}>
-              {isActionLoading ? (
+            <Button type="submit" disabled={isUpdatingLoading}>
+              {isUpdatingLoading ? (
                 <>
                   <SpinnerButton variant="sizes" /> Guardando...
                 </>

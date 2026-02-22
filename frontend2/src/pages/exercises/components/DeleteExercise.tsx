@@ -41,11 +41,10 @@ export function DeleteExercise({
       toast.success(
         resultPayload.routineDeleted
           ? "Exercise deleted and the routine was removed because it had no exercises left"
-          : "Exercise deleted successfully!",
+          : "Ejercicio eliminado exitosamente!",
       );
 
       setIsOpen(false);
-
     } catch (error: unknown) {
       toast.error(
         typeof error === "string" ? error : "Failed to delete exercise",
@@ -61,11 +60,11 @@ export function DeleteExercise({
             <TriangleAlertIcon className="text-destructive w-6 h-6" />
           </div>
           <AlertDialogTitle className="bg-background text-foreground">
-            Are you absolutely sure you want to delete this exercise?
+            ¿Estás seguro de que deseas eliminar este ejercicio??
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            This action cannot be undone. This will permanently delete the
-            exercise.
+            Esta acción no se puede deshacer. Eliminará el ejercicio
+            permanentemente.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -73,15 +72,15 @@ export function DeleteExercise({
             className="bg-background text-foreground"
             disabled={isDeletingLoading}
           >
-            Cancel
+            Cancelar
           </AlertDialogCancel>
 
           <AlertDialogAction
             className="bg-destructive text-white hover:bg-destructive/80"
-            onClick={handleDelete} 
+            onClick={handleDelete}
             disabled={isDeletingLoading}
           >
-            {isDeletingLoading ? <SpinnerButton variant="sizes" /> : "Delete"}
+            {isDeletingLoading ? <SpinnerButton variant="sizes" /> : "Eliminar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

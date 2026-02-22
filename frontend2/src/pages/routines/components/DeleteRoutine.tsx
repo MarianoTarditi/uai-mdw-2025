@@ -11,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { SpinnerButton } from "@/components/private/spinner/Spinner";
 
 interface DeleteRoutineProps {
   routine: {
@@ -28,22 +29,18 @@ export function DeleteRoutine({
 }: DeleteRoutineProps) {
   const dispatch = useAppDispatch();
 
-  const { isActionLoading } = useAppSelector(
-    (state) => state.routine
-  );
+  const { isDeletingLoading } = useAppSelector((state) => state.routine);
 
   const handleDelete = async () => {
     if (!routine._id) return;
 
     try {
       await dispatch(deleteRoutine(routine._id)).unwrap();
-      toast.success("Routine deleted successfully!");
+      toast.success("Rutina eliminada exitosamente!");
       setIsOpen(false);
     } catch (error) {
       toast.error(
-        typeof error === "string"
-          ? error
-          : "An unexpected error occurred"
+        typeof error === "string" ? error : "An unexpected error occurred",
       );
     }
   };
@@ -52,13 +49,13 @@ export function DeleteRoutine({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete routine</DialogTitle>
+          <DialogTitle>Eliminar rutina</DialogTitle>
         </DialogHeader>
 
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete{" "}
-          <span className="font-medium">{routine.name}</span>?  
-          This action cannot be undone.
+          ¿Estás seguro de que deseas eliminar la rutina
+          <span className="font-medium">{routine.name}</span>? Esta acción no se
+          puede deshacer.
         </p>
 
         <DialogFooter className="gap-2">
@@ -66,18 +63,18 @@ export function DeleteRoutine({
             type="button"
             variant="outline"
             onClick={() => setIsOpen(false)}
-            disabled={isActionLoading}
+            disabled={isDeletingLoading}
           >
-            Cancel
+            Cancelar
           </Button>
 
           <Button
             type="button"
             variant="destructive"
             onClick={handleDelete}
-            disabled={isActionLoading}
+            disabled={isDeletingLoading}
           >
-            {isActionLoading ? "Deleting..." : "Delete"}
+            {isDeletingLoading ? <SpinnerButton variant="sizes" /> : "Eliminar"}
           </Button>
         </DialogFooter>
       </DialogContent>

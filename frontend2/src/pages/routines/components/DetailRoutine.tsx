@@ -78,7 +78,7 @@ export function DetailRoutine({
   const exercisesList = detailedRoutine?.exerciseAssignments || [];
   const hasExercises = exercisesList.length > 0;
 
-  const studentData = detailedRoutine?.studentId as any; 
+  const studentData = detailedRoutine?.studentId as any;
   const isStudentPopulated =
     studentData && typeof studentData === "object" && "name" in studentData;
 
@@ -90,6 +90,9 @@ export function DetailRoutine({
         ? studentData.profileImage
         : `${API_URL}${studentData.profileImage}`
       : "";
+
+  const shouldShowSpinner =
+    isDetailLoading || !detailedRoutine || detailedRoutine._id !== routine?._id;
 
   return (
     <>
@@ -115,7 +118,7 @@ export function DetailRoutine({
             </DialogHeader>
           </div>
 
-          {isDetailLoading ? (
+          {shouldShowSpinner ? (
             <div className="flex flex-col justify-center items-center h-64 gap-2">
               <SpinnerButton variant="sizes" />
               <span className="text-sm text-muted-foreground">
