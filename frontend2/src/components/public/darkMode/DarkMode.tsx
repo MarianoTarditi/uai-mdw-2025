@@ -8,7 +8,6 @@ import { IconSun, IconMoon } from "@tabler/icons-react";
 export function DarkMode() {
   const { setColorScheme } = useMantineColorScheme();
   
-  // El valor computado nos dice el estado REAL actual
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });

@@ -24,7 +24,7 @@ const contextMiddleware = async (req: any, res: any, next: any) => {
       }
     } else {
       console.log(
-        "No hay req.user en contextMiddleware (Petición pública o sin token)",
+        "No hay req.user en contextMiddleware",
       );
     }
 

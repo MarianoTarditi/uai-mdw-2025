@@ -4,16 +4,13 @@ import { getCurrentUser } from "./requestContext";
 
 export const auditPlugin = (schema: Schema) => {
 
-  // 🔥 1. Función simplificada: ya no hace consultas a la BD
   const getPerformer = async (doc: any, modelName: string, isCreate: boolean) => {
     const currentUser = getCurrentUser();
     
-    // Si el middleware encontró al usuario, ya viene con su _id, lo usamos directo.
     if (currentUser && currentUser._id) {
       return currentUser; 
     }
 
-    // Solo si es un Registro nuevo (Creación de User sin sesión), asumimos que es él mismo
     if (modelName === "User" && isCreate) {
       return { _id: doc._id }; 
     }
@@ -31,16 +28,10 @@ export const auditPlugin = (schema: Schema) => {
     return "Elemento sin nombre"; 
   };
 
-  // =================================================================
-  // 1. Hook para CREAR y MODIFICAR (.save())
-  // =================================================================
   schema.post("save", async function (doc: any) {
     const modelName = (doc.constructor as any).modelName || "Entidad";
     
-    // Calculamos si es creación ANTES de llamar a getPerformer
     const isCreate = doc.createdAt && doc.updatedAt && doc.createdAt.getTime() === doc.updatedAt.getTime();
-    
-    // Pasamos isCreate
     const user = await getPerformer(doc, modelName, isCreate); 
     
     if (!user) return; 
@@ -62,15 +53,11 @@ export const auditPlugin = (schema: Schema) => {
     }
   });
 
-  // =================================================================
-  // 2. Hook para MODIFICAR POR QUERY (findOneAndUpdate y updateOne)
-  // =================================================================
   schema.post(["findOneAndUpdate", "updateOne"], async function (doc: any) {
     if (!doc) return; 
 
     const modelName = (this as any).model.modelName || "Entidad";
     
-    // En una actualización, isCreate SIEMPRE es false
     const user = await getPerformer(doc, modelName, false);
     
     if (!user) return;
@@ -98,15 +85,11 @@ export const auditPlugin = (schema: Schema) => {
     }
   });
 
-  // =================================================================
-  // 3. Hook para ELIMINAR (findOneAndDelete)
-  // =================================================================
   schema.post("findOneAndDelete", async function (doc: any) {
     if (!doc) return;
 
     const modelName = (this as any).model.modelName || "Entidad";
     
-    // En una eliminación, isCreate SIEMPRE es false
     const user = await getPerformer(doc, modelName, false);
     
     if (!user) return;

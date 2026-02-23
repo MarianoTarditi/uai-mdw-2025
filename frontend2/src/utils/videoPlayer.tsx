@@ -7,7 +7,6 @@ interface VideoPlayerProps {
 export const VideoPlayer = ({ url }: VideoPlayerProps) => {
   const API_URL = import.meta.env.VITE_STATIC_URL;
 
-  // 1. Función para extraer ID de YouTube (Soporta links cortos, largos, etc.)
   const getYoutubeId = (url: string) => {
     if (!url) return null;
     const regExp =
@@ -16,7 +15,6 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  // 2. Lógica para obtener la URL local limpia
   const getLocalUrl = (url: string) => {
     const cleanUrl = url.trim();
     const cleanPath = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
@@ -41,7 +39,6 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
       }}
     >
       {isYoutube ? (
-        // --- OPCIÓN A: YOUTUBE (Iframe Nativo) ---
         <iframe
           src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0&modestbranding=1`}
           title="YouTube video player"
@@ -57,7 +54,6 @@ export const VideoPlayer = ({ url }: VideoPlayerProps) => {
           }}
         />
       ) : (
-        // --- OPCIÓN B: VIDEO LOCAL (HTML5 Nativo) ---
         <video
           controls
           controlsList="nodownload"
