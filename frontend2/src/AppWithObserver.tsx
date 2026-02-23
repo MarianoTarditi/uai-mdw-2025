@@ -23,22 +23,23 @@ import { UserRole } from "./features/users/userSlice";
 
 const HomeOrRedirect = () => {
   const { profile, isDetailLoading } = useAppSelector((state) => state.user);
-  const { isCheckingAuth, user: authUser, isLoading: isAuthLoading } = useAppSelector((state) => state.auth);
+  const { isCheckingAuth, user: authUser } = useAppSelector(
+    (state) => state.auth,
+  );
 
-  const isGlobalLoading = isCheckingAuth || isDetailLoading || isAuthLoading || (authUser && !profile);
-
-  if (isGlobalLoading) {
+  if (isCheckingAuth || isDetailLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-dark-9"> 
+      <div className="flex h-screen w-full items-center justify-center bg-dark-9">
         <SpinnerButton variant="sizes" />
       </div>
     );
   }
 
-  if (!authUser) return <Navigate to="/home" replace />;
-  if (!profile) return <Navigate to="/home" replace />; 
+  if (!authUser || (profile && profile.isActive === false)) {
+    return <Navigate to="/login" replace />;
+  }
 
-  const isAdmin = profile.roles?.includes(UserRole.Admin);
+  const isAdmin = profile?.roles?.includes(UserRole.Admin);
   return <Navigate to={isAdmin ? "/Dashboard" : "/GetAllRoutines"} replace />;
 };
 

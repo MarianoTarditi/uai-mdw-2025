@@ -13,12 +13,6 @@ router.get(
   controllers.getStudents,
 );
 
-router.post(
-  "/",
-  authenticateFirebase,
-  checkRole([UserRole.Trainer]),
-  controllers.createRoutine,
-);
 router.get(
   "/",
   authenticateFirebase,
@@ -30,6 +24,14 @@ router.get(
   authenticateFirebase,
   checkRole([UserRole.Trainer, UserRole.Student]),
   controllers.getRoutineById,
+);
+
+
+router.post(
+  "/",
+  authenticateFirebase,
+  checkRole([UserRole.Trainer]),
+  controllers.createRoutine,
 );
 
 router.put(

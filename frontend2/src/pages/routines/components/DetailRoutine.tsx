@@ -46,12 +46,14 @@ export function DetailRoutine({
     (state) => state.routine,
   );
 
+  const { isCheckingAuth } = useAppSelector((state) => state.auth);
+
   useEffect(() => {
-    if (isOpen && routine?._id) {
+    if (!isCheckingAuth && isOpen && routine?._id) {
       dispatch(reset());
       dispatch(getRoutineById(routine._id));
     }
-  }, [isOpen, routine?._id, dispatch]);
+  }, [isOpen, routine?._id, isCheckingAuth, dispatch]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);

@@ -128,6 +128,7 @@ export const getRoutineById = createAsyncThunk<
   { rejectValue: string }
 >("routines/getById", async (id, thunkAPI) => {
   try {
+    console.log("Obteniendo detalle de rutina con ID:", id);
     return await routineService.getRoutineById(id);
   } catch (error: unknown) {
     let message = "Error al obtener el detalle";

@@ -6,7 +6,7 @@ import routine from "./routine/routine";
 import admin from "./admin/admin";
 import { requestContext } from "../utils/requestContext";
 import { authenticateFirebase } from "../middlewares/authenticateFirebase";
-import User from "../models/User"; // Asegúrate de ajustar esta ruta
+import User from "../models/User"; 
 
 const router = express.Router();
 
@@ -15,33 +15,31 @@ const contextMiddleware = async (req: any, res: any, next: any) => {
     let contextUser = null;
 
     if (req.user && req.user.email) {
-      // 🔥 Buscamos el usuario en Mongo UNA SOLA VEZ por cada petición
       const mongoUser = await User.findOne({ email: req.user.email }).lean();
-      
+
       if (mongoUser) {
-        contextUser = mongoUser; // Tiene el _id, name, lastName, etc.
+        contextUser = mongoUser;
       } else {
-        // Si no está en Mongo (ej: en medio del registro), usamos el de Firebase
         contextUser = req.user;
       }
     } else {
-      console.log("No hay req.user en contextMiddleware (Petición pública o sin token)");
+      console.log(
+        "No hay req.user en contextMiddleware (Petición pública o sin token)",
+      );
     }
 
-    // 🔥 SIEMPRE envolvemos el next(), haya o no haya usuario
     requestContext.run({ user: contextUser }, () => {
       next();
     });
   } catch (error) {
     console.error("Error en contextMiddleware:", error);
-    // Si la BD falla, dejamos que la petición continúe con contexto vacío
     requestContext.run({ user: null }, () => {
       next();
     });
   }
 };
 
-router.use("/auth", auth); 
+router.use("/auth", auth);
 router.use(authenticateFirebase);
 router.use(contextMiddleware);
 

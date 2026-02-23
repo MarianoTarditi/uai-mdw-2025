@@ -123,23 +123,29 @@ const getAllRoutines = async (req: Request, res: Response) => {
 const getRoutineById = async (req: Request, res: Response) => {
   try {
     const authUser = (req as any).user;
-
     if (!authUser) {
       return handleHttpError(res, "User not authenticated", 401);
     }
 
-    const trainer = await User.findOne({ email: authUser.email });
+    const user = await User.findOne({ firebaseUid: authUser.uid });
 
-    if (!trainer) {
-      return handleHttpError(res, "Trainer not found", 404);
+    if (!user) {
+      return handleHttpError(res, "User not found", 404);
     }
 
     const { id } = req.params;
 
-    const routine = await Routine.findOne({
-      _id: id,
-      trainerId: trainer._id,
-    })
+    let routineQuery: any = { _id: id };
+
+    if (user.roles.includes(UserRole.Trainer)) {
+      routineQuery.trainerId = user._id;
+    }
+
+    if (user.roles.includes(UserRole.Student)) {
+      routineQuery.studentId = user._id;
+    }
+
+    const routine = await Routine.findOne(routineQuery)
       .populate("trainerId", "name lastName email")
       .populate({
         path: "exerciseAssignments.exerciseId",
@@ -187,7 +193,7 @@ const updateRoutine = async (req: Request, res: Response) => {
         path: "exerciseAssignments.exerciseId",
         select: "nombre musculosPrincipales imgUrl",
       })
-      .populate("studentId", "name lastName email profileImage"); 
+      .populate("studentId", "name lastName email profileImage");
 
     if (!updatedRoutine) {
       return handleHttpError(res, "Routine not found", 404);

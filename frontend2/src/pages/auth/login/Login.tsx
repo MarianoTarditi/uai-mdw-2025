@@ -19,8 +19,6 @@ import { useEffect } from "react";
 import { loginUser, reset } from "../../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { SpinnerButton } from "@/components/private/spinner/Spinner";
-import { Center } from "@mantine/core";
 
 export function Login() {
   const dispatch = useAppDispatch();
@@ -47,8 +45,6 @@ export function Login() {
   const onSubmit = (data: ILoginUserData) => {
     dispatch(loginUser(data));
   };
-
-
 
   return (
     <Container size={480} my="auto" style={{ width: "100%" }}>
