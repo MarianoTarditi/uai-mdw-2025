@@ -26,7 +26,7 @@ import {
 import { routineSchema } from "@/pages/routines/validations/routineSchema";
 import type { IRoutine } from "@/features/routines/routineTypes";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
-import { Plus, Trash, Check, ChevronsUpDown } from "lucide-react";
+import { Plus, Trash, Check, ChevronsUpDown, WandSparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
@@ -115,8 +115,6 @@ export function UpdateRoutine({
         ? routine.studentId._id
         : routine.studentId || "";
 
-    console.log("Seteando studentId inicial:", studentIdValue);
-
     resetForm({
       name: routine.name,
       description: routine.description || "",
@@ -132,15 +130,21 @@ export function UpdateRoutine({
       await dispatch(
         updateRoutine({
           id: routine._id,
-          routineData: data as any,
+          routineData: data,
         }),
       ).unwrap();
 
       toast.success("Rutina actualizada correctamente");
       dispatch(reset());
       setIsOpen(false);
-    } catch (error: any) {
-      toast.error(error || "Error al actualizar la rutina");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : "Error al actualizar la rutina";
+      toast.error(errorMessage);
     }
   };
 
@@ -148,10 +152,13 @@ export function UpdateRoutine({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="premium-dialog sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Editar Rutina</DialogTitle>
+          <DialogHeader className="premium-dialog-header mb-4 px-1 pb-4">
+            <DialogTitle className="flex items-center gap-2">
+              <WandSparkles className="h-4 w-4 text-primary" />
+              Editar Rutina
+            </DialogTitle>
             <DialogDescription>
               Modifica el nombre, descripción o los ejercicios asignados.
             </DialogDescription>
@@ -261,7 +268,7 @@ export function UpdateRoutine({
                 return (
                   <div
                     key={field.id}
-                    className="grid grid-cols-12 gap-2 items-start border p-3 rounded-lg bg-slate-50 dark:bg-slate-900"
+                    className="premium-editor-panel grid grid-cols-12 items-start gap-2 p-3"
                   >
                     <div className="col-span-12 sm:col-span-5">
                       <Label className="text-xs mb-1 block">Ejercicio</Label>

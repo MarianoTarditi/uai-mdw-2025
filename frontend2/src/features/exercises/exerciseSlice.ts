@@ -65,7 +65,7 @@ export const getExercise = createAsyncThunk<
 
 export const createExercise = createAsyncThunk<
   IExercise,
-  IExercise,
+  IExercise | FormData,
   { rejectValue: string }
 >("exercise/create", async (exerciseData, thunkAPI) => {
   try {

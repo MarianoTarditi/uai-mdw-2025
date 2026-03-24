@@ -6,7 +6,8 @@ import {
   Dumbbell,
   LayoutDashboard,
   ListCheck,
-  UserRoundCog 
+  UserRoundCog,
+  Wallet,
 } from "lucide-react";
 import { NavMain } from "@/components/ui/nav-main";
 import { NavProjects } from "@/components/ui/nav-projects";
@@ -20,25 +21,21 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/app/reduxHooks";
+import { resolveMediaUrl } from "@/utils/mediaUrl";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
-
-  const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
-
-  const getImageUrl = (imagePath: string | null | undefined) => {
-    if (!imagePath) return null;
-
-    return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
-  };
+  const isAdmin = profile?.roles?.includes("admin");
+  const isTrainer = profile?.roles?.includes("trainer");
+  const canManage = Boolean(isAdmin || isTrainer);
 
   const GymLogo = () => (
     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-       <img 
-         src="/Logo.png" 
-         alt="Logo" 
-         className="size-6 object-contain" 
-       />
+      <img
+        src="/Logo.png"
+        alt="Logo"
+        className="size-6 object-contain"
+      />
     </div>
   );
 
@@ -47,27 +44,36 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       name: profile?.name ?? "Unknown",
       email: profile?.email ?? "No email",
       avatar: profile?.profileImage
-        ? getImageUrl(profile.profileImage)
+        ? resolveMediaUrl(profile.profileImage)
         : "/UserDefault.png",
     },
-   teams: 
+    teams: [
       {
         name: "AgustinTurriEDF",
         logo: GymLogo,
-        plan: "Entrenador de fuerza",
+        plan: "High-Performance Coaching",
       },
-   
+    ],
     navMain: [
-      {
-        title: "Dashboard",
-        url: "/Dashboard",
-        icon: LayoutDashboard,
-      },
-      {
-        title: "Usuarios",
-        url: "/GetAllUsers",
-        icon: User,
-      },
+      ...(canManage
+        ? [
+            {
+              title: "Dashboard",
+              url: "/Dashboard",
+              icon: LayoutDashboard,
+            },
+            {
+              title: "Usuarios",
+              url: "/GetAllUsers",
+              icon: User,
+            },
+            {
+              title: "Pagos",
+              url: "/Payments",
+              icon: Wallet,
+            },
+          ]
+        : []),
       {
         title: "Ejercicios",
         url: "/Exercises",

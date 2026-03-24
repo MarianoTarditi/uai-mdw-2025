@@ -19,7 +19,7 @@ export function DashboardTable<TData>({ table }: DashboardTableProps<TData>) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -61,7 +61,7 @@ export function DashboardTable<TData>({ table }: DashboardTableProps<TData>) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No hay actividad para los filtros seleccionados.
                 </TableCell>
               </TableRow>
             )}

@@ -13,6 +13,21 @@ export interface IExerciseAssignment {
   notes?: string;
 }
 
+export interface IRoutineExerciseAssignmentPayload {
+  exerciseId: string;
+  sets: number;
+  reps: number;
+  restTime: number;
+  notes?: string;
+}
+
+export interface IRoutinePayload {
+  name: string;
+  description?: string;
+  studentId: string;
+  exerciseAssignments: IRoutineExerciseAssignmentPayload[];
+}
+
 export interface IRoutine {
   _id: string;
   name: string;

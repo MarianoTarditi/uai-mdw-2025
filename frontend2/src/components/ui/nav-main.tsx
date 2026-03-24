@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react"
+import { Link } from "react-router-dom"
 
 import {
   SidebarGroup,
@@ -20,7 +21,7 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Home</SidebarGroupLabel>
+      <SidebarGroupLabel>Comando</SidebarGroupLabel>
 
       <SidebarMenu>
         {items.map((item) => (
@@ -30,10 +31,10 @@ export function NavMain({
               isActive={item.isActive}
               tooltip={item.title}
             >
-              <a href={item.url} className="flex items-center gap-2">
+              <Link to={item.url} className="flex items-center gap-2">
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

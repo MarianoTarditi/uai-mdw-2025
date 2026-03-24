@@ -20,7 +20,6 @@ import type { IRegisterUserData } from "../../../types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../../zodValidations/authSchema";
 import { useForm } from "react-hook-form";
-import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { SelectGender } from "../../../components/shadcn-studio/select/SelectGender";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +31,7 @@ export function SignUp() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm<IRegisterUserData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {

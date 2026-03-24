@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { fetchRoutines } from "@/features/routines/routineSlice";
@@ -9,8 +8,12 @@ import { useRoutineTable } from "./table/useRoutineTable";
 import { RoutineButton } from "./table/RoutineButton";
 import { DataTableViewOptions } from "@/components/private/table/DataTableViewOptions";
 import { useEffect } from "react";
-import { Lock } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { PageHero } from "@/components/private/premium/PageHero";
+import { PremiumTableShell } from "@/components/private/premium/PremiumTableShell";
+import { PremiumErrorState } from "@/components/private/premium/PremiumErrorState";
 
 export function GetAllRoutines() {
   const dispatch = useAppDispatch();
@@ -18,10 +21,14 @@ export function GetAllRoutines() {
   const { routines, isFetchingLoading, isError, message } = useAppSelector(
     (state) => state.routine,
   );
+  const { profile } = useAppSelector((state) => state.user);
+  const canManageTemplates =
+    profile?.roles?.includes("trainer") || profile?.roles?.includes("admin");
 
   useEffect(() => {
+    if (routines.length > 0) return;
     dispatch(fetchRoutines());
-  }, [dispatch]);
+  }, [dispatch, routines.length]);
 
   const { table } = useRoutineTable(routines);
 
@@ -37,62 +44,53 @@ export function GetAllRoutines() {
 
   if (isError) {
     return (
-      <div className="relative flex min-h-[60vh] items-center justify-center bg-background">
-        <div className="relative z-10 w-full max-w-md rounded-2xl border bg-card p-8 shadow-xl text-center">
-          <div className="mb-5 flex justify-center">
-            <div
-              className={`flex h-16 w-16 items-center justify-center rounded-full ${isForbidden ? "bg-destructive/10" : "bg-muted"}`}
-            >
-              <Lock
-                className={`h-8 w-8 ${isForbidden ? "text-destructive" : "text-muted-foreground"}`}
-              />
-            </div>
-          </div>
-
-          <h2 className="text-xl font-semibold mb-2">
-            {isForbidden ? "Acceso denegado" : "Ops! Algo salió mal"}
-          </h2>
-
-          <p className="text-sm text-muted-foreground">
-            {isForbidden
-              ? 'No tienes los permisos necesarios para acceder a la sección de "Rutinas".'
-              : message || "No se pudieron cargar las rutinas en este momento."}
-          </p>
-
-          {!isForbidden && (
-            <Button
-              variant="outline"
-              mt="md"
-              onClick={() => dispatch(fetchRoutines())}
-              className="mt-4"
-            >
-              Reintentar
-            </Button>
-          )}
-        </div>
-      </div>
+      <PremiumErrorState
+        title={isForbidden ? "Acceso denegado" : "Ops! Algo salió mal"}
+        description={
+          isForbidden
+            ? 'No tienes los permisos necesarios para acceder a la sección de "Rutinas".'
+            : message || "No se pudieron cargar las rutinas en este momento."
+        }
+        tone={isForbidden ? "forbidden" : "default"}
+        retryLabel={isForbidden ? undefined : "Reintentar"}
+        onRetry={isForbidden ? undefined : () => dispatch(fetchRoutines())}
+      />
     );
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por nombre de rutina..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(e) =>
-            table.getColumn("name")?.setFilterValue(e.target.value)
-          }
-          className="max-w-sm"
-        />
+    <div className="w-full space-y-4">
+      <PageHero
+        icon={ClipboardList}
+        title="Biblioteca de Rutinas"
+        description="Estructura mesociclos y plantillas con una operativa agil para asignar, iterar y escalar planes por objetivo."
+        badge={`${routines.length} rutinas`}
+        chips={["Carga Progresiva", "Periodizacion", "Seguimiento Activo"]}
+      />
 
-        <div className="ml-auto flex items-center space-x-2">
-          <RoutineButton />
-          <DataTableViewOptions table={table} />
-        </div>
-      </div>
-
-      <RoutineTable table={table} />
+      <PremiumTableShell
+        searchPlaceholder="Buscar rutina por nombre..."
+        searchValue={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+        onSearchChange={(value) => table.getColumn("name")?.setFilterValue(value)}
+        actions={
+          <>
+            {canManageTemplates && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-9 rounded-full px-4"
+              >
+                <Link to="/RoutineTemplates">Plantillas Excel/PDF</Link>
+              </Button>
+            )}
+            <RoutineButton />
+            <DataTableViewOptions table={table} />
+          </>
+        }
+      >
+        <RoutineTable table={table} />
+      </PremiumTableShell>
     </div>
   );
 }

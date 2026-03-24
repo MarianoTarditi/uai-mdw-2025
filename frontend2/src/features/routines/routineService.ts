@@ -1,10 +1,13 @@
 
 import axiosPrivate from "@/config/axios";
-import { type IRoutine } from "./routineTypes";
+import {
+  type IRoutine,
+  type IRoutinePayload,
+} from "./routineTypes";
 
 const ROUTINE_URL = "/routines";
 
-const createRoutine = async (data: any): Promise<IRoutine> => {
+const createRoutine = async (data: IRoutinePayload): Promise<IRoutine> => {
   const res = await axiosPrivate.post(ROUTINE_URL, data);
   return res.data.data;
 };
@@ -24,7 +27,10 @@ const deleteRoutine = async (id: string) => {
   return res.data;
 };
 
-const updateRoutine = async (id: string, data: any): Promise<IRoutine> => {
+const updateRoutine = async (
+  id: string,
+  data: Partial<IRoutinePayload>,
+): Promise<IRoutine> => {
   const res = await axiosPrivate.put(`${ROUTINE_URL}/${id}`, data);
   return res.data.data;
 };
@@ -39,6 +45,28 @@ const getStudents = async () => {
   return res.data.data;
 };
 
+const getRoutineTemplates = async () => {
+  const res = await axiosPrivate.get("/routines/templates");
+  return res.data.data;
+};
+
+const uploadRoutineTemplate = async (payload: FormData) => {
+  const res = await axiosPrivate.post("/routines/templates", payload);
+  return res.data.data;
+};
+
+const deleteRoutineTemplate = async (id: string) => {
+  const res = await axiosPrivate.delete(`/routines/templates/${id}`);
+  return res.data;
+};
+
+const renameRoutineTemplate = async (id: string, title: string) => {
+  const res = await axiosPrivate.patch(`/routines/templates/${id}/title`, {
+    title,
+  });
+  return res.data.data;
+};
+
 export default {
   createRoutine,
   getAllRoutines,
@@ -46,5 +74,9 @@ export default {
   deleteRoutine,
   updateRoutine,
   deleteExerciseAssignment,
-  getStudents
+  getStudents,
+  getRoutineTemplates,
+  uploadRoutineTemplate,
+  deleteRoutineTemplate,
+  renameRoutineTemplate,
 };

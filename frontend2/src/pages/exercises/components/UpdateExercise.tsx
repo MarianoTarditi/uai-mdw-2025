@@ -3,6 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +22,10 @@ import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { useEffect, useState } from "react";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { reset, updateExercise } from "@/features/exercises/exerciseSlice";
-import { exerciseSchema } from "@/pages/exercises/validations/exerciseSchema";
+import {
+  exerciseSchema,
+  type ExerciseFormValues,
+} from "@/pages/exercises/validations/exerciseSchema";
 import { ETIQUETAS, MATERIALES, MUSCULOS } from "@/pages/exercises/constants";
 import { ComboBoxMultiSelect } from "@/components/private/comboBoxMultiSelect/ComboBoxMultiSelect";
 
@@ -30,6 +34,7 @@ import {
   Link as LinkIcon,
   UploadCloud,
   FileVideo,
+  WandSparkles,
   Youtube,
 } from "lucide-react";
 
@@ -38,6 +43,8 @@ interface UpdateExerciseProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
+
+type ExerciseFormInput = z.input<typeof exerciseSchema>;
 
 export function UpdateExercise({
   exercise,
@@ -57,8 +64,18 @@ export function UpdateExercise({
     control,
     reset: resetForm,
     formState: { errors },
-  } = useForm<IExercise>({
+  } = useForm<ExerciseFormInput, unknown, ExerciseFormValues>({
     resolver: zodResolver(exerciseSchema),
+    defaultValues: {
+      nombre: "",
+      musculosPrincipales: [],
+      musculosSecundarios: [],
+      materialesNecesarios: [],
+      etiquetas: [],
+      comentario: "",
+      videoUrl: "",
+      imageUrl: "",
+    },
   });
 
   const musculoOptions = MUSCULOS.map((m) => ({ value: m, label: m }));
@@ -95,7 +112,7 @@ export function UpdateExercise({
     }
   }, [isError, isUpdatingSuccess, message, dispatch, setIsOpen, isOpen]);
 
-  const handleFormSubmit = async (data: IExercise) => {
+  const handleFormSubmit = async (data: ExerciseFormValues) => {
     if (!exercise?._id) return;
 
     if (videoFile) {
@@ -120,7 +137,7 @@ export function UpdateExercise({
       formData.append("video", videoFile);
 
       await dispatch(
-        updateExercise({ id: exercise._id, exerciseData: formData as any }),
+        updateExercise({ id: exercise._id, exerciseData: formData }),
       );
     } else {
       await dispatch(updateExercise({ id: exercise._id, exerciseData: data }));
@@ -129,10 +146,13 @@ export function UpdateExercise({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
+      <DialogContent className="premium-dialog data-[state=open]:!zoom-in-100 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:duration-600 sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <DialogHeader className="mb-4">
-            <DialogTitle>Editar Ejercicio</DialogTitle>
+          <DialogHeader className="premium-dialog-header mb-4 px-1 pb-4">
+            <DialogTitle className="flex items-center gap-2">
+              <WandSparkles className="h-4 w-4 text-primary" />
+              Editar Ejercicio
+            </DialogTitle>
             <DialogDescription>
               Modifica los detalles del ejercicio.
             </DialogDescription>
@@ -159,7 +179,7 @@ export function UpdateExercise({
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     options={musculoOptions}
-                    value={field.value}
+                    value={field.value ?? []}
                     onChange={field.onChange}
                     placeholder="Seleccionar músculos"
                     searchPlaceholder="Buscar músculo..."
@@ -181,7 +201,7 @@ export function UpdateExercise({
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     options={musculoOptions}
-                    value={field.value}
+                    value={field.value ?? []}
                     onChange={field.onChange}
                     placeholder="Seleccionar músculos"
                   />
@@ -197,7 +217,7 @@ export function UpdateExercise({
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     options={materialOptions}
-                    value={field.value}
+                    value={field.value ?? []}
                     onChange={field.onChange}
                     placeholder="Seleccionar materiales"
                   />
@@ -218,7 +238,7 @@ export function UpdateExercise({
                 render={({ field }) => (
                   <ComboBoxMultiSelect
                     options={etiquetaOptions}
-                    value={field.value}
+                    value={field.value ?? []}
                     onChange={field.onChange}
                     placeholder="Seleccionar etiquetas"
                   />
@@ -231,7 +251,7 @@ export function UpdateExercise({
               )}
             </div>
 
-            <div className="grid gap-3 mt-2 p-4 border rounded-lg bg-muted/10">
+            <div className="premium-editor-panel mt-2 grid gap-3 p-4">
               <Label className="text-base font-semibold">
                 Video del Ejercicio
               </Label>
@@ -267,7 +287,7 @@ export function UpdateExercise({
                 </TabsContent>
 
                 <TabsContent value="upload" className="mt-4">
-                  <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors border-muted-foreground/25">
+                  <div className="premium-upload-zone flex h-32 w-full cursor-pointer flex-col items-center justify-center transition-colors">
                     <label
                       htmlFor="dropzone-file-edit"
                       className="flex flex-col items-center justify-center w-full h-full pt-5 pb-6"
