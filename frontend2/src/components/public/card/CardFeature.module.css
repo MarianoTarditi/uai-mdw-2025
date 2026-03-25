@@ -35,7 +35,6 @@
     light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
   transition:
     transform 0.3s ease,
-    box-shadow 0.3s ease,
     border-color 0.3s ease;
   cursor: default;
   height: 100%;
@@ -43,10 +42,6 @@
   flex-direction: column;
 
   &:hover {
-    box-shadow: light-dark(
-      0 12px 24px rgba(0, 0, 0, 0.15),
-      0 12px 24px rgba(0, 0, 0, 0.4)
-    );
     border-color: light-dark(
       var(--mantine-color-blue-3),
       var(--mantine-color-blue-7)
@@ -107,10 +102,6 @@
     background-color: light-dark(
       var(--mantine-color-blue-7),
       var(--mantine-color-blue-6)
-    );
-    box-shadow: light-dark(
-      0 4px 12px rgba(37, 99, 235, 0.3),
-      0 4px 12px rgba(37, 99, 235, 0.5)
     );
   }
 }

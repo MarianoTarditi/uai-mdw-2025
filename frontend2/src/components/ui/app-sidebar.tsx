@@ -22,12 +22,21 @@ import {
 } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/app/reduxHooks";
 import { resolveMediaUrl } from "@/utils/mediaUrl";
+import { UserRole } from "@/features/users/userSlice";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
-  const isAdmin = profile?.roles?.includes("admin");
-  const isTrainer = profile?.roles?.includes("trainer");
-  const canManage = Boolean(isAdmin || isTrainer);
+  const roles = profile?.roles ?? [];
+  const isAdmin = roles.includes(UserRole.Admin);
+  const isTrainer = roles.includes(UserRole.Trainer);
+  const isStudent = roles.includes(UserRole.Student);
+
+  const canSeeDashboard = isAdmin;
+  const canSeeUsers = isAdmin;
+  const canSeePayments = isTrainer;
+  const canSeeProfile = isAdmin || isTrainer || isStudent;
+  const canSeeExercises = isAdmin || isTrainer || isStudent;
+  const canSeeRoutines = isAdmin || isTrainer || isStudent;
 
   const GymLogo = () => (
     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -55,18 +64,26 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       },
     ],
     navMain: [
-      ...(canManage
+      ...(canSeeDashboard
         ? [
             {
               title: "Dashboard",
               url: "/Dashboard",
               icon: LayoutDashboard,
             },
+          ]
+        : []),
+      ...(canSeeUsers
+        ? [
             {
               title: "Usuarios",
               url: "/GetAllUsers",
               icon: User,
             },
+          ]
+        : []),
+      ...(canSeePayments
+        ? [
             {
               title: "Pagos",
               url: "/Payments",
@@ -74,26 +91,35 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             },
           ]
         : []),
-      {
-        title: "Ejercicios",
-        url: "/Exercises",
-        icon: Dumbbell,
-      },
-      {
-        title: "Rutinas",
-        url: "/GetAllRoutines",
-        icon: ListCheck,
-      },
+      ...(canSeeExercises
+        ? [
+            {
+              title: "Ejercicios",
+              url: "/Exercises",
+              icon: Dumbbell,
+            },
+          ]
+        : []),
+      ...(canSeeRoutines
+        ? [
+            {
+              title: "Rutinas",
+              url: "/GetAllRoutines",
+              icon: ListCheck,
+            },
+          ]
+        : []),
     ],
 
-    projects: [
-     
-            {
+    projects: canSeeProfile
+      ? [
+          {
         name: "Perfil",
         url: "/UserProfile",
         icon: UserRoundCog,
       },
-    ],
+        ]
+      : [],
   };
 
   return (

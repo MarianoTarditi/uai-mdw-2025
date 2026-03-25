@@ -11,20 +11,50 @@ import { IconUsers, IconClock, IconCheck } from "@tabler/icons-react";
 import classes from "./TercerHero.module.css";
 import { Titles } from "./title/Titles";
 import { Carrusel } from "../carrusel/Carrusel";
+import { useEffect, useRef, useState } from "react";
 
 export function TercerHero() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [shouldLoadMedia, setShouldLoadMedia] = useState(false);
+
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element || shouldLoadMedia) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoadMedia(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [shouldLoadMedia]);
+
   return (
-    <section className={classes.hero} aria-labelledby="instalaciones-title">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className={classes.videoBackground}
-        aria-hidden="true"
-      >
-        <source src="/images/Video5.mp4" type="video/mp4" />
-      </video>
+    <section
+      ref={sectionRef}
+      className={classes.hero}
+      aria-labelledby="instalaciones-title"
+    >
+      {shouldLoadMedia && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          className={classes.videoBackground}
+          aria-hidden="true"
+        >
+          <source src="/images/Video5.mp4" type="video/mp4" />
+        </video>
+      )}
 
       <Overlay
         gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)"
@@ -129,32 +159,48 @@ export function TercerHero() {
           }}
         />
 
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-          {" "}
-          <Carrusel
-            media={[
-              { src: "/images/Video1.mp4", alt: "Video 1" },
-              { src: "/images/Video2.mp4", alt: "Video 2" },
-              { src: "/images/Video3.mp4", alt: "Video 3" },
-              { src: "/images/Lugar1.jpeg", alt: "Video 3" },
-            ]}
-          />
-          <Carrusel
-            media={[
-              { src: "/images/Recopilacion.mp4", alt: "Video 4" },
-              { src: "/images/Planificando.mp4", alt: "Video 5" },
-              { src: "/images/Lugar2.jpeg", alt: "Video 3" },
-            ]}
-          />
-          <Carrusel
-            media={[
-              { src: "/images/Video4.mp4", alt: "Video 7" },
-              { src: "/images/Lugar4.jpeg", alt: "Foto del lugar" },
-              { src: "/images/Tecla.mp4", alt: "Video 9" },
-              { src: "/images/Lugar3.jpeg", alt: "Video 3" },
-            ]}
-          />
-        </SimpleGrid>
+        {shouldLoadMedia ? (
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            <Carrusel
+              media={[
+                { src: "/images/Video1.mp4", alt: "Video 1" },
+                { src: "/images/Video2.mp4", alt: "Video 2" },
+                { src: "/images/Video3.mp4", alt: "Video 3" },
+                { src: "/images/Lugar1.jpeg", alt: "Video 3" },
+              ]}
+            />
+            <Carrusel
+              media={[
+                { src: "/images/Recopilacion.mp4", alt: "Video 4" },
+                { src: "/images/Planificando.mp4", alt: "Video 5" },
+                { src: "/images/Lugar2.jpeg", alt: "Video 3" },
+              ]}
+            />
+            <Carrusel
+              media={[
+                { src: "/images/Video4.mp4", alt: "Video 7" },
+                { src: "/images/Lugar4.jpeg", alt: "Foto del lugar" },
+                { src: "/images/Tecla.mp4", alt: "Video 9" },
+                { src: "/images/Lugar3.jpeg", alt: "Video 3" },
+              ]}
+            />
+          </SimpleGrid>
+        ) : (
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                style={{
+                  height: 600,
+                  borderRadius: 20,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  background:
+                    "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+                }}
+              />
+            ))}
+          </SimpleGrid>
+        )}
       </Container>
     </section>
   );

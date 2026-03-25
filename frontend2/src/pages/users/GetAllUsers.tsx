@@ -74,7 +74,6 @@ export const GetAllUsers = () => {
         title="Gestión de Alumnos"
         description="Controla perfiles, roles y estado operativo de la base para mantener seguimiento preciso y comunicación efectiva."
         badge={`${users.length} usuarios`}
-        chips={["Control de Acceso", "Estado Activo", "Seguimiento de Perfil"]}
       />
 
       <MetricStrip items={userMetrics} />

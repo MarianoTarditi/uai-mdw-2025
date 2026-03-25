@@ -536,7 +536,6 @@ export const GetAllPayments = () => {
         title="Gestión de Pagos"
         description="Visualiza estado financiero, vencimientos y recordatorios en una vista operativa para sostener ingresos y adherencia."
         badge={`${students.length} alumnos`}
-        chips={["Cobranza Activa", "Seguimiento Diario", "Control de Riesgo"]}
       />
 
       <MetricStrip items={paymentMetrics} />

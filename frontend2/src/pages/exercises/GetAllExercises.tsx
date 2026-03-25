@@ -53,7 +53,6 @@ export function GetAllExercises() {
         title="Biblioteca de Ejercicios"
         description="Gestiona el catalogo tecnico por grupo muscular, objetivo y equipamiento para acelerar la prescripcion diaria."
         badge={`${exercises.length} ejercicios`}
-        chips={["Precision Tecnica", "Carga Inteligente", "Base Escalable"]}
       />
 
       <PremiumTableShell

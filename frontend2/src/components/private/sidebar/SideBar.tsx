@@ -65,7 +65,7 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
 
             <span className="premium-topbar-badge hidden md:inline-flex">
               <Bolt className="h-3.5 w-3.5" />
-              Focus Mode
+              AgustínTurriEDF
             </span>
 
             <Breadcrumb>

@@ -173,7 +173,6 @@
     &:hover {
       color: white;
       background: #25d366;
-      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
     }
   }
 }

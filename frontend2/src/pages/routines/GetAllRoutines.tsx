@@ -65,7 +65,6 @@ export function GetAllRoutines() {
         title="Biblioteca de Rutinas"
         description="Estructura mesociclos y plantillas con una operativa agil para asignar, iterar y escalar planes por objetivo."
         badge={`${routines.length} rutinas`}
-        chips={["Carga Progresiva", "Periodizacion", "Seguimiento Activo"]}
       />
 
       <PremiumTableShell

@@ -1,28 +1,19 @@
-import {
-  Anchor,
-  Button,
-  Container,
-  Divider,
-  Group,
-  Paper,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Title,
-  SimpleGrid
-} from "@mantine/core";
 import { useEffect } from "react";
-import { useAppSelector, useAppDispatch } from "../../../app/reduxHooks";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+
+import { useAppDispatch, useAppSelector } from "../../../app/reduxHooks";
 import { registerUser, reset } from "../../../features/auth/authSlice";
 import type { IRegisterUserData } from "../../../types/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../../zodValidations/authSchema";
-import { useForm } from "react-hook-form";
-import { SelectGender } from "../../../components/shadcn-studio/select/SelectGender";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { SelectNative } from "@/components/ui/select-native";
+import classes from "../AuthForm.module.css";
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -38,6 +29,7 @@ export function SignUp() {
       name: "",
       lastName: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       birthDate: "",
@@ -53,13 +45,14 @@ export function SignUp() {
 
   useEffect(() => {
     if (isError) {
-      toast.error("An error occurred while registering");
+      toast.error("Ocurrio un error al registrarte.");
     }
 
     if (isSuccess && user) {
-      toast.success(`Registration successful, welcome! ${user.email}!`);
+      toast.success(`Registro exitoso. Bienvenido ${user.email}.`);
       navigate("/");
     }
+
     return () => {
       dispatch(reset());
     };
@@ -69,126 +62,178 @@ export function SignUp() {
     dispatch(registerUser(data));
   };
 
-
-
   return (
-    <Container size="sm" my={30}>
-      <Paper radius="md" p="lg" withBorder>
-        <Title size="h3" style={{ textAlign: "center", marginBottom: "1rem" }}>
-          Crea tu cuenta
-        </Title>
-        <Divider label="Continúa con tu email" labelPosition="center" my="lg" />
+    <section className={`${classes.containerWide} auth-premium-main`}>
+      <Card className={`${classes.card} auth-premium-card border-0 py-0`}>
+        <CardHeader className={classes.cardHeader}>
+          <p className={classes.eyebrow}>Nuevo acceso</p>
+          <CardTitle className={classes.title}>Crea tu cuenta</CardTitle>
+          <p className={classes.subtitle}>
+            Completa tus datos para ingresar al espacio privado de entrenamiento.
+          </p>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack>
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                required
-                label="Nombre"
-                placeholder="Tu nombre"
-                {...register("name")}
-                error={errors.name?.message}
-                radius="md"
-              />
-              <TextInput
-                required
-                label="Apellido"
-                placeholder="Tu apellido"
-                {...register("lastName")}
-                error={errors.lastName?.message}
-                radius="md"
-              />
-            </SimpleGrid>
-
-            <TextInput
-              required
-              label="Email"
-              placeholder="tucorreo@gmail.com"
-              {...register("email")}
-              error={errors.email?.message}
-              radius="md"
-            />
-
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                label="Fecha de nacimiento"
-                placeholder="DD/MM/YYYY"
-                {...register("birthDate")}
-                error={errors.birthDate?.message}
-                radius="md"
-              />
-              <SelectGender register={register} defaultValue={undefined} />
-            </SimpleGrid>
-
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <div className="grid gap-2">
-                <Label htmlFor="height">Altura (cm)</Label>
+        <CardContent className={classes.cardContent}>
+          <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
+            <div className={classes.gridTwo}>
+              <div className={classes.field}>
+                <Label htmlFor="signup-name">Nombre</Label>
                 <Input
-                  placeholder="Ej: 175"
+                  id="signup-name"
+                  placeholder="Tu nombre"
+                  autoComplete="given-name"
+                  {...register("name")}
+                />
+                {errors.name?.message ? (
+                  <p className={classes.error}>{errors.name.message}</p>
+                ) : null}
+              </div>
+
+              <div className={classes.field}>
+                <Label htmlFor="signup-lastname">Apellido</Label>
+                <Input
+                  id="signup-lastname"
+                  placeholder="Tu apellido"
+                  autoComplete="family-name"
+                  {...register("lastName")}
+                />
+                {errors.lastName?.message ? (
+                  <p className={classes.error}>{errors.lastName.message}</p>
+                ) : null}
+              </div>
+            </div>
+
+            <div className={classes.field}>
+              <Label htmlFor="signup-email">Email</Label>
+              <Input
+                id="signup-email"
+                type="email"
+                placeholder="tucorreo@gmail.com"
+                autoComplete="email"
+                {...register("email")}
+              />
+              {errors.email?.message ? (
+                <p className={classes.error}>{errors.email.message}</p>
+              ) : null}
+            </div>
+
+            <div className={classes.field}>
+              <Label htmlFor="signup-phone">Telefono</Label>
+              <Input
+                id="signup-phone"
+                type="tel"
+                placeholder="Ej: +54 9 2474 416101"
+                autoComplete="tel"
+                {...register("phone")}
+              />
+              {errors.phone?.message ? (
+                <p className={classes.error}>{errors.phone.message}</p>
+              ) : null}
+            </div>
+
+            <div className={classes.gridTwo}>
+              <div className={classes.field}>
+                <Label htmlFor="signup-birthDate">Fecha de nacimiento</Label>
+                <Input
+                  id="signup-birthDate"
+                  placeholder="DD/MM/AAAA"
+                  {...register("birthDate")}
+                />
+                {errors.birthDate?.message ? (
+                  <p className={classes.error}>{errors.birthDate.message}</p>
+                ) : null}
+              </div>
+
+              <div className={classes.field}>
+                <Label htmlFor="signup-gender">Genero</Label>
+                <SelectNative id="signup-gender" defaultValue="" {...register("gender")}>
+                  <option value="" disabled>
+                    Selecciona tu genero
+                  </option>
+                  <option value="male">Masculino</option>
+                  <option value="female">Femenino</option>
+                  <option value="other">Otro</option>
+                </SelectNative>
+                {errors.gender?.message ? (
+                  <p className={classes.error}>{errors.gender.message}</p>
+                ) : null}
+              </div>
+            </div>
+
+            <div className={classes.gridTwo}>
+              <div className={classes.field}>
+                <Label htmlFor="signup-height">Altura (cm)</Label>
+                <Input
+                  id="signup-height"
                   type="number"
-                  id="height"
+                  placeholder="Ej: 175"
                   {...register("height")}
                 />
-                {errors.height && (
-                  <p className="text-sm text-red-500 m-0">{errors.height?.message as string}</p>
-                )}
+                {errors.height?.message ? (
+                  <p className={classes.error}>{errors.height.message as string}</p>
+                ) : null}
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="weight">Peso (kg)</Label>
+
+              <div className={classes.field}>
+                <Label htmlFor="signup-weight">Peso (kg)</Label>
                 <Input
-                  placeholder="Ej: 75"
+                  id="signup-weight"
                   type="number"
-                  id="weight"
+                  placeholder="Ej: 75"
                   {...register("weight")}
                 />
-                {errors.weight && (
-                  <p className="text-sm text-red-500 m-0">{errors.weight?.message as string}</p>
-                )}
+                {errors.weight?.message ? (
+                  <p className={classes.error}>{errors.weight.message as string}</p>
+                ) : null}
               </div>
-            </SimpleGrid>
+            </div>
 
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <PasswordInput
-                required
-                label="Contraseña"
-                placeholder="Tu contraseña"
-                {...register("password")}
-                error={errors.password?.message}
-                radius="md"
-              />
-              <PasswordInput
-                required
-                label="Confirmar contraseña"
-                placeholder="Confirma tu contraseña"
-                {...register("confirmPassword")}
-                error={errors.confirmPassword?.message}
-                radius="md"
-              />
-            </SimpleGrid>
-          </Stack>
+            <div className={classes.gridTwo}>
+              <div className={classes.field}>
+                <Label htmlFor="signup-password">Contraseña</Label>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Tu contraseña"
+                  autoComplete="new-password"
+                  {...register("password")}
+                />
+                {errors.password?.message ? (
+                  <p className={classes.error}>{errors.password.message}</p>
+                ) : null}
+              </div>
 
-          <Group justify="space-between" mt="xl">
-            <Anchor
-              component={Link}
-              to={"/login"}
-              type="button"
-              c="dimmed"
-              size="xs"
-            >
-              ¿Ya tienes una cuenta? Iniciar sesión
-            </Anchor>
+              <div className={classes.field}>
+                <Label htmlFor="signup-confirm-password">Confirmar contraseña</Label>
+                <Input
+                  id="signup-confirm-password"
+                  type="password"
+                  placeholder="Repite tu contraseña"
+                  autoComplete="new-password"
+                  {...register("confirmPassword")}
+                />
+                {errors.confirmPassword?.message ? (
+                  <p className={classes.error}>{errors.confirmPassword.message}</p>
+                ) : null}
+              </div>
+            </div>
+
+            <div className={classes.hintRow}>
+              <Link to="/login" className={classes.switch}>
+                Ya tienes cuenta? Inicia sesion
+              </Link>
+            </div>
+
             <Button
               type="submit"
-              radius="xl"
-              loading={isLoading}
-              color="myColor.9"
+              className={`${classes.submit} w-full`}
+              disabled={isLoading}
             >
-              Registrarse
+              {isLoading ? "Registrando..." : "Crear cuenta"}
             </Button>
-          </Group>
-        </form>
-      </Paper>
-    </Container>
+          </form>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
-

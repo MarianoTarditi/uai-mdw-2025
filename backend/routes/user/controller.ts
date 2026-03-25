@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
 import handleHttpError from "../../utils/handleError";
+import { UserRole } from "../../types";
+import Routine from "../../models/Routine";
+import { calculatePaymentStatus } from "../../utils/paymentStatus";
 
 const sanitizeUser = (user: any) => {
   if (!user) return null;
@@ -10,6 +13,15 @@ const sanitizeUser = (user: any) => {
     name: user.name,
     email: user.email,
     roles: user.roles,
+  };
+};
+
+const enrichStudentPayment = (student: any) => {
+  const paymentStatus = calculatePaymentStatus(student.payment);
+
+  return {
+    ...student,
+    paymentStatus,
   };
 };
 
@@ -85,15 +97,8 @@ const updateUser = async (req: Request, res: Response) => {
     }
 
     const { id } = req.params;
-    const {
-      name,
-      lastName,
-      height,
-      weight,
-      birthDate,
-      gender,
-      existingProfileImage,
-    } = req.body;
+    const { name, lastName, phone, height, weight, birthDate, gender, existingProfileImage } =
+      req.body;
 
     const currentUser = await User.findById(id);
     if (!currentUser) {
@@ -105,24 +110,43 @@ const updateUser = async (req: Request, res: Response) => {
     if (req.file) {
       finalProfileImage = `/uploads/profileImages/${req.file.filename}`;
     }
+    const updateData: Record<string, unknown> = {
+      name,
+      lastName,
+      profileImage: finalProfileImage,
+    };
 
-    const parsedHeight = height && height !== "null" ? Number(height) : null;
-    const parsedWeight = weight && weight !== "null" ? Number(weight) : null;
-    const parsedBirthDate = birthDate ? new Date(birthDate) : null;
+    if (phone !== undefined) {
+      updateData.phone = phone === "" ? null : phone;
+    }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        name,
-        lastName,
-        height: parsedHeight,
-        weight: parsedWeight,
-        birthDate: parsedBirthDate,
-        gender,
-        profileImage: finalProfileImage,
-      },
-      { new: true, runValidators: true },
-    );
+    if (height !== undefined) {
+      updateData.height =
+        height === null || height === "" || height === "null"
+          ? null
+          : Number(height);
+    }
+
+    if (weight !== undefined) {
+      updateData.weight =
+        weight === null || weight === "" || weight === "null"
+          ? null
+          : Number(weight);
+    }
+
+    if (birthDate !== undefined) {
+      updateData.birthDate =
+        birthDate === null || birthDate === "" ? null : new Date(birthDate);
+    }
+
+    if (gender !== undefined) {
+      updateData.gender = gender === "" ? null : gender;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json({
       message: "User updated successfully",
@@ -222,6 +246,299 @@ const setUserRole = async (req: Request, res: Response) => {
   }
 };
 
+const getStudentsPayments = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const requester = (req as any).dbUser || null;
+    if (!requester) {
+      return handleHttpError(res, "User not found in database", 404);
+    }
+
+    const isAdmin = requester.roles.includes(UserRole.Admin);
+
+    let studentFilter: any = { roles: { $in: [UserRole.Student] } };
+
+    if (!isAdmin) {
+      const routines = await Routine.find({ trainerId: requester._id })
+        .select("studentId")
+        .lean();
+
+      const studentIds = Array.from(
+        new Set(routines.map((routine: any) => String(routine.studentId))),
+      );
+
+      studentFilter._id = { $in: studentIds };
+    }
+
+    const students = await User.find(studentFilter)
+      .select(
+        "_id name lastName email phone roles isActive profileImage payment createdAt updatedAt",
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const enrichedStudents = students.map(enrichStudentPayment);
+
+    res.status(200).json({
+      userRequesting: sanitizeUser(req.user),
+      data: enrichedStudents,
+    });
+  } catch (error) {
+    handleHttpError(res, "Error getting students payments", 500, error);
+  }
+};
+
+const getPaymentsSummary = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const requester = (req as any).dbUser || null;
+    if (!requester) {
+      return handleHttpError(res, "User not found in database", 404);
+    }
+
+    const isAdmin = requester.roles.includes(UserRole.Admin);
+
+    let studentFilter: any = { roles: { $in: [UserRole.Student] } };
+
+    if (!isAdmin) {
+      const routines = await Routine.find({ trainerId: requester._id })
+        .select("studentId")
+        .lean();
+
+      const studentIds = Array.from(
+        new Set(routines.map((routine: any) => String(routine.studentId))),
+      );
+
+      studentFilter._id = { $in: studentIds };
+    }
+
+    const students = await User.find(studentFilter)
+      .select("_id payment")
+      .lean();
+
+    const enriched = students.map((student) => ({
+      ...student,
+      paymentStatus: calculatePaymentStatus(student.payment),
+    }));
+
+    const totalStudents = enriched.length;
+    const paidStudents = enriched.filter(
+      (student) => student.paymentStatus.status === "al_dia",
+    ).length;
+    const pendingStudents = totalStudents - paidStudents;
+    const dueSoonStudents = enriched.filter(
+      (student) => student.paymentStatus.status === "vence",
+    ).length;
+    const overdueStudents = enriched.filter(
+      (student) => student.paymentStatus.status === "vencido",
+    ).length;
+
+    const totalAmount = enriched.reduce(
+      (sum, student) => sum + Number(student.payment?.amount || 0),
+      0,
+    );
+
+    const collectedAmount = enriched.reduce((sum, student) => {
+      if (student.paymentStatus.status !== "al_dia") return sum;
+      return sum + Number(student.payment?.amount || 0);
+    }, 0);
+
+    res.status(200).json({
+      data: {
+        totalStudents,
+        paidStudents,
+        pendingStudents,
+        dueSoonStudents,
+        overdueStudents,
+        totalAmount,
+        collectedAmount,
+        pendingAmount: totalAmount - collectedAmount,
+      },
+    });
+  } catch (error) {
+    handleHttpError(res, "Error getting payments summary", 500, error);
+  }
+};
+
+const updateStudentPayment = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const { id } = req.params;
+    const { startDate, amount, paymentDate, isPaid, billingCycleDays } = req.body;
+
+    const requester = (req as any).dbUser || null;
+    if (!requester) {
+      return handleHttpError(res, "User not found in database", 404);
+    }
+
+    const student = await User.findById(id);
+    if (!student) {
+      return handleHttpError(res, "User not found", 404);
+    }
+
+    const isAdmin = requester.roles.includes(UserRole.Admin);
+
+    if (!isAdmin) {
+      const trainerStudentRelation = await Routine.exists({
+        trainerId: requester._id,
+        studentId: student._id,
+      });
+
+      if (!trainerStudentRelation) {
+        return handleHttpError(
+          res,
+          "You can only update payments for your own students",
+          403,
+        );
+      }
+    }
+
+    const isStudent = student.roles?.includes(UserRole.Student);
+    if (!isStudent) {
+      return handleHttpError(
+        res,
+        "Payments can only be updated for student users",
+        400,
+      );
+    }
+
+    const nextPayment = {
+      startDate: student.payment?.startDate ?? null,
+      amount: student.payment?.amount ?? null,
+      paymentDate: student.payment?.paymentDate ?? null,
+      isPaid: student.payment?.isPaid ?? false,
+      billingCycleDays: student.payment?.billingCycleDays ?? 30,
+      reminderCount: student.payment?.reminderCount ?? 0,
+      lastReminderAt: student.payment?.lastReminderAt ?? null,
+      lastReminderChannel: student.payment?.lastReminderChannel ?? null,
+    };
+
+    if (startDate !== undefined) {
+      nextPayment.startDate =
+        startDate === null || startDate === "" ? null : new Date(startDate);
+    }
+
+    if (amount !== undefined) {
+      nextPayment.amount = amount === null || amount === "" ? null : Number(amount);
+    }
+
+    if (paymentDate !== undefined) {
+      nextPayment.paymentDate =
+        paymentDate === null || paymentDate === ""
+          ? null
+          : new Date(paymentDate);
+    }
+
+    if (typeof isPaid === "boolean") {
+      nextPayment.isPaid = isPaid;
+      if (isPaid && !nextPayment.paymentDate) {
+        nextPayment.paymentDate = new Date();
+      }
+    }
+
+    if (billingCycleDays !== undefined) {
+      nextPayment.billingCycleDays =
+        billingCycleDays === null || billingCycleDays === ""
+          ? 30
+          : Number(billingCycleDays);
+    }
+
+    student.payment = nextPayment;
+
+    await student.save();
+
+    const studentObject = student.toObject();
+    const enrichedStudent = {
+      ...studentObject,
+      paymentStatus: calculatePaymentStatus(studentObject.payment),
+    };
+
+    res.status(200).json({
+      message: "Student payment updated successfully",
+      data: enrichedStudent,
+    });
+  } catch (error) {
+    handleHttpError(res, "Error updating student payment", 500, error);
+  }
+};
+
+const sendPaymentReminder = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const { id } = req.params;
+    const { channel } = req.body as { channel?: "email" | "whatsapp" };
+
+    if (channel !== "email" && channel !== "whatsapp") {
+      return handleHttpError(res, "Invalid reminder channel", 400);
+    }
+
+    const requester = (req as any).dbUser || null;
+    if (!requester) {
+      return handleHttpError(res, "User not found in database", 404);
+    }
+
+    const student = await User.findById(id);
+    if (!student) {
+      return handleHttpError(res, "User not found", 404);
+    }
+
+    const isAdmin = requester.roles.includes(UserRole.Admin);
+
+    if (!isAdmin) {
+      const trainerStudentRelation = await Routine.exists({
+        trainerId: requester._id,
+        studentId: student._id,
+      });
+
+      if (!trainerStudentRelation) {
+        return handleHttpError(
+          res,
+          "You can only send reminders to your own students",
+          403,
+        );
+      }
+    }
+
+    const isStudent = student.roles?.includes(UserRole.Student);
+    if (!isStudent) {
+      return handleHttpError(res, "Reminders can only target students", 400);
+    }
+
+    const payment = student.payment || ({} as any);
+    payment.reminderCount = Number(payment.reminderCount || 0) + 1;
+    payment.lastReminderAt = new Date();
+    payment.lastReminderChannel = channel;
+    student.payment = payment;
+
+    await student.save();
+
+    const studentObject = student.toObject();
+    const enrichedStudent = {
+      ...studentObject,
+      paymentStatus: calculatePaymentStatus(studentObject.payment),
+    };
+
+    res.status(200).json({
+      message: "Reminder tracked successfully",
+      data: enrichedStudent,
+    });
+  } catch (error) {
+    handleHttpError(res, "Error sending payment reminder", 500, error);
+  }
+};
+
 export default {
   getAllUsers,
   getUserById,
@@ -230,4 +547,8 @@ export default {
   activateUser,
   setUserRole,
   getProfile,
+  getStudentsPayments,
+  getPaymentsSummary,
+  updateStudentPayment,
+  sendPaymentReminder,
 };

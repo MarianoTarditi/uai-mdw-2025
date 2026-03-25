@@ -33,12 +33,8 @@ import { ETIQUETAS, MATERIALES, MUSCULOS } from "@/pages/exercises/constants";
 import type { IExercise } from "@/types/auth";
 import { FileVideo, LinkIcon, UploadCloud, WandSparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ComboBoxMultiSelect } from "@/components/private/comboBoxMultiSelect/ComboBoxMultiSelect";
 
-type ArrayField =
-  | "musculosPrincipales"
-  | "musculosSecundarios"
-  | "materialesNecesarios"
-  | "etiquetas";
 type ExerciseFormInput = z.input<typeof exerciseSchema>;
 
 interface CreateExerciseProps {
@@ -140,77 +136,6 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
     }
   }, [dispatch, isCreatingSuccess, isError, message, setIsOpen]);
 
-  const toggleArrayValue = (field: ArrayField, value: string) => {
-    if (field === "musculosPrincipales") {
-      const current = watch("musculosPrincipales") || [];
-      const typedValue = value as ExerciseFormValues["musculosPrincipales"][number];
-      const exists = current.includes(typedValue);
-
-      if (watch("musculosSecundarios")?.includes(typedValue)) {
-        setValue(
-          "musculosSecundarios",
-          (watch("musculosSecundarios") || []).filter((item) => item !== typedValue),
-        );
-      }
-
-      setValue(
-        "musculosPrincipales",
-        exists
-          ? current.filter((item) => item !== typedValue)
-          : [...current, typedValue],
-        { shouldValidate: true },
-      );
-      return;
-    }
-
-    if (field === "musculosSecundarios") {
-      const current = watch("musculosSecundarios") || [];
-      const typedValue = value as ExerciseFormValues["musculosSecundarios"][number];
-      const exists = current.includes(typedValue);
-
-      if (watch("musculosPrincipales")?.includes(typedValue)) {
-        setValue(
-          "musculosPrincipales",
-          (watch("musculosPrincipales") || []).filter((item) => item !== typedValue),
-        );
-      }
-
-      setValue(
-        "musculosSecundarios",
-        exists
-          ? current.filter((item) => item !== typedValue)
-          : [...current, typedValue],
-        { shouldValidate: true },
-      );
-      return;
-    }
-
-    if (field === "materialesNecesarios") {
-      const current = watch("materialesNecesarios") || [];
-      const typedValue = value as ExerciseFormValues["materialesNecesarios"][number];
-      const exists = current.includes(typedValue);
-
-      setValue(
-        "materialesNecesarios",
-        exists
-          ? current.filter((item) => item !== typedValue)
-          : [...current, typedValue],
-        { shouldValidate: true },
-      );
-      return;
-    }
-
-    const current = watch("etiquetas") || [];
-    const typedValue = value as ExerciseFormValues["etiquetas"][number];
-    const exists = current.includes(typedValue);
-
-    setValue(
-      "etiquetas",
-      exists ? current.filter((item) => item !== typedValue) : [...current, typedValue],
-      { shouldValidate: true },
-    );
-  };
-
   const stepValidationMap = useMemo<Record<number, FieldPath<ExerciseFormValues>[]>>(
     () => ({
       1: ["nombre"],
@@ -230,6 +155,41 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
   };
 
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
+
+  const muscleOptions = useMemo(
+    () => MUSCULOS.map((muscle) => ({ value: muscle, label: muscle })),
+    [],
+  );
+
+  const materialOptions = useMemo(
+    () => MATERIALES.map((material) => ({ value: material, label: material })),
+    [],
+  );
+
+  const tagOptions = useMemo(
+    () => ETIQUETAS.map((tag) => ({ value: tag, label: tag })),
+    [],
+  );
+
+  const handlePrimaryMusclesChange = (values: string[]) => {
+    const validValues = values as ExerciseFormValues["musculosPrincipales"];
+    const secondary = watch("musculosSecundarios") || [];
+    const filteredSecondary = secondary.filter(
+      (muscle) => !validValues.includes(muscle),
+    );
+
+    setValue("musculosPrincipales", validValues, { shouldValidate: true });
+    setValue("musculosSecundarios", filteredSecondary, { shouldValidate: true });
+  };
+
+  const handleSecondaryMusclesChange = (values: string[]) => {
+    const validValues = values as ExerciseFormValues["musculosSecundarios"];
+    const primary = watch("musculosPrincipales") || [];
+    const filteredPrimary = primary.filter((muscle) => !validValues.includes(muscle));
+
+    setValue("musculosSecundarios", validValues, { shouldValidate: true });
+    setValue("musculosPrincipales", filteredPrimary, { shouldValidate: true });
+  };
 
   const handlePreset = (preset: (typeof EXERCISE_PRESETS)[number]) => {
     setValue("etiquetas", [...preset.tags], { shouldValidate: true });
@@ -328,103 +288,89 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
               )}
 
               {step === 2 && (
-                <section className="space-y-6">
-                  <div className="space-y-2">
-                    <Label>Músculos principales</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {MUSCULOS.map((muscle) => {
-                        const selected = (formValues.musculosPrincipales || []).includes(muscle);
-                        return (
-                          <Button
-                            key={muscle}
-                            type="button"
-                            size="sm"
-                            variant={selected ? "default" : "outline"}
-                            onClick={() => toggleArrayValue("musculosPrincipales", muscle)}
-                          >
-                            {muscle}
-                          </Button>
-                        );
-                      })}
+                <section className="space-y-5">
+                  <div className="premium-editor-panel grid gap-4 p-4 sm:p-5">
+                    <div className="space-y-2">
+                      <Label>Músculos principales</Label>
+                      <ComboBoxMultiSelect
+                        options={muscleOptions}
+                        value={formValues.musculosPrincipales || []}
+                        onChange={handlePrimaryMusclesChange}
+                        placeholder="Selecciona músculos principales"
+                        searchPlaceholder="Buscar músculo principal..."
+                        emptyMessage="No se encontraron músculos."
+                        className="min-h-10"
+                      />
+                      {errors.musculosPrincipales && (
+                        <p className="text-sm text-destructive">
+                          {errors.musculosPrincipales.message as string}
+                        </p>
+                      )}
                     </div>
-                    {errors.musculosPrincipales && (
-                      <p className="text-sm text-destructive">
-                        {errors.musculosPrincipales.message as string}
-                      </p>
-                    )}
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label>Músculos secundarios</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {MUSCULOS.map((muscle) => {
-                        const selected = (formValues.musculosSecundarios || []).includes(muscle);
-                        return (
-                          <Button
-                            key={muscle}
-                            type="button"
-                            size="sm"
-                            variant={selected ? "default" : "outline"}
-                            onClick={() => toggleArrayValue("musculosSecundarios", muscle)}
-                          >
-                            {muscle}
-                          </Button>
-                        );
-                      })}
+                    <div className="space-y-2">
+                      <Label>Músculos secundarios</Label>
+                      <ComboBoxMultiSelect
+                        options={muscleOptions}
+                        value={formValues.musculosSecundarios || []}
+                        onChange={handleSecondaryMusclesChange}
+                        placeholder="Selecciona músculos secundarios"
+                        searchPlaceholder="Buscar músculo secundario..."
+                        emptyMessage="No se encontraron músculos."
+                        className="min-h-10"
+                      />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Equipamiento</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {MATERIALES.map((material) => {
-                        const selected = (formValues.materialesNecesarios || []).includes(material);
-                        return (
-                          <Button
-                            key={material}
-                            type="button"
-                            size="sm"
-                            variant={selected ? "default" : "outline"}
-                            onClick={() => toggleArrayValue("materialesNecesarios", material)}
-                          >
-                            {material}
-                          </Button>
-                        );
-                      })}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="premium-editor-panel grid gap-3 p-4 sm:p-5">
+                      <Label>Equipamiento</Label>
+                      <ComboBoxMultiSelect
+                        options={materialOptions}
+                        value={formValues.materialesNecesarios || []}
+                        onChange={(values) =>
+                          setValue(
+                            "materialesNecesarios",
+                            values as ExerciseFormValues["materialesNecesarios"],
+                            { shouldValidate: true },
+                          )
+                        }
+                        placeholder="Selecciona equipamiento"
+                        searchPlaceholder="Buscar equipamiento..."
+                        emptyMessage="No se encontró equipamiento."
+                        className="min-h-10"
+                      />
+                      {errors.materialesNecesarios && (
+                        <p className="text-sm text-destructive">
+                          {errors.materialesNecesarios.message as string}
+                        </p>
+                      )}
                     </div>
-                    {errors.materialesNecesarios && (
-                      <p className="text-sm text-destructive">
-                        {errors.materialesNecesarios.message as string}
-                      </p>
-                    )}
+
+                    <div className="premium-editor-panel grid gap-3 p-4 sm:p-5">
+                      <Label>Etiqueta de objetivo</Label>
+                      <ComboBoxMultiSelect
+                        options={tagOptions}
+                        value={formValues.etiquetas || []}
+                        onChange={(values) =>
+                          setValue("etiquetas", values as ExerciseFormValues["etiquetas"], {
+                            shouldValidate: true,
+                          })
+                        }
+                        placeholder="Selecciona etiquetas"
+                        searchPlaceholder="Buscar etiqueta..."
+                        emptyMessage="No se encontraron etiquetas."
+                        className="min-h-10"
+                      />
+                      {errors.etiquetas && (
+                        <p className="text-sm text-destructive">
+                          {errors.etiquetas.message as string}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Etiqueta de objetivo</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {ETIQUETAS.map((tag) => {
-                        const selected = (formValues.etiquetas || []).includes(tag);
-                        return (
-                          <Button
-                            key={tag}
-                            type="button"
-                            size="sm"
-                            variant={selected ? "default" : "outline"}
-                            onClick={() => toggleArrayValue("etiquetas", tag)}
-                          >
-                            {tag}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    {errors.etiquetas && (
-                      <p className="text-sm text-destructive">
-                        {errors.etiquetas.message as string}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
+                  <div className="premium-editor-panel space-y-3 p-4 sm:p-5">
                     <Label>Plantillas rápidas</Label>
                     <div className="flex flex-wrap gap-2">
                       {EXERCISE_PRESETS.map((preset) => (
@@ -565,3 +511,4 @@ export function AddExercise({ isOpen, setIsOpen }: CreateExerciseProps) {
     </Dialog>
   );
 }
+

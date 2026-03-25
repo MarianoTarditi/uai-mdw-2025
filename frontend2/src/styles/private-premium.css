@@ -1,12 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 .fit-premium {
-  --premium-glow: color-mix(in srgb, var(--color-primary) 80%, #ff6b2c 20%);
-  --premium-accent: #ff6b2c;
+  --premium-glow: color-mix(in srgb, var(--color-primary) 90%, #0f1720 10%);
+  --premium-accent: color-mix(in srgb, var(--color-primary) 70%, var(--color-foreground) 30%);
   --premium-lime: #c9ff32;
   --premium-panel: color-mix(in srgb, var(--color-card) 82%, #0f151b 18%);
   --premium-panel-soft: color-mix(in srgb, var(--color-card) 92%, #121821 8%);
-  --premium-line: color-mix(in srgb, var(--color-border) 72%, #ff6b2c 28%);
+  --premium-line: color-mix(in srgb, var(--color-border) 86%, var(--color-foreground) 14%);
   --premium-text-soft: color-mix(in srgb, var(--color-foreground) 62%, transparent);
   font-family: "Manrope", sans-serif;
   position: relative;
@@ -55,7 +55,7 @@
     linear-gradient(180deg, color-mix(in srgb, var(--premium-panel) 84%, transparent), color-mix(in srgb, var(--premium-panel-soft) 92%, transparent));
   border-radius: 1rem;
   padding: 1.1rem 1.25rem;
-  box-shadow: 0 22px 50px color-mix(in srgb, black 80%, transparent);
+  box-shadow: none;
 }
 
 .fit-premium .premium-page-title {
@@ -78,9 +78,7 @@
   background:
     radial-gradient(1000px 240px at 120% -10%, color-mix(in srgb, var(--premium-accent) 15%, transparent) 0%, transparent 58%),
     linear-gradient(170deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
-  box-shadow:
-    0 14px 38px color-mix(in srgb, black 84%, transparent),
-    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+  box-shadow: none;
   border-radius: 1rem;
 }
 
@@ -93,8 +91,8 @@
 
 .fit-premium [data-slot="button"][data-variant="default"],
 .fit-premium [data-slot="button"].bg-primary {
-  background: linear-gradient(130deg, var(--premium-accent), color-mix(in srgb, var(--premium-accent) 62%, #ffb86d 38%));
-  color: #17120f;
+  background: var(--action-navy);
+  color: var(--action-navy-text);
   font-weight: 800;
   letter-spacing: 0.03em;
   border: 0;
@@ -111,7 +109,7 @@
 .fit-premium [data-slot="select-trigger"] {
   border-color: color-mix(in srgb, var(--premium-line) 54%, transparent);
   background: color-mix(in srgb, var(--premium-panel) 64%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+  box-shadow: none;
 }
 
 .fit-premium [data-slot="table-container"] {
@@ -213,7 +211,7 @@
   background:
     radial-gradient(900px 260px at 120% -10%, color-mix(in srgb, var(--premium-accent) 15%, transparent), transparent 62%),
     linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 95%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
-  box-shadow: 0 30px 70px color-mix(in srgb, black 82%, transparent);
+  box-shadow: none;
 }
 
 .fit-premium .premium-dialog-header {
@@ -229,8 +227,8 @@
 
 .fit-premium .premium-step-pill[data-active="true"] {
   border-color: color-mix(in srgb, var(--premium-accent) 68%, transparent);
-  background: linear-gradient(140deg, color-mix(in srgb, var(--premium-accent) 85%, #ffc28e 15%), color-mix(in srgb, var(--premium-accent) 55%, #c74f1d 45%));
-  color: #19120f;
+  background: linear-gradient(140deg, color-mix(in srgb, var(--premium-accent) 78%, var(--color-background) 22%), color-mix(in srgb, var(--premium-accent) 60%, var(--color-background) 40%));
+  color: var(--color-foreground);
   font-weight: 700;
 }
 
@@ -248,4 +246,18 @@
 
 .fit-premium .premium-upload-zone:hover {
   background: color-mix(in srgb, var(--premium-accent) 10%, transparent);
+}
+
+.fit-premium.auth-premium-layout .auth-premium-main {
+  max-width: 1100px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.fit-premium.auth-premium-layout .auth-premium-card {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 62%, transparent);
+  background:
+    radial-gradient(1000px 280px at 130% -20%, color-mix(in srgb, var(--premium-accent) 16%, transparent), transparent 60%),
+    linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 95%, transparent));
+  box-shadow: none;
 }

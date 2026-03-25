@@ -20,6 +20,14 @@ const UpdateUserValidator = [
     .isBoolean().withMessage("isActive must be true or false")
     .toBoolean(),
 
+  check("phone")
+    .optional({ nullable: true, checkFalsy: true })
+    .isString()
+    .withMessage("phone must be a string")
+    .bail()
+    .isLength({ min: 6, max: 20 })
+    .withMessage("phone must be between 6 and 20 characters"),
+
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
   },
@@ -35,7 +43,54 @@ const getUserValidator = [
   },
 ];
 
+const updateStudentPaymentValidator = [
+  check("startDate")
+    .optional({ nullable: true })
+    .isISO8601()
+    .withMessage("startDate must be a valid date"),
+
+  check("amount")
+    .optional({ nullable: true })
+    .isFloat({ min: 0 })
+    .withMessage("amount must be a positive number"),
+
+  check("paymentDate")
+    .optional({ nullable: true })
+    .isISO8601()
+    .withMessage("paymentDate must be a valid date"),
+
+  check("isPaid")
+    .optional()
+    .isBoolean()
+    .withMessage("isPaid must be true or false")
+    .toBoolean(),
+
+  check("billingCycleDays")
+    .optional({ nullable: true })
+    .isInt({ min: 1, max: 365 })
+    .withMessage("billingCycleDays must be an integer between 1 and 365"),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    validateResults(req, res, next);
+  },
+];
+
+const paymentReminderValidator = [
+  check("channel")
+    .exists()
+    .withMessage("channel is required")
+    .bail()
+    .isIn(["email", "whatsapp"])
+    .withMessage("channel must be 'email' or 'whatsapp'"),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    validateResults(req, res, next);
+  },
+];
+
 export default {
   getUserValidator,
   UpdateUserValidator,
+  updateStudentPaymentValidator,
+  paymentReminderValidator,
 };

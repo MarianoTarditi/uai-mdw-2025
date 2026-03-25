@@ -3,7 +3,7 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import { Suspense, lazy, useEffect, type ComponentType } from "react";
+import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from "react";
 import { AuthLayout } from "./components/public/authLayout/AuthLayout";
 import MainLayout from "./components/public/mainLayout/MainLayout";
 import PrivateRoute from "./components/private/privateRoute/PrivateRoute";
@@ -68,6 +68,46 @@ const withSuspense = (Component: ComponentType) => (
   </Suspense>
 );
 
+const hasRole = (roles: string[] | undefined, allowed: UserRole[]) =>
+  Boolean(roles?.some((role) => allowed.includes(role as UserRole)));
+
+const getDefaultPrivatePath = (roles: string[] | undefined): string => {
+  if (hasRole(roles, [UserRole.Admin])) {
+    return "/Dashboard";
+  }
+
+  if (hasRole(roles, [UserRole.Trainer])) {
+    return "/Exercises";
+  }
+
+  if (hasRole(roles, [UserRole.Student])) {
+    return "/GetAllRoutines";
+  }
+
+  return "/login";
+};
+
+const RoleRoute = ({
+  allowedRoles,
+  children,
+}: {
+  allowedRoles: UserRole[];
+  children: ReactElement;
+}) => {
+  const { profile, isDetailLoading } = useAppSelector((state) => state.user);
+
+  if (isDetailLoading) {
+    return <LoadingScreen />;
+  }
+
+  const roles = profile?.roles;
+  if (hasRole(roles, allowedRoles)) {
+    return children;
+  }
+
+  return <Navigate to={getDefaultPrivatePath(roles)} replace />;
+};
+
 const HomeOrRedirect = () => {
   const { profile, isDetailLoading } = useAppSelector((state) => state.user);
   const { isCheckingAuth, user: authUser } = useAppSelector(
@@ -82,8 +122,7 @@ const HomeOrRedirect = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isAdmin = profile?.roles?.includes(UserRole.Admin);
-  return <Navigate to={isAdmin ? "/Dashboard" : "/GetAllRoutines"} replace />;
+  return <Navigate to={getDefaultPrivatePath(profile?.roles)} replace />;
 };
 
 const router = createBrowserRouter([
@@ -111,13 +150,62 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      { path: "/Dashboard", element: withSuspense(Dashboard) },
-      { path: "/Exercises", element: withSuspense(GetAllExercises) },
-      { path: "/UserProfile", element: withSuspense(UserProfile) },
-      { path: "/GetAllUsers", element: withSuspense(GetAllUsers) },
-      { path: "/GetAllRoutines", element: withSuspense(GetAllRoutines) },
-      { path: "/RoutineTemplates", element: withSuspense(RoutineTemplates) },
-      { path: "/Payments", element: withSuspense(GetAllPayments) },
+      {
+        path: "/Dashboard",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin]}>
+            {withSuspense(Dashboard)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/Exercises",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+            {withSuspense(GetAllExercises)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/UserProfile",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+            {withSuspense(UserProfile)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/GetAllUsers",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin]}>
+            {withSuspense(GetAllUsers)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/GetAllRoutines",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+            {withSuspense(GetAllRoutines)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/RoutineTemplates",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer]}>
+            {withSuspense(RoutineTemplates)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/Payments",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Trainer]}>
+            {withSuspense(GetAllPayments)}
+          </RoleRoute>
+        ),
+      },
     ],
   },
 ]);

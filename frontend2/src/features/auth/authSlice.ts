@@ -69,6 +69,7 @@ export const registerUser = createAsyncThunk<
       email: formData.email,
       name: formData.name,
       lastName: formData.lastName,
+      phone: formData.phone,
       gender: formData.gender,
       birthDate: formData.birthDate,
       weight: formData.weight,
@@ -193,8 +194,7 @@ export const observeUser = createAsyncThunk<
       localStorage.setItem("token", token);
 
       dispatch(setUser({ uid: user.uid, email: user.email, token }));
-
-      await dispatch(fetchUserProfile());
+      dispatch(fetchUserProfile());
     } else {
       localStorage.removeItem("token");
       dispatch(clearUser());

@@ -6,7 +6,7 @@ export const registerSchema = z
   .object({
     name: z
       .string("El nombre es requerido")
-      .min(1, "El nombre es requerido") 
+      .min(1, "El nombre es requerido")
       .min(3, "El nombre debe tener al menos 3 caracteres")
       .max(30, "El nombre debe tener menos de 30 caracteres"),
     lastName: z
@@ -15,9 +15,15 @@ export const registerSchema = z
       .min(3, "El apellido debe tener al menos 3 caracteres")
       .max(30, "El apellido debe tener menos de 30 caracteres"),
     email: z
-      .email("Formato de email inválido")
+      .email("Formato de email invalido")
       .min(3, "El email debe tener al menos 3 caracteres")
       .max(100, "El email debe tener menos de 100 caracteres"),
+    phone: z
+      .string("El telefono es requerido")
+      .min(1, "El telefono es requerido")
+      .min(6, "El telefono debe tener al menos 6 caracteres")
+      .max(20, "El telefono debe tener menos de 20 caracteres")
+      .regex(/^[\d\s()+-]+$/, "Formato de telefono invalido"),
     password: z
       .string("La contraseña es requerida")
       .min(1, "La contraseña es requerida")
@@ -26,15 +32,15 @@ export const registerSchema = z
     confirmPassword: z
       .string("Confirmar contraseña es requerido")
       .min(1, "Confirmar contraseña es requerido")
-      .min(6, "La confirmación debe tener al menos 6 caracteres")
-      .max(100, "La confirmación debe tener menos de 100 caracteres"),
+      .min(6, "La confirmacion debe tener al menos 6 caracteres")
+      .max(100, "La confirmacion debe tener menos de 100 caracteres"),
     birthDate: z
       .string()
       .transform((val) => (val === "" ? null : val))
       .nullable()
       .refine(
         (val) => val === null || dateRegex.test(val),
-        "Formato de fecha inválido (DD/MM/AAAA)",
+        "Formato de fecha invalido (DD/MM/AAAA)",
       )
       .refine((val) => {
         if (!val) return true;
@@ -51,7 +57,7 @@ export const registerSchema = z
         }
 
         return age >= 10 && age <= 100;
-      }, "Fecha inválida (debes tener entre 10 y 100 años)"),
+      }, "Fecha invalida (debes tener entre 10 y 100 anos)"),
 
     gender: z
       .string()
@@ -59,7 +65,7 @@ export const registerSchema = z
       .nullable()
       .refine(
         (val) => val === null || ["male", "female", "other"].includes(val),
-        "Género inválido",
+        "Genero invalido",
       ),
 
     height: z
@@ -76,7 +82,7 @@ export const registerSchema = z
           val === null ||
           val === undefined ||
           (typeof val === "number" && val >= 100 && val <= 250),
-        "Ingresa una altura válida (100-250 cm)",
+        "Ingresa una altura valida (100-250 cm)",
       )
       .nullable(),
 
@@ -94,7 +100,7 @@ export const registerSchema = z
           val === null ||
           val === undefined ||
           (typeof val === "number" && val >= 1 && val <= 200),
-        "Ingresa un peso válido (1-200 kg)",
+        "Ingresa un peso valido (1-200 kg)",
       )
       .nullable(),
   })
@@ -106,7 +112,7 @@ export const registerSchema = z
 export const loginSchema = z.object({
   email: z
     .string("El email es requerido")
-    .email("Formato de email inválido")
+    .email("Formato de email invalido")
     .min(1, "El email es requerido")
     .max(100, "El email debe tener menos de 100 caracteres"),
   password: z

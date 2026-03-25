@@ -107,7 +107,6 @@ export default function Dashboard() {
                 title="Performance Command Center"
                 description="Monitorea alumnos, pagos, rutinas y progreso en un tablero con foco total en consistencia, disciplina y resultados medibles."
                 badge={`${filteredCount}/${totalCount} eventos`}
-                chips={["Ritmo Diario", "Gestion Integral", "Control Tactico"]}
                 rightSlot={<Gauge className="h-4 w-4 text-primary" />}
               />
             </div>
