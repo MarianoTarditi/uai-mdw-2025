@@ -4,6 +4,7 @@ import auth from "./auth/auth";
 import exercise from "./exercise/exercise";
 import routine from "./routine/routine";
 import admin from "./admin/admin";
+import progress from "./progress/progress";
 import { requestContext } from "../utils/requestContext";
 import { authenticateFirebase } from "../middlewares/authenticateFirebase";
 import User from "../models/User"; 
@@ -47,5 +48,6 @@ router.use("/user", user);
 router.use("/exercise", exercise);
 router.use("/routines", routine);
 router.use("/admin", admin);
+router.use("/progress", progress);
 
 export default router;

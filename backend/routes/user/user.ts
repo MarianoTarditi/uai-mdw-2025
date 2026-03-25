@@ -16,6 +16,20 @@ router.get(
 );
 
 router.get(
+  "/students/payments",
+  authenticateFirebase,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.getStudentsPayments,
+);
+
+router.get(
+  "/students/payments/summary",
+  authenticateFirebase,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.getPaymentsSummary,
+);
+
+router.get(
   "/profile",
   authenticateFirebase,
   controllers.getProfile,
@@ -60,6 +74,24 @@ router.patch(
   validator.getUserValidator,
   checkRol([UserRole.Admin]),
   controllers.setUserRole,
+);
+
+router.patch(
+  "/payment/:id",
+  authenticateFirebase,
+  validator.getUserValidator,
+  validator.updateStudentPaymentValidator,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.updateStudentPayment,
+);
+
+router.post(
+  "/payment/reminder/:id",
+  authenticateFirebase,
+  validator.getUserValidator,
+  validator.paymentReminderValidator,
+  checkRol([UserRole.Admin, UserRole.Trainer]),
+  controllers.sendPaymentReminder,
 );
 
 export default router;

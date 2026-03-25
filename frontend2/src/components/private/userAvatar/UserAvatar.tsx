@@ -1,5 +1,6 @@
 import React from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { resolveMediaUrl } from "@/utils/mediaUrl";
 
 interface UserAvatarProps {
   imagePath: string | null | undefined;
@@ -8,13 +9,7 @@ interface UserAvatarProps {
   className?: string;
 }
 
-const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
 const DEFAULT_AVATAR = "/UserDefault.png";
-
-const getImageUrl = (imagePath?: string | null): string => {
-  if (!imagePath) return DEFAULT_AVATAR;
-  return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
-};
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({
   imagePath,
@@ -22,7 +17,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   lastName,
   className,
 }) => {
-  const imageUrl = getImageUrl(imagePath);
+  const imageUrl = resolveMediaUrl(imagePath) ?? DEFAULT_AVATAR;
   const fallbackText = `${name?.[0] ?? "?"}${lastName?.[0] ?? "?"}`;
   const altText = `${name} ${lastName} profile`;
 

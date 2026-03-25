@@ -19,13 +19,13 @@ export function RoutineTable<TData>({ table }: RoutineTableProps<TData>) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-xl border bg-card">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/40">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-xs uppercase tracking-wide text-muted-foreground">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -44,6 +44,7 @@ export function RoutineTable<TData>({ table }: RoutineTableProps<TData>) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-primary/5"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import routineService from "./routineService";
-import { type IRoutine } from "./routineTypes";
+import { type IRoutine, type IRoutinePayload } from "./routineTypes";
 import axios from "axios";
 import { deleteExercise } from "../exercises/exerciseSlice";
 
@@ -12,9 +12,27 @@ export interface IStudent {
   profileImage?: string;
 }
 
+export interface IRoutineTemplate {
+  _id: string;
+  title: string;
+  fileUrl: string;
+  originalName: string;
+  mimeType: string;
+  fileSize: number;
+  uploadedBy?: {
+    _id?: string;
+    name?: string;
+    lastName?: string;
+    email?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface RoutineState {
   routines: IRoutine[];
   students: IStudent[];
+  templates: IRoutineTemplate[];
   selectedRoutine: IRoutine | null;
 
   isFetchingLoading: boolean;
@@ -23,6 +41,9 @@ interface RoutineState {
   isDeletingLoading: boolean;
   isDetailLoading: boolean;
   isStudentsLoading: boolean;
+  isTemplatesLoading: boolean;
+  isTemplateUploading: boolean;
+  isTemplateDeleting: boolean;
 
   isFetchingSuccess: boolean;
   isCreatingSuccess: boolean;
@@ -41,6 +62,7 @@ interface DeleteAssignmentResponse {
 const initialState: RoutineState = {
   routines: [],
   students: [],
+  templates: [],
   selectedRoutine: null,
 
   isFetchingLoading: false,
@@ -49,6 +71,9 @@ const initialState: RoutineState = {
   isDeletingLoading: false,
   isDetailLoading: false,
   isStudentsLoading: false,
+  isTemplatesLoading: false,
+  isTemplateUploading: false,
+  isTemplateDeleting: false,
 
   isFetchingSuccess: false,
   isCreatingSuccess: false,
@@ -104,7 +129,7 @@ export const fetchRoutines = createAsyncThunk<
 
 export const createRoutine = createAsyncThunk<
   IRoutine,
-  Omit<IRoutine, "_id">,
+  IRoutinePayload,
   { rejectValue: string }
 >("routines/create", async (data, thunkAPI) => {
   try {
@@ -143,7 +168,7 @@ export const getRoutineById = createAsyncThunk<
 
 export const updateRoutine = createAsyncThunk<
   IRoutine,
-  { id: string; routineData: Partial<IRoutine> },
+  { id: string; routineData: Partial<IRoutinePayload> },
   { rejectValue: string }
 >("routines/update", async ({ id, routineData }, thunkAPI) => {
   try {
@@ -199,6 +224,71 @@ export const getStudents = createAsyncThunk(
   },
 );
 
+export const fetchRoutineTemplates = createAsyncThunk<
+  IRoutineTemplate[],
+  void,
+  { rejectValue: string }
+>("routines/getTemplates", async (_, thunkAPI) => {
+  try {
+    return await routineService.getRoutineTemplates();
+  } catch (error: unknown) {
+    let message = "Error al obtener plantillas";
+    if (axios.isAxiosError(error) && error.response) {
+      message = error.response.data?.message || error.message;
+    }
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const uploadRoutineTemplate = createAsyncThunk<
+  IRoutineTemplate,
+  FormData,
+  { rejectValue: string }
+>("routines/uploadTemplate", async (payload, thunkAPI) => {
+  try {
+    return await routineService.uploadRoutineTemplate(payload);
+  } catch (error: unknown) {
+    let message = "Error al subir plantilla";
+    if (axios.isAxiosError(error) && error.response) {
+      message = error.response.data?.message || error.message;
+    }
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const removeRoutineTemplate = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("routines/deleteTemplate", async (id, thunkAPI) => {
+  try {
+    await routineService.deleteRoutineTemplate(id);
+    return id;
+  } catch (error: unknown) {
+    let message = "Error al eliminar plantilla";
+    if (axios.isAxiosError(error) && error.response) {
+      message = error.response.data?.message || error.message;
+    }
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const renameRoutineTemplate = createAsyncThunk<
+  IRoutineTemplate,
+  { id: string; title: string },
+  { rejectValue: string }
+>("routines/renameTemplate", async ({ id, title }, thunkAPI) => {
+  try {
+    return await routineService.renameRoutineTemplate(id, title);
+  } catch (error: unknown) {
+    let message = "Error al renombrar plantilla";
+    if (axios.isAxiosError(error) && error.response) {
+      message = error.response.data?.message || error.message;
+    }
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 const routineSlice = createSlice({
   name: "routines",
   initialState,
@@ -214,6 +304,9 @@ const routineSlice = createSlice({
       state.isError = false;
       state.message = "";
       state.selectedRoutine = null;
+      state.isTemplateUploading = false;
+      state.isTemplatesLoading = false;
+      state.isTemplateDeleting = false;
     },
   },
   extraReducers: (builder) => {
@@ -397,6 +490,62 @@ const routineSlice = createSlice({
         }
       }
     });
+
+    // 9. TEMPLATES
+    builder
+      .addCase(fetchRoutineTemplates.pending, (state) => {
+        state.isTemplatesLoading = true;
+        state.isError = false;
+      })
+      .addCase(fetchRoutineTemplates.fulfilled, (state, action) => {
+        state.isTemplatesLoading = false;
+        state.templates = action.payload;
+      })
+      .addCase(fetchRoutineTemplates.rejected, (state, action) => {
+        state.isTemplatesLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(uploadRoutineTemplate.pending, (state) => {
+        state.isTemplateUploading = true;
+        state.isError = false;
+      })
+      .addCase(uploadRoutineTemplate.fulfilled, (state, action) => {
+        state.isTemplateUploading = false;
+        state.templates.unshift(action.payload);
+      })
+      .addCase(uploadRoutineTemplate.rejected, (state, action) => {
+        state.isTemplateUploading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(removeRoutineTemplate.pending, (state) => {
+        state.isTemplateDeleting = true;
+      })
+      .addCase(removeRoutineTemplate.fulfilled, (state, action) => {
+        state.isTemplateDeleting = false;
+        state.templates = state.templates.filter((t) => t._id !== action.payload);
+      })
+      .addCase(removeRoutineTemplate.rejected, (state, action) => {
+        state.isTemplateDeleting = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(renameRoutineTemplate.pending, (state) => {
+        state.isTemplateUploading = true;
+      })
+      .addCase(renameRoutineTemplate.fulfilled, (state, action) => {
+        state.isTemplateUploading = false;
+        const updated = action.payload;
+        state.templates = state.templates.map((template) =>
+          template._id === updated._id ? updated : template,
+        );
+      })
+      .addCase(renameRoutineTemplate.rejected, (state, action) => {
+        state.isTemplateUploading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
   },
 });
 

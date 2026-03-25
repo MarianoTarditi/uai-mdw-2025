@@ -17,6 +17,17 @@ export const updateUserSchema = z.object({
     .max(50, "El apellido es demasiado largo")
     .regex(onlyLettersRegex, "El apellido solo puede contener letras"),
 
+  phone: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .refine((value) => {
+      if (!value) return true;
+      const normalized = value.replace(/[^\d+]/g, "");
+      return normalized.length >= 6 && normalized.length <= 20;
+    }, "Ingresá un teléfono válido (con código de país)"),
+
   height: z.coerce
     .number()
     .nullable()

@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import admin from "../utils/firebase";
-import User from "../models/User";
-
 
 export const authenticateFirebase = async (
   req: Request,

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
+import { Bolt, Moon, Sun } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +34,7 @@ const routeNameMap: Record<string, string> = {
   settings: "Configuración",
   profile: "Mi Perfil",
   products: "Productos",
+  payments: "Pagos",
   edit: "Editar",
   create: "Crear",
 };
@@ -54,13 +55,18 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="premium-topbar flex h-16 shrink-0 items-center justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
+
+            <span className="premium-topbar-badge hidden md:inline-flex">
+              <Bolt className="h-3.5 w-3.5" />
+              AgustínTurriEDF
+            </span>
 
             <Breadcrumb>
               <BreadcrumbList>
@@ -126,7 +132,7 @@ export default function Sidebar({ children }: SidebarLayoutProps) {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className="premium-shell flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

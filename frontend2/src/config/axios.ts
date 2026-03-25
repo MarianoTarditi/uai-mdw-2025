@@ -1,18 +1,30 @@
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1");
+
+const resolvedBaseURL = isLocalhost
+  ? "/api"
+  : (import.meta.env.VITE_API_URL ?? "");
+
 const axiosPrivate = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: resolvedBaseURL,
 });
 
 axiosPrivate.interceptors.request.use(
   async (config) => {
     const auth = getAuth();
     const user = auth.currentUser;
+    const savedToken = localStorage.getItem("token");
 
     if (user) {
       const token = await user.getIdToken(false);
       config.headers.Authorization = `Bearer ${token}`;
+    } else if (savedToken) {
+      config.headers.Authorization = `Bearer ${savedToken}`;
     }
 
     return config;

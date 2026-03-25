@@ -10,10 +10,8 @@
   background-color: rgba(18, 18, 18, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
   transition:
     background-color 0.3s ease,
-    box-shadow 0.3s ease,
     border-bottom-color 0.3s ease;
   display: flex;
   align-items: center;
@@ -36,7 +34,6 @@
 
 .header.scrolled {
   background-color: rgba(18, 18, 18, 0.98);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   border-bottom-color: rgba(255, 255, 255, 0.15);
 }
 

@@ -58,6 +58,10 @@
 
 :root {
   --radius: 0.625rem;
+  --action-navy: #0b1f3a;
+  --action-navy-hover: #133055;
+  --action-navy-active: #09172c;
+  --action-navy-text: #f7fbff;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -92,6 +96,10 @@
 }
 
 .dark {
+  --action-navy: #0b1f3a;
+  --action-navy-hover: #133055;
+  --action-navy-active: #09172c;
+  --action-navy-text: #f7fbff;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -167,4 +175,46 @@
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+/* Global visual cleanup requested: no subtle orange accents or card/section shadows */
+.shadow-xs,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: none !important;
+}
+
+[data-slot="card"],
+.premium-page-intro,
+.premium-dialog,
+.premium-editor-panel,
+.auth-premium-card,
+.mantine-Card-root,
+.mantine-Paper-root {
+  box-shadow: none !important;
+}
+
+[data-slot="button"][data-variant="default"],
+[data-slot="button"].bg-primary,
+.fit-premium .mantine-Button-root {
+  background: var(--action-navy) !important;
+  color: var(--action-navy-text) !important;
+  border-color: var(--action-navy) !important;
+}
+
+[data-slot="button"][data-variant="default"]:hover,
+[data-slot="button"].bg-primary:hover,
+.fit-premium .mantine-Button-root:hover {
+  background: var(--action-navy-hover) !important;
+  border-color: var(--action-navy-hover) !important;
+}
+
+[data-slot="button"][data-variant="default"]:active,
+[data-slot="button"].bg-primary:active,
+.fit-premium .mantine-Button-root:active {
+  background: var(--action-navy-active) !important;
+  border-color: var(--action-navy-active) !important;
 }

@@ -8,7 +8,7 @@ const saveUser = async (req: Request, res: Response) => {
     const firebaseUid = firebaseUser.uid;
     const email = firebaseUser.email;
 
-    const { name, lastName, gender, birthDate, weight, height } = req.body;
+    const { name, lastName, phone, gender, birthDate, weight, height } = req.body;
 
     const existingUser = await User.findOne({ firebaseUid });
     if (existingUser) {
@@ -20,6 +20,7 @@ const saveUser = async (req: Request, res: Response) => {
       email,
       name,
       lastName,
+      phone,
       gender,
       birthDate,
       weight,

@@ -5,7 +5,7 @@ import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { UploadCloud, Image as ImageIcon } from "lucide-react";
+import { UploadCloud, Image as ImageIcon, UserPen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -85,6 +85,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
     defaultValues: {
       name: "",
       lastName: "",
+      phone: "",
       birthDate: "",
       gender: undefined,
       height: null,
@@ -98,6 +99,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
       resetForm({
         name: user.name ?? "",
         lastName: user.lastName ?? "",
+        phone: user.phone ?? "",
         birthDate: formatIsoToDDMMYYYY(user.birthDate),
         gender: user.gender ?? undefined,
         height: user.height ?? null,
@@ -130,6 +132,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("lastName", data.lastName);
+    formData.append("phone", data.phone?.trim() ? data.phone.trim() : "");
 
     if (data.height != null) formData.append("height", data.height.toString());
     if (data.weight != null) formData.append("weight", data.weight.toString());
@@ -149,10 +152,13 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
+      <DialogContent className="premium-dialog sm:max-w-[500px] bg-background text-foreground max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <DialogHeader className="mb-4">
-            <DialogTitle>Editar Usuario</DialogTitle>
+          <DialogHeader className="premium-dialog-header mb-4 px-1 pb-4">
+            <DialogTitle className="flex items-center gap-2">
+              <UserPen className="h-4 w-4 text-primary" />
+              Editar Usuario
+            </DialogTitle>
             <DialogDescription>
               Modifica la información personal del usuario.
             </DialogDescription>
@@ -178,6 +184,20 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
+              <Input
+                id="phone"
+                placeholder="+5491122334455"
+                {...register("phone")}
+              />
+              {errors.phone && (
+                <p className="text-xs text-red-500">
+                  {errors.phone.message as string}
+                </p>
+              )}
             </div>
 
             <div className="grid gap-2">
@@ -249,9 +269,9 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
               )}
             </div>
 
-            <div className="grid gap-3 mt-2 p-4 border rounded-lg bg-muted/10">
+            <div className="premium-editor-panel mt-2 grid gap-3 p-4">
               <Label className="text-base font-semibold">Foto de Perfil</Label>
-              <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors border-muted-foreground/25 relative">
+              <div className="premium-upload-zone relative flex h-32 w-full cursor-pointer flex-col items-center justify-center transition-colors">
                 <label
                   htmlFor="profile-image-upload"
                   className="flex flex-col items-center justify-center w-full h-full pt-5 pb-6 cursor-pointer z-10"

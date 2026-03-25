@@ -48,11 +48,7 @@ const Navbar = () => {
               className="relative h-10 w-10 rounded-full p-0"
             >
               <UserAvatar
-                imagePath={
-                  profile?.profileImage
-                    ? `${profile.profileImage}?t=${Date.now()}`
-                    : "/UserDefault.png"
-                }
+                imagePath={profile?.profileImage ?? null}
                 name={profile?.name ?? "U"}
                 lastName={profile?.lastName ?? "A"}
                 className="w-8 h-8"

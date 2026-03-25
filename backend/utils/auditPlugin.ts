@@ -25,7 +25,7 @@ export const auditPlugin = (schema: Schema) => {
     if (doc.name) return doc.name;
     if (doc.email) return doc.email;
     if (doc.title) return doc.title;
-    return "Elemento sin nombre"; 
+    return "Elemento sin nombree"; 
   };
 
   schema.post("save", async function (doc: any) {

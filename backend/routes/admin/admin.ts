@@ -9,19 +9,19 @@ const router = express.Router();
 router.get(
   "/dashboard",
   authenticateFirebase,
-  checkRole([UserRole.Admin]),
+  checkRole([UserRole.Admin, UserRole.Trainer]),
   controller.getDashboardStats,
 );
 router.get(
   "/chartData",
   authenticateFirebase,
-  checkRole([UserRole.Admin]),
+  checkRole([UserRole.Admin, UserRole.Trainer]),
   controller.getChartData,
 );
 router.get(
   "/auditLogs",
   authenticateFirebase,
-  checkRole([UserRole.Admin]),
+  checkRole([UserRole.Admin, UserRole.Trainer]),
   controller.getAuditLogs,
 );
 

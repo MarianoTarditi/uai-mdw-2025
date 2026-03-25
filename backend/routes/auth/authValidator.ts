@@ -18,9 +18,16 @@ const registerValidator = [
   check("email")
     .exists().withMessage("El campo email no existe").bail()
     .notEmpty().withMessage("El email es requerido").bail()
-    .isEmail().withMessage("El formato del email es inválido").bail()
+    .isEmail().withMessage("El formato del email es invalido").bail()
     .isString().withMessage("El email debe ser una cadena de texto").bail()
     .isLength({ min: 3, max: 100 }).withMessage("El email debe tener entre 3 y 100 caracteres"),
+
+  check("phone")
+    .exists().withMessage("El campo telefono no existe").bail()
+    .notEmpty().withMessage("El telefono es requerido").bail()
+    .isString().withMessage("El telefono debe ser una cadena de texto").bail()
+    .isLength({ min: 6, max: 20 }).withMessage("El telefono debe tener entre 6 y 20 caracteres").bail()
+    .matches(/^[\d\s()+-]+$/).withMessage("Formato de telefono invalido"),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);
@@ -31,7 +38,7 @@ const loginValidator = [
   check("email")
     .exists().withMessage("El campo email no existe").bail()
     .notEmpty().withMessage("El email es requerido").bail()
-    .isEmail().withMessage("El formato del email es inválido").bail()
+    .isEmail().withMessage("El formato del email es invalido").bail()
     .isString().withMessage("El email debe ser una cadena de texto").bail(),
 
   check("password")

@@ -4,6 +4,8 @@ import { Footer } from "../footer/Footer";
 import { AuthHeader } from "../header/AuthHeader";
 import { useAppSelector } from "@/app/reduxHooks";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
+import { ThemeProvider } from "../themeProvider/ThemeProvider";
+import "@/styles/private-premium.css";
 
 export const AuthLayout = () => {
   const { user, isCheckingAuth } = useAppSelector((state) => state.auth);
@@ -17,12 +19,14 @@ export const AuthLayout = () => {
   }
 
   return (
-    <div className={classes.layout}>
-      <AuthHeader />
-      <main className={classes.main}>
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <div className={`${classes.layout} fit-premium auth-premium-layout`}>
+        <AuthHeader />
+        <main className={classes.main}>
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 };

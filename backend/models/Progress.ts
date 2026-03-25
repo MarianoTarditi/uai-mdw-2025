@@ -17,6 +17,9 @@ const progressSchema = new Schema(
   }
 );
 
+progressSchema.index({ userId: 1, date: -1 });
+progressSchema.index({ routineId: 1, exerciseId: 1, date: -1 });
+
 type ProgressType = InferSchemaType<typeof progressSchema>;
 const Progress = model<ProgressType>("Progress", progressSchema);
 export default Progress;

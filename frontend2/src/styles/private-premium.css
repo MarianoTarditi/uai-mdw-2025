@@ -1,0 +1,263 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+.fit-premium {
+  --premium-glow: color-mix(in srgb, var(--color-primary) 90%, #0f1720 10%);
+  --premium-accent: color-mix(in srgb, var(--color-primary) 70%, var(--color-foreground) 30%);
+  --premium-lime: #c9ff32;
+  --premium-panel: color-mix(in srgb, var(--color-card) 82%, #0f151b 18%);
+  --premium-panel-soft: color-mix(in srgb, var(--color-card) 92%, #121821 8%);
+  --premium-line: color-mix(in srgb, var(--color-border) 86%, var(--color-foreground) 14%);
+  --premium-text-soft: color-mix(in srgb, var(--color-foreground) 62%, transparent);
+  font-family: "Manrope", sans-serif;
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 640px at 115% -10%, color-mix(in srgb, var(--premium-glow) 32%, transparent) 0%, transparent 58%),
+    radial-gradient(900px 520px at -20% 110%, color-mix(in srgb, var(--premium-lime) 14%, transparent) 0%, transparent 65%),
+    linear-gradient(145deg, color-mix(in srgb, var(--color-background) 97%, #090d10 3%), var(--color-background));
+}
+
+.fit-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--premium-line) 24%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--premium-line) 18%, transparent) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(70% 80% at 45% 40%, black 40%, transparent 100%);
+  opacity: 0.42;
+}
+
+.fit-premium h1,
+.fit-premium h2,
+.fit-premium h3,
+.fit-premium [data-slot="card-title"] {
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.fit-premium .premium-main {
+  padding: 1rem;
+}
+
+.fit-premium .premium-shell {
+  animation: premium-rise 0.6s ease both;
+}
+
+.fit-premium .premium-page-intro {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 64%, transparent);
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--premium-accent) 18%, transparent), transparent 55%),
+    linear-gradient(180deg, color-mix(in srgb, var(--premium-panel) 84%, transparent), color-mix(in srgb, var(--premium-panel-soft) 92%, transparent));
+  border-radius: 1rem;
+  padding: 1.1rem 1.25rem;
+  box-shadow: none;
+}
+
+.fit-premium .premium-page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: clamp(1.55rem, 2vw, 2.1rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fit-premium .premium-page-copy {
+  margin-top: 0.4rem;
+  color: var(--premium-text-soft);
+  max-width: 70ch;
+}
+
+.fit-premium [data-slot="card"] {
+  border-color: color-mix(in srgb, var(--premium-line) 60%, transparent);
+  background:
+    radial-gradient(1000px 240px at 120% -10%, color-mix(in srgb, var(--premium-accent) 15%, transparent) 0%, transparent 58%),
+    linear-gradient(170deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
+  box-shadow: none;
+  border-radius: 1rem;
+}
+
+.fit-premium [data-slot="card-description"] {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  color: color-mix(in srgb, var(--color-foreground) 45%, transparent);
+}
+
+.fit-premium [data-slot="button"][data-variant="default"],
+.fit-premium [data-slot="button"].bg-primary {
+  background: var(--action-navy);
+  color: var(--action-navy-text);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  border: 0;
+}
+
+.fit-premium [data-slot="button"].border,
+.fit-premium [data-slot="button"][data-variant="outline"] {
+  border-color: color-mix(in srgb, var(--premium-line) 60%, transparent);
+  background: color-mix(in srgb, var(--premium-panel) 60%, transparent);
+}
+
+.fit-premium [data-slot="input"],
+.fit-premium [data-slot="textarea"],
+.fit-premium [data-slot="select-trigger"] {
+  border-color: color-mix(in srgb, var(--premium-line) 54%, transparent);
+  background: color-mix(in srgb, var(--premium-panel) 64%, transparent);
+  box-shadow: none;
+}
+
+.fit-premium [data-slot="table-container"] {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 55%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--premium-panel-soft) 86%, transparent);
+}
+
+.fit-premium [data-slot="table-header"] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
+}
+
+.fit-premium [data-slot="table-head"] {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.66rem;
+  color: color-mix(in srgb, var(--color-foreground) 56%, transparent);
+}
+
+.fit-premium [data-slot="table-row"] {
+  border-color: color-mix(in srgb, var(--premium-line) 44%, transparent);
+}
+
+.fit-premium [data-slot="table-row"]:hover {
+  background: color-mix(in srgb, var(--premium-accent) 10%, transparent);
+}
+
+.fit-premium [data-slot="sidebar-wrapper"] {
+  background: transparent;
+}
+
+.fit-premium [data-slot="sidebar-inner"] {
+  border-right: 1px solid color-mix(in srgb, var(--premium-line) 52%, transparent);
+  background:
+    radial-gradient(600px 260px at 10% -20%, color-mix(in srgb, var(--premium-accent) 18%, transparent), transparent 65%),
+    linear-gradient(180deg, color-mix(in srgb, var(--premium-panel) 95%, transparent), color-mix(in srgb, var(--premium-panel-soft) 98%, transparent));
+}
+
+.fit-premium [data-sidebar="menu-button"] {
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+}
+
+.fit-premium [data-sidebar="menu-button"][data-active="true"] {
+  border-color: color-mix(in srgb, var(--premium-line) 65%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--premium-accent) 20%, transparent), color-mix(in srgb, var(--premium-panel) 96%, transparent));
+}
+
+.fit-premium .premium-topbar {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 50%, transparent);
+  border-radius: 1rem;
+  margin: 0.45rem;
+  background: color-mix(in srgb, var(--premium-panel) 80%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.fit-premium .premium-topbar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--premium-line) 60%, transparent);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  color: color-mix(in srgb, var(--color-foreground) 74%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@keyframes premium-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .fit-premium .premium-main {
+    padding: 0.5rem;
+  }
+
+  .fit-premium .premium-page-intro {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fit-premium .premium-shell {
+    animation: none;
+  }
+}
+
+.fit-premium .premium-dialog {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 56%, transparent);
+  background:
+    radial-gradient(900px 260px at 120% -10%, color-mix(in srgb, var(--premium-accent) 15%, transparent), transparent 62%),
+    linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 95%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
+  box-shadow: none;
+}
+
+.fit-premium .premium-dialog-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--premium-line) 45%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--premium-accent) 12%, transparent), transparent 58%);
+}
+
+.fit-premium .premium-step-pill {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--premium-line) 56%, transparent);
+  background: color-mix(in srgb, var(--premium-panel) 62%, transparent);
+}
+
+.fit-premium .premium-step-pill[data-active="true"] {
+  border-color: color-mix(in srgb, var(--premium-accent) 68%, transparent);
+  background: linear-gradient(140deg, color-mix(in srgb, var(--premium-accent) 78%, var(--color-background) 22%), color-mix(in srgb, var(--premium-accent) 60%, var(--color-background) 40%));
+  color: var(--color-foreground);
+  font-weight: 700;
+}
+
+.fit-premium .premium-editor-panel {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 50%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--premium-panel-soft) 86%, transparent);
+}
+
+.fit-premium .premium-upload-zone {
+  border: 1.5px dashed color-mix(in srgb, var(--premium-line) 62%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--premium-panel) 44%, transparent);
+}
+
+.fit-premium .premium-upload-zone:hover {
+  background: color-mix(in srgb, var(--premium-accent) 10%, transparent);
+}
+
+.fit-premium.auth-premium-layout .auth-premium-main {
+  max-width: 1100px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.fit-premium.auth-premium-layout .auth-premium-card {
+  border: 1px solid color-mix(in srgb, var(--premium-line) 62%, transparent);
+  background:
+    radial-gradient(1000px 280px at 130% -20%, color-mix(in srgb, var(--premium-accent) 16%, transparent), transparent 60%),
+    linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 95%, transparent));
+  box-shadow: none;
+}

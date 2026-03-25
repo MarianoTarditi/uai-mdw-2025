@@ -14,19 +14,21 @@ export function ExerciseButton() {
   const closeModal = () => setIsOpen(false);
 
   const { profile } = useAppSelector((state) => state.user);
-  const isTrainer = profile?.roles.includes(UserRole.Trainer);
+  const canCreate =
+    profile?.roles.includes(UserRole.Trainer) ||
+    profile?.roles.includes(UserRole.Admin);
 
   return (
     <>
       <Button
-        disabled={!isTrainer}
+        disabled={!canCreate}
         onClick={openModal}
-        variant="outline"
+        variant="default"
         size="sm"
-        className="ml-auto hidden h-8 lg:flex"
+        className="ml-auto hidden h-9 rounded-full px-4 lg:flex"
       >
         <Settings2 className="mr-2 h-4 w-4" />
-        Crear
+        Nuevo ejercicio
       </Button>
 
       <AddExercise

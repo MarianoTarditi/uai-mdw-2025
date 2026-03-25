@@ -4,6 +4,7 @@ import exerciseReducer from "../features/exercises/exerciseSlice";
 import userReducer from "../features/users/userSlice";
 import routineReducer from "../features/routines/routineSlice";
 import adminReducer from "../features/admin/adminSlice";
+import paymentReducer from "../features/users/paymentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     user: userReducer,
     routine: routineReducer,
     admin: adminReducer,
+    payment: paymentReducer,
   },
 });
 

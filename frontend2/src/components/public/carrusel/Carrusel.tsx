@@ -1,7 +1,8 @@
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Image } from "@mantine/core";
+import type { EmblaCarouselType } from "embla-carousel";
 
 interface MediaItem {
   src: string;
@@ -40,7 +41,8 @@ const CarouselVideo = ({
   return (
     <video
       ref={videoRef}
-      src={src}
+      src={isActive ? src : undefined}
+      preload="metadata"
       muted
       playsInline
       onEnded={onEnded}
@@ -54,7 +56,7 @@ const CarouselVideo = ({
 };
 
 export function Carrusel({ media }: CarruselProps) {
-  const [embla, setEmbla] = useState<any | null>(null);
+  const [embla, setEmbla] = useState<EmblaCarouselType | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const imageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -65,7 +67,7 @@ export function Carrusel({ media }: CarruselProps) {
     );
   };
 
-  const goToNextSlide = () => {
+  const goToNextSlide = useCallback(() => {
     if (embla) {
       if (embla.canScrollNext()) {
         embla.scrollNext();
@@ -73,7 +75,7 @@ export function Carrusel({ media }: CarruselProps) {
         embla.scrollTo(0);
       }
     }
-  };
+  }, [embla]);
 
   useEffect(() => {
     if (!embla || media.length === 0) return;
@@ -95,7 +97,7 @@ export function Carrusel({ media }: CarruselProps) {
     return () => {
       if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
     };
-  }, [currentSlide, embla, media]);
+  }, [currentSlide, embla, goToNextSlide, media]);
 
   return (
     <div
@@ -104,7 +106,7 @@ export function Carrusel({ media }: CarruselProps) {
       <Carousel
         getEmblaApi={setEmbla}
         onSlideChange={(index) => setCurrentSlide(index)}
-        loop
+        emblaOptions={{ loop: true }}
         withIndicators
         height="100%"
         styles={{

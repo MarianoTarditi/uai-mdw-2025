@@ -24,7 +24,7 @@ export function DataTableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="ml-auto hidden h-9 rounded-full px-4 lg:flex"
         >
           <Settings2 />
           Ordenar vista

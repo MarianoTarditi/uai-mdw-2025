@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { getAllExercises, reset } from "@/features/exercises/exerciseSlice";
@@ -9,7 +8,10 @@ import { useExerciseTable } from "./Table/useExerciseTable";
 import { ExerciseButton } from "./Table/ExerciseButton";
 import { DataTableViewOptions } from "../../components/private/table/DataTableViewOptions";
 import { useEffect } from "react";
-import { Lock } from "lucide-react";
+import { Dumbbell } from "lucide-react";
+import { PageHero } from "@/components/private/premium/PageHero";
+import { PremiumTableShell } from "@/components/private/premium/PremiumTableShell";
+import { PremiumErrorState } from "@/components/private/premium/PremiumErrorState";
 
 export function GetAllExercises() {
   const dispatch = useAppDispatch();
@@ -18,8 +20,9 @@ export function GetAllExercises() {
     useAppSelector((state) => state.exercise);
 
   useEffect(() => {
+    if (exercises.length > 0) return;
     dispatch(getAllExercises());
-  }, [dispatch]);
+  }, [dispatch, exercises.length]);
 
   useEffect(() => {
     if (isDeletingSuccess) {
@@ -34,44 +37,37 @@ export function GetAllExercises() {
 
   if (isError) {
     return (
-      <div className="relative flex min-h-screen items-start justify-center bg-background pt-60">
-        <div className="absolute inset-0 backdrop-blur-sm" />
-
-        <div className="relative z-10 w-full max-w-md rounded-2xl border bg-card p-8 shadow-xl text-center">
-          <div className="mb-5 flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-              <Lock className="h-8 w-8 text-destructive" />
-            </div>
-          </div>
-
-          <h2 className="text-xl font-semibold mb-2">Acceso denegado</h2>
-
-          <p className="text-sm text-muted-foreground">
-            No tienes los permisos necesarios para acceder a la sección de
-            "Ejercicios".
-          </p>
-        </div>
-      </div>
+      <PremiumErrorState
+        title="Acceso denegado"
+        description='No tienes los permisos necesarios para acceder a la sección de "Ejercicios".'
+        tone="forbidden"
+        fullScreen
+      />
     );
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por nombre..."
-          value={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
-          onChange={(e) =>
-            table.getColumn("nombre")?.setFilterValue(e.target.value)
-          }
-          className="max-w-sm"
-        />
-        <div className="ml-auto flex items-center space-x-2">
-          <ExerciseButton />
-          <DataTableViewOptions table={table} />
-        </div>
-      </div>
-      <ExerciseTable table={table} />
+    <div className="w-full space-y-4">
+      <PageHero
+        icon={Dumbbell}
+        title="Biblioteca de Ejercicios"
+        description="Gestiona el catalogo tecnico por grupo muscular, objetivo y equipamiento para acelerar la prescripcion diaria."
+        badge={`${exercises.length} ejercicios`}
+      />
+
+      <PremiumTableShell
+        searchPlaceholder="Buscar ejercicio por nombre..."
+        searchValue={(table.getColumn("nombre")?.getFilterValue() as string) ?? ""}
+        onSearchChange={(value) => table.getColumn("nombre")?.setFilterValue(value)}
+        actions={
+          <>
+            <ExerciseButton />
+            <DataTableViewOptions table={table} />
+          </>
+        }
+      >
+        <ExerciseTable table={table} />
+      </PremiumTableShell>
     </div>
   );
 }

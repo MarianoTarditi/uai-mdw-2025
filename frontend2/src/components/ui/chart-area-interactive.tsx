@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, Dumbbell, ClipboardList } from "lucide-react";
+import { Users, Dumbbell, ClipboardList, Activity } from "lucide-react";
 
 export const description = "An interactive area chart";
 
@@ -54,6 +54,7 @@ export function ChartAreaInteractive() {
     users: "Usuarios Registrados",
     routines: "Rutinas Creadas",
     exercises: "Ejercicios Creados",
+    progress: "Entrenamientos Registrados",
   };
 
   const parseDateLocal = (dateString: string) => {
@@ -63,11 +64,11 @@ export function ChartAreaInteractive() {
   };
 
   return (
-    <Card className="@container/card">
+    <Card className="@container/card overflow-hidden">
       <CardHeader>
         <div className="flex flex-col gap-2">
-          <CardTitle>{titleMap[dataType]}</CardTitle>
-          <CardDescription>Historial de creación por fecha</CardDescription>
+          <CardTitle className="text-3xl uppercase tracking-[0.06em]">{titleMap[dataType]}</CardTitle>
+          <CardDescription>Ritmo de carga en los ultimos dias</CardDescription>
         </div>
 
         <CardAction>
@@ -87,6 +88,9 @@ export function ChartAreaInteractive() {
             <ToggleGroupItem value="exercises" className="gap-2">
               <Dumbbell className="w-4 h-4" /> Ejercicios
             </ToggleGroupItem>
+            <ToggleGroupItem value="progress" className="gap-2">
+              <Activity className="w-4 h-4" /> Progreso
+            </ToggleGroupItem>
           </ToggleGroup>
 
           <Select value={dataType} onValueChange={setDataType}>
@@ -97,6 +101,7 @@ export function ChartAreaInteractive() {
               <SelectItem value="users">Usuarios</SelectItem>
               <SelectItem value="routines">Rutinas</SelectItem>
               <SelectItem value="exercises">Ejercicios</SelectItem>
+              <SelectItem value="progress">Progreso</SelectItem>
             </SelectContent>
           </Select>
         </CardAction>

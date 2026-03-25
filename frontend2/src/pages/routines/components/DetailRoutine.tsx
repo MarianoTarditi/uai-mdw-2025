@@ -1,5 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/app/reduxHooks";
+import { getRoutineById, reset } from "@/features/routines/routineSlice";
+import type { IRoutine } from "@/features/routines/routineTypes";
+import { DetailExercise } from "@/pages/exercises/components/DetailExercise";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,22 +14,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Clock, Dumbbell, Repeat, Ban, Eye, User } from "lucide-react";
-
-import type { IRoutine } from "@/features/routines/routineTypes";
-import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
-import { useEffect, useState } from "react";
-import { SpinnerButton } from "@/components/private/spinner/Spinner";
-import { reset, getRoutineById } from "@/features/routines/routineSlice";
-import { DetailExercise } from "@/pages/exercises/components/DetailExercise";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Activity,
+  Ban,
+  Clock3,
+  Dumbbell,
+  Eye,
+  Layers,
+  Repeat,
+  Timer,
+  User,
+} from "lucide-react";
+import { SpinnerButton } from "@/components/private/spinner/Spinner";
 
 interface DetailRoutineProps {
   routine: IRoutine | null;
@@ -32,20 +41,23 @@ interface DetailRoutineProps {
   setIsOpen: (open: boolean) => void;
 }
 
-export function DetailRoutine({
-  routine,
-  isOpen,
-  setIsOpen,
-}: DetailRoutineProps) {
-  const dispatch = useAppDispatch();
+type ExerciseInfo = {
+  _id?: string;
+  nombre?: string;
+  musculosPrincipales?: string[];
+  musculosSecundarios?: string[];
+  etiquetas?: string[];
+  materialesNecesarios?: string[];
+};
 
+export function DetailRoutine({ routine, isOpen, setIsOpen }: DetailRoutineProps) {
+  const dispatch = useAppDispatch();
   const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
   const [isExerciseDetailOpen, setIsExerciseDetailOpen] = useState(false);
 
   const { isDetailLoading, selectedRoutine: detailedRoutine } = useAppSelector(
     (state) => state.routine,
   );
-
   const { isCheckingAuth } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -53,19 +65,11 @@ export function DetailRoutine({
       dispatch(reset());
       dispatch(getRoutineById(routine._id));
     }
-  }, [isOpen, routine?._id, isCheckingAuth, dispatch]);
+  }, [dispatch, isCheckingAuth, isOpen, routine?._id]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (!open) {
-      dispatch(reset());
-    }
-  };
-
-  const handleViewExercise = (exercise: any) => {
-    if (!exercise) return;
-    setSelectedExercise(exercise);
-    setIsExerciseDetailOpen(true);
+    if (!open) dispatch(reset());
   };
 
   const formatDate = (dateString?: string) => {
@@ -79,294 +83,345 @@ export function DetailRoutine({
 
   const exercisesList = detailedRoutine?.exerciseAssignments || [];
   const hasExercises = exercisesList.length > 0;
-
   const studentData = detailedRoutine?.studentId as any;
   const isStudentPopulated =
     studentData && typeof studentData === "object" && "name" in studentData;
 
-  const API_URL = import.meta.env.VITE_STATIC_URL;
-
+  const staticUrl = import.meta.env.VITE_STATIC_URL;
   const imageUrl =
     isStudentPopulated && studentData.profileImage
       ? studentData.profileImage.startsWith("http")
         ? studentData.profileImage
-        : `${API_URL}${studentData.profileImage}`
+        : `${staticUrl}${studentData.profileImage}`
       : "";
 
   const shouldShowSpinner =
     isDetailLoading || !detailedRoutine || detailedRoutine._id !== routine?._id;
 
+  const summary = useMemo(() => {
+    const exerciseCount = exercisesList.length;
+    const totalSets = exercisesList.reduce(
+      (acc: number, item: any) => acc + Number(item.sets || 0),
+      0,
+    );
+    const totalReps = exercisesList.reduce(
+      (acc: number, item: any) => acc + Number(item.reps || 0),
+      0,
+    );
+    const volume = exercisesList.reduce(
+      (acc: number, item: any) =>
+        acc + Number(item.sets || 0) * Number(item.reps || 0),
+      0,
+    );
+    const avgRest =
+      exerciseCount > 0
+        ? Math.round(
+            exercisesList.reduce(
+              (acc: number, item: any) => acc + Number(item.restTime || 0),
+              0,
+            ) / exerciseCount,
+          )
+        : 0;
+    const estimatedSeconds = exercisesList.reduce((acc: number, item: any) => {
+      const sets = Number(item.sets || 0);
+      const reps = Number(item.reps || 0);
+      const rest = Number(item.restTime || 0);
+
+      // Aproximación simple para lectura rápida del entrenador.
+      const activeTime = sets * Math.max(20, reps * 3);
+      const restTime = Math.max(0, sets - 1) * rest;
+      return acc + activeTime + restTime;
+    }, 0);
+    const estimatedMinutes = Math.max(1, Math.round(estimatedSeconds / 60));
+
+    return {
+      exerciseCount,
+      totalSets,
+      totalReps,
+      volume,
+      avgRest,
+      estimatedMinutes,
+    };
+  }, [exercisesList]);
+
+  const handleViewExercise = (exercise: ExerciseInfo) => {
+    if (!exercise) return;
+    setSelectedExercise(exercise);
+    setIsExerciseDetailOpen(true);
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[650px] h-[90vh] flex flex-col bg-background text-foreground p-0 gap-0 overflow-hidden">
-          <div className="p-6 pb-2 shrink-0">
+        <DialogContent className="sm:max-w-[980px] h-[92vh] flex flex-col bg-background text-foreground p-0 gap-0 overflow-hidden">
+          <div className="border-b bg-gradient-to-r from-primary/10 via-card to-card px-6 py-5 shrink-0">
             <DialogHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <DialogTitle className="text-xl">
-                    Detalles de Rutina
-                  </DialogTitle>
+                  <DialogTitle className="text-xl">Detalle de rutina</DialogTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {detailedRoutine?.name || "Cargando nombre..."}
+                  </p>
                 </div>
-                {detailedRoutine?.isTemplate && (
-                  <Badge
-                    variant="outline"
-                    className="border-primary text-primary"
-                  >
-                    Plantilla
-                  </Badge>
-                )}
+                <div className="flex items-center gap-2">
+                  {detailedRoutine?.isTemplate ? (
+                    <Badge variant="outline" className="border-primary text-primary">
+                      Plantilla
+                    </Badge>
+                  ) : (
+                    <Badge>Asignada</Badge>
+                  )}
+                </div>
               </div>
             </DialogHeader>
           </div>
 
           {shouldShowSpinner ? (
-            <div className="flex flex-col justify-center items-center h-64 gap-2">
+            <div className="flex h-72 flex-col items-center justify-center gap-2">
               <SpinnerButton variant="sizes" />
-              <span className="text-sm text-muted-foreground">
-                Cargando datos...
-              </span>
+              <span className="text-sm text-muted-foreground">Cargando datos...</span>
             </div>
           ) : (
-            <ScrollArea className="flex-1 min-h-0 w-full">
-              <div className="p-6 pt-2 flex flex-col h-full gap-6">
-                <div className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label>Nombre de la rutina</Label>
-                    <Input readOnly value={detailedRoutine?.name || ""} />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Asignado a</Label>
-
-                    {isStudentPopulated ? (
-                      <div className="flex items-center gap-3 p-3 border rounded-md bg-muted/20">
-                        <Avatar className="h-10 w-10 border border-primary/20">
-                          <AvatarImage
-                            src={imageUrl}
-                            alt={studentData.name}
-                            className="object-cover"
-                          />
-                          <AvatarFallback className="font-bold text-primary bg-primary/10">
-                            {studentData.name?.[0]}
-                            {studentData.lastName?.[0]}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-sm font-medium truncate">
-                            {studentData.name} {studentData.lastName}
-                          </span>
-                          <span className="text-xs text-muted-foreground truncate">
-                            {studentData.email}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-3 border rounded-md bg-muted/20 text-sm text-muted-foreground italic flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>
-                          {detailedRoutine?.isTemplate
-                            ? "Sin asignar (Plantilla)"
-                            : "Datos de usuario no disponibles"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Descripción</Label>
-                    <Textarea
-                      readOnly
-                      value={detailedRoutine?.description || "Sin descripción"}
-                      className="resize-none min-h-[60px]"
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-sm font-medium mb-3 text-muted-foreground uppercase tracking-wider flex justify-between items-center">
-                    <span>Plan de Entrenamiento</span>
-                    <Badge variant={hasExercises ? "secondary" : "outline"}>
-                      {exercisesList.length} Ejercicios
-                    </Badge>
-                  </h3>
-
-                  <div className="space-y-4">
-                    {hasExercises ? (
-                      exercisesList.map((assignment: any, index: number) => {
-                        const exInfo = assignment.exerciseId;
-                        const exName =
-                          exInfo?.nombre || "Ejercicio no disponible";
-                        const isPopulated =
-                          typeof exInfo === "object" && exInfo !== null;
-
-                        return (
-                          <Card
-                            key={index}
-                            className="overflow-hidden border-l-4 border-l-primary/50 shadow-sm"
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start mb-3">
-                                <h4 className="font-bold text-base flex items-center gap-2">
-                                  <span className="text-muted-foreground text-sm">
-                                    #{index + 1}
-                                  </span>
-                                  {exName}
-                                </h4>
-
-                                {isPopulated && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 px-2 hover:bg-primary/10 hover:text-primary ml-2"
-                                    onClick={() => handleViewExercise(exInfo)}
-                                  >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    <span className="text-xs font-medium">
-                                      Ver detalle
-                                    </span>
-                                  </Button>
-                                )}
-                              </div>
-
-                              <div className="flex flex-wrap gap-4 mb-4">
-                                {exInfo.musculosPrincipales?.length > 0 && (
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex flex-wrap gap-1">
-                                      {exInfo.musculosPrincipales.map(
-                                        (m: string) => (
-                                          <Badge
-                                            key={m}
-                                            className="text-[10px] px-2 h-5 bg-primary/90 hover:bg-primary"
-                                          >
-                                            {m}
-                                          </Badge>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {exInfo.musculosSecundarios?.length > 0 && (
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex flex-wrap gap-1">
-                                      {exInfo.musculosSecundarios.map(
-                                        (m: string) => (
-                                          <Badge
-                                            key={m}
-                                            variant="secondary"
-                                            className="text-[10px] px-2 h-5"
-                                          >
-                                            {m}
-                                          </Badge>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {exInfo.etiquetas?.length > 0 && (
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex flex-wrap gap-1">
-                                      {exInfo.etiquetas.map((tag: string) => (
-                                        <Badge
-                                          key={tag}
-                                          variant="outline"
-                                          className="text-[10px] px-2 h-5"
-                                        >
-                                          {tag}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {exInfo.materialesNecesarios?.length > 0 && (
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex flex-wrap gap-1">
-                                      {exInfo.materialesNecesarios.map(
-                                        (mat: string) => (
-                                          <Badge
-                                            key={mat}
-                                            variant="outline"
-                                            className="text-[10px] px-2 h-5"
-                                          >
-                                            {mat}
-                                          </Badge>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="grid grid-cols-3 gap-2 bg-muted/40 p-2 rounded-lg border border-border/60">
-                                <div className="flex flex-col items-center justify-center p-1">
-                                  <div className="flex items-center text-muted-foreground text-[10px] uppercase mb-1 font-bold">
-                                    <Dumbbell className="w-3 h-3 mr-1" /> Sets
-                                  </div>
-                                  <span className="font-mono font-bold text-sm">
-                                    {assignment.sets || 0}
-                                  </span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center border-x border-border/30 p-1">
-                                  <div className="flex items-center text-muted-foreground text-[10px] uppercase mb-1 font-bold">
-                                    <Repeat className="w-3 h-3 mr-1" /> Reps
-                                  </div>
-                                  <span className="font-mono font-bold text-sm">
-                                    {assignment.reps || 0}
-                                  </span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-1">
-                                  <div className="flex items-center text-muted-foreground text-[10px] uppercase mb-1 font-bold">
-                                    <Clock className="w-3 h-3 mr-1" /> Rest
-                                  </div>
-                                  <span className="font-mono font-bold text-sm">
-                                    {assignment.restTime || 0}s
-                                  </span>
-                                </div>
-                              </div>
-
-                              {assignment.notes && (
-                                <div className="mt-3 text-xs text-amber-700 dark:text-amber-400 italic bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-900">
-                                  <span className="font-semibold not-italic">
-                                    Nota de rutina:
-                                  </span>{" "}
-                                  {assignment.notes}
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        );
-                      })
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-10 text-muted-foreground border-2 border-dashed rounded-xl bg-muted/5 gap-2">
-                        <div className="bg-muted p-3 rounded-full">
-                          <Ban className="w-6 h-6 opacity-50" />
-                        </div>
-                        <p className="font-medium text-sm">
-                          Sin ejercicios asignados
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="p-6 grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <section className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <Card className="py-3">
+                      <CardContent className="px-4 py-0">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Ejercicios
                         </p>
-                      </div>
-                    )}
+                        <p className="text-xl font-semibold">{summary.exerciseCount}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="py-3">
+                      <CardContent className="px-4 py-0">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Volumen
+                        </p>
+                        <p className="text-xl font-semibold">{summary.volume}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="py-3">
+                      <CardContent className="px-4 py-0">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Duración
+                        </p>
+                        <p className="text-xl font-semibold">{summary.estimatedMinutes}m</p>
+                      </CardContent>
+                    </Card>
                   </div>
+
+                  <Card className="py-4">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Datos generales</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid gap-1.5">
+                        <Label>Nombre de rutina</Label>
+                        <Input readOnly value={detailedRoutine?.name || ""} />
+                      </div>
+
+                      <div className="grid gap-1.5">
+                        <Label>Descripción</Label>
+                        <Textarea
+                          readOnly
+                          value={detailedRoutine?.description || "Sin descripción"}
+                          className="resize-none min-h-[90px]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                        <div className="rounded-md border p-2">
+                          Creado: {formatDate(detailedRoutine?.createdAt)}
+                        </div>
+                        <div className="rounded-md border p-2 text-right">
+                          Actualizado: {formatDate(detailedRoutine?.updatedAt)}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                <aside className="space-y-4">
+                  <Card className="py-4">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Alumno asignado</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isStudentPopulated ? (
+                        <div className="flex items-center gap-3 rounded-lg border bg-muted/20 p-3">
+                          <Avatar className="h-10 w-10 border border-primary/20">
+                            <AvatarImage
+                              src={imageUrl}
+                              alt={studentData.name}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="font-bold text-primary bg-primary/10">
+                              {studentData.name?.[0]}
+                              {studentData.lastName?.[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {studentData.name} {studentData.lastName}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {studentData.email}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-3 text-sm text-muted-foreground">
+                          <User className="h-4 w-4" />
+                          {detailedRoutine?.isTemplate
+                            ? "Sin asignar (plantilla)"
+                            : "Datos de usuario no disponibles"}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="py-4">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Carga de trabajo</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-center justify-between rounded-md border p-2 text-sm">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <Layers className="h-4 w-4" /> Series
+                        </span>
+                        <span className="font-semibold">{summary.totalSets}</span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-md border p-2 text-sm">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <Repeat className="h-4 w-4" /> Reps
+                        </span>
+                        <span className="font-semibold">{summary.totalReps}</span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-md border p-2 text-sm">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <Timer className="h-4 w-4" /> Descanso medio
+                        </span>
+                        <span className="font-semibold">{summary.avgRest}s</span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-md border p-2 text-sm">
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <Clock3 className="h-4 w-4" /> Duración estimada
+                        </span>
+                        <span className="font-semibold">{summary.estimatedMinutes} min</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </aside>
+              </div>
+
+              <Separator />
+
+              <div className="p-6 pt-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                    Plan de entrenamiento
+                  </h3>
+                  <Badge variant={hasExercises ? "secondary" : "outline"}>
+                    {summary.exerciseCount} bloques
+                  </Badge>
                 </div>
 
-                <div className="text-[10px] text-muted-foreground flex justify-between pt-4 border-t mt-4">
-                  <span>Creado: {formatDate(detailedRoutine?.createdAt)}</span>
-                  <span>
-                    Última act.: {formatDate(detailedRoutine?.updatedAt)}
-                  </span>
-                </div>
+                {hasExercises ? (
+                  <div className="space-y-3">
+                    {exercisesList.map((assignment: any, index: number) => {
+                      const exInfo = assignment.exerciseId as ExerciseInfo | null;
+                      const isPopulated = !!(exInfo && typeof exInfo === "object");
+                      const exName = exInfo?.nombre || "Ejercicio no disponible";
+
+                      return (
+                        <Card key={index} className="border-l-4 border-l-primary/60 py-4">
+                          <CardContent className="px-4 space-y-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-xs text-muted-foreground">Bloque #{index + 1}</p>
+                                <h4 className="font-semibold text-base">{exName}</h4>
+                              </div>
+                              {isPopulated && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewExercise(exInfo)}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Ver ejercicio
+                                </Button>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap gap-1.5">
+                              {(exInfo?.musculosPrincipales || []).map((muscle) => (
+                                <Badge key={`p-${muscle}`} className="bg-primary/90 hover:bg-primary">
+                                  {muscle}
+                                </Badge>
+                              ))}
+                              {(exInfo?.musculosSecundarios || []).map((muscle) => (
+                                <Badge key={`s-${muscle}`} variant="secondary">
+                                  {muscle}
+                                </Badge>
+                              ))}
+                              {(exInfo?.etiquetas || []).map((tag) => (
+                                <Badge key={`t-${tag}`} variant="outline">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2 rounded-lg border bg-muted/25 p-2">
+                              <div className="rounded-md bg-card p-2 text-center">
+                                <p className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center justify-center gap-1">
+                                  <Dumbbell className="h-3 w-3" /> Sets
+                                </p>
+                                <p className="text-sm font-bold">{assignment.sets || 0}</p>
+                              </div>
+                              <div className="rounded-md bg-card p-2 text-center">
+                                <p className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center justify-center gap-1">
+                                  <Repeat className="h-3 w-3" /> Reps
+                                </p>
+                                <p className="text-sm font-bold">{assignment.reps || 0}</p>
+                              </div>
+                              <div className="rounded-md bg-card p-2 text-center">
+                                <p className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center justify-center gap-1">
+                                  <Timer className="h-3 w-3" /> Rest
+                                </p>
+                                <p className="text-sm font-bold">{assignment.restTime || 0}s</p>
+                              </div>
+                            </div>
+
+                            {assignment.notes && (
+                              <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+                                <span className="font-semibold">Nota:</span> {assignment.notes}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-muted/5 py-10 text-muted-foreground">
+                    <div className="rounded-full bg-muted p-3">
+                      <Ban className="h-6 w-6 opacity-60" />
+                    </div>
+                    <p className="text-sm font-medium">Sin ejercicios asignados</p>
+                  </div>
+                )}
               </div>
             </ScrollArea>
           )}
 
-          <DialogFooter className="p-6 pt-2 border-t bg-muted/10 shrink-0">
-            {" "}
+          <DialogFooter className="border-t bg-muted/10 px-6 py-4 shrink-0">
+            <div className="mr-auto hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
+              <Activity className="h-3.5 w-3.5" />
+              Vista optimizada para seguimiento de carga y ejecución.
+            </div>
             <DialogClose asChild>
               <Button type="button" className="w-full sm:w-auto">
                 Cerrar
@@ -386,3 +441,4 @@ export function DetailRoutine({
     </>
   );
 }
+

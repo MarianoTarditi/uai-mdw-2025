@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../private/sidebar/SideBar";
 import { ThemeProvider } from "../../public/themeProvider/ThemeProvider";
+import "@/styles/private-premium.css";
 
 const MainLayout = () => {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <div className="flex min-h-screen w-full bg-background text-foreground">
+      <div className="fit-premium flex min-h-screen w-full text-foreground">
         <Sidebar>
-          <main className="flex-1 px-4 py-6">
+          <main className="premium-main flex-1">
             <Outlet />
           </main>
         </Sidebar>

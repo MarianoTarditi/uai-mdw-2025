@@ -7,6 +7,7 @@ export interface IUserProfile {
   name: string;
   lastName: string;
   email: string;
+  phone?: string | null;
   roles: string[];
   isActive: boolean;
   _id: string;

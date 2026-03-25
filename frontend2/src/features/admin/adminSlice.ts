@@ -4,9 +4,12 @@ import axios from "axios";
 
 interface DashboardStats {
   totalStudents: number;
+  activeStudents: number;
   totalTrainers: number;
   totalRoutines: number;
   totalExercises: number;
+  progressEntriesThisMonth: number;
+  studentsWithPendingPayments: number;
 }
 
 interface AdminState {

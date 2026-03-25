@@ -92,3 +92,36 @@ Cada ejercicio incluye:
 
 - 🌐 **Aplicación Web:** [https://TU-LINK-DEPLOY.com](https://uai-mdw-2025.vercel.app/home)
 
+
+---
+
+# Entornos (Local + Deploy sin romper)
+
+## Frontend (`frontend2`)
+
+1. Crear `frontend2/.env.local` tomando como base `frontend2/.env.local.example`.
+2. En local, usar:
+   - `VITE_API_URL=http://localhost:3001/api`
+   - `VITE_STATIC_URL=http://localhost:3001`
+3. En deploy, usar variables de entorno de Vercel tomando como base `frontend2/.env.production.example`.
+4. El dev server de Vite proxyea tanto `"/api"` como `"/uploads"` al backend local (`http://localhost:3001`).
+
+Tomar como referencia: `frontend2/.env.example`.
+
+## Backend (`backend`)
+
+1. Crear `backend/.env` con `PORT`, `MONGO_URI`, credenciales de Firebase Admin.
+2. Configurar `CORS_ORIGINS` con lista separada por comas:
+   - `http://localhost:5173`
+   - `https://tu-frontend.vercel.app`
+
+Tomar como referencia: `backend/.env.example`.
+
+Importante para archivos subidos (Excel/PDF/videos/imágenes):
+- Definir `UPLOADS_DIR`.
+- En Render, usar una ruta de disco persistente (por ejemplo `/var/data/uploads`) para evitar `404` después de reinicios/deploy.
+
+## Variables en Render / Vercel
+
+- Render (backend): definir `PORT`, `MONGO_URI`, `CORS_ORIGINS`, `FIREBASE_*`.
+- Vercel (frontend): definir `VITE_API_URL`, `VITE_STATIC_URL`, `VITE_FIREBASE_*`.

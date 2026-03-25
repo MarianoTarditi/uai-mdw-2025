@@ -6,7 +6,8 @@ import {
   Dumbbell,
   LayoutDashboard,
   ListCheck,
-  UserRoundCog 
+  UserRoundCog,
+  Wallet,
 } from "lucide-react";
 import { NavMain } from "@/components/ui/nav-main";
 import { NavProjects } from "@/components/ui/nav-projects";
@@ -20,25 +21,30 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/app/reduxHooks";
+import { resolveMediaUrl } from "@/utils/mediaUrl";
+import { UserRole } from "@/features/users/userSlice";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { profile } = useAppSelector((state) => state.user);
+  const roles = profile?.roles ?? [];
+  const isAdmin = roles.includes(UserRole.Admin);
+  const isTrainer = roles.includes(UserRole.Trainer);
+  const isStudent = roles.includes(UserRole.Student);
 
-  const STATIC_BASE_URL = import.meta.env.VITE_STATIC_URL;
-
-  const getImageUrl = (imagePath: string | null | undefined) => {
-    if (!imagePath) return null;
-
-    return `${STATIC_BASE_URL}${imagePath}?t=${Date.now()}`;
-  };
+  const canSeeDashboard = isAdmin;
+  const canSeeUsers = isAdmin;
+  const canSeePayments = isTrainer;
+  const canSeeProfile = isAdmin || isTrainer || isStudent;
+  const canSeeExercises = isAdmin || isTrainer || isStudent;
+  const canSeeRoutines = isAdmin || isTrainer || isStudent;
 
   const GymLogo = () => (
     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-       <img 
-         src="/Logo.png" 
-         alt="Logo" 
-         className="size-6 object-contain" 
-       />
+      <img
+        src="/Logo.png"
+        alt="Logo"
+        className="size-6 object-contain"
+      />
     </div>
   );
 
@@ -47,47 +53,73 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       name: profile?.name ?? "Unknown",
       email: profile?.email ?? "No email",
       avatar: profile?.profileImage
-        ? getImageUrl(profile.profileImage)
+        ? resolveMediaUrl(profile.profileImage)
         : "/UserDefault.png",
     },
-   teams: 
+    teams: [
       {
         name: "AgustinTurriEDF",
         logo: GymLogo,
-        plan: "Entrenador de fuerza",
-      },
-   
-    navMain: [
-      {
-        title: "Dashboard",
-        url: "/Dashboard",
-        icon: LayoutDashboard,
-      },
-      {
-        title: "Usuarios",
-        url: "/GetAllUsers",
-        icon: User,
-      },
-      {
-        title: "Ejercicios",
-        url: "/Exercises",
-        icon: Dumbbell,
-      },
-      {
-        title: "Rutinas",
-        url: "/GetAllRoutines",
-        icon: ListCheck,
+        plan: "High-Performance Coaching",
       },
     ],
-
-    projects: [
-     
+    navMain: [
+      ...(canSeeDashboard
+        ? [
             {
+              title: "Dashboard",
+              url: "/Dashboard",
+              icon: LayoutDashboard,
+            },
+          ]
+        : []),
+      ...(canSeeUsers
+        ? [
+            {
+              title: "Usuarios",
+              url: "/GetAllUsers",
+              icon: User,
+            },
+          ]
+        : []),
+      ...(canSeePayments
+        ? [
+            {
+              title: "Pagos",
+              url: "/Payments",
+              icon: Wallet,
+            },
+          ]
+        : []),
+      ...(canSeeExercises
+        ? [
+            {
+              title: "Ejercicios",
+              url: "/Exercises",
+              icon: Dumbbell,
+            },
+          ]
+        : []),
+      ...(canSeeRoutines
+        ? [
+            {
+              title: "Rutinas",
+              url: "/GetAllRoutines",
+              icon: ListCheck,
+            },
+          ]
+        : []),
+    ],
+
+    projects: canSeeProfile
+      ? [
+          {
         name: "Perfil",
         url: "/UserProfile",
         icon: UserRoundCog,
       },
-    ],
+        ]
+      : [],
   };
 
   return (

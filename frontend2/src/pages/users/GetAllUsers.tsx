@@ -2,10 +2,14 @@ import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { getAllUsers, selectAllUsers } from "@/features/users/userSlice";
 import { useEffect } from "react";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
-import { Input } from "@/components/ui/input";
 import { useUserTable } from "./Table/useUserTable";
 import { UserTable } from "./Table/UserTable";
 import { DataTableViewOptions } from "../../components/private/table/DataTableViewOptions";
+import { Activity, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
+import { PageHero } from "@/components/private/premium/PageHero";
+import { MetricStrip } from "@/components/private/premium/MetricStrip";
+import { PremiumTableShell } from "@/components/private/premium/PremiumTableShell";
+import { PremiumErrorState } from "@/components/private/premium/PremiumErrorState";
 
 export const GetAllUsers = () => {
   const dispatch = useAppDispatch();
@@ -14,51 +18,74 @@ export const GetAllUsers = () => {
   const { isFetchingLoading, isError } = useAppSelector((state) => state.user);
 
   useEffect(() => {
+    if (users.length > 0) return;
     dispatch(getAllUsers());
-  }, [dispatch]);
+  }, [dispatch, users.length]);
+
+  const activeUsers = users.filter((user) => user.isActive).length;
+  const inactiveUsers = users.length - activeUsers;
+  const adminOrTrainerUsers = users.filter(
+    (user) => user.roles.includes("admin") || user.roles.includes("trainer"),
+  ).length;
+
+  const userMetrics = [
+    {
+      label: "Alumnos activos",
+      value: activeUsers,
+      helper: `${inactiveUsers} inactivos`,
+      icon: UserCheck,
+      tone: "positive" as const,
+    },
+    {
+      label: "Equipo de gestión",
+      value: adminOrTrainerUsers,
+      helper: "Admins y trainers",
+      icon: ShieldCheck,
+      tone: "default" as const,
+    },
+    {
+      label: "Base total",
+      value: users.length,
+      helper: "Usuarios registrados",
+      icon: Activity,
+      tone: "default" as const,
+    },
+  ];
 
   const { table } = useUserTable(users || []);
 
   if (isFetchingLoading) return <SpinnerButton variant="sizes" />;
 
+  if (isError) {
+    return (
+      <PremiumErrorState
+        title="Acceso denegado"
+        description="No tienes los permisos necesarios para acceder a la sección de usuarios."
+        tone="forbidden"
+        fullScreen
+      />
+    );
+  }
+
   return (
-    <div className="relative w-full space-y-4">
-      {isError && (
-        <div className="relative flex h-screen items-center justify-center bg-background">
-          <div className="absolute inset-0 backdrop-blur-sm" />
+    <div className="w-full space-y-4">
+      <PageHero
+        icon={UsersRound}
+        title="Gestión de Alumnos"
+        description="Controla perfiles, roles y estado operativo de la base para mantener seguimiento preciso y comunicación efectiva."
+        badge={`${users.length} usuarios`}
+      />
 
-          <div className="relative z-10 w-full max-w-md rounded-2xl border bg-card p-8 shadow-xl text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/5">
-                <span className="text-2xl">🔒</span>
-              </div>
-            </div>
+      <MetricStrip items={userMetrics} />
 
-            <h2 className="text-xl font-semibold mb-2">Acceso denegado</h2>
-
-            <p className="text-sm text-muted-foreground mb-4">
-              No tienes los permisos necesarios para acceder a la sección de usuarios.
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className={isError ? "pointer-events-none opacity-30" : ""}>
-        <div className="flex items-center justify-between py-4">
-          <Input
-            placeholder="Filtrar por nombre o email..."
-            value={(table.getState().globalFilter as string) ?? ""}
-            onChange={(e) => table.setGlobalFilter(e.target.value)}
-            className="max-w-sm"
-          />
-
-          <div className="flex items-center space-x-2">
-            <DataTableViewOptions table={table} />
-          </div>
-        </div>
-
+      <PremiumTableShell
+        searchPlaceholder="Filtrar por nombre o email..."
+        searchValue={(table.getState().globalFilter as string) ?? ""}
+        onSearchChange={(value) => table.setGlobalFilter(value)}
+        actions={<DataTableViewOptions table={table} />}
+      >
         <UserTable table={table} />
-      </div>
+      </PremiumTableShell>
     </div>
   );
 };
