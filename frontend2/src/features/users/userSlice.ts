@@ -31,6 +31,7 @@ interface UserState {
   users: IUserProfile[];
   selectedUser: IUserProfile | null;
 
+  isProfileLoading: boolean;
   isFetchingLoading: boolean;
   isDetailLoading: boolean;
   isCreatingLoading: boolean;
@@ -50,6 +51,7 @@ const initialState: UserState = {
   users: [],
   selectedUser: null,
 
+  isProfileLoading: false,
   isFetchingLoading: false,
   isDetailLoading: false,
   isCreatingLoading: false,
@@ -208,6 +210,7 @@ const userSlice = createSlice({
       state.selectedUser = null;
     },
     reset: (state) => {
+      state.isProfileLoading = false;
       state.isFetchingLoading = false;
       state.isDetailLoading = false;
       state.isCreatingLoading = false;
@@ -225,15 +228,15 @@ const userSlice = createSlice({
     builder
       // FETCH USER
       .addCase(fetchUserProfile.pending, (state) => {
-        state.isDetailLoading = true;
+        state.isProfileLoading = true;
         state.isError = false;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        state.isDetailLoading = false;
+        state.isProfileLoading = false;
         state.profile = action.payload; // Guarda en 'profile'
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
-        state.isDetailLoading = false;
+        state.isProfileLoading = false;
         state.isError = true;
         state.message = action.payload as string;
       })
@@ -369,6 +372,8 @@ export const selectUsersLoading = (state: RootState) =>
   state.user.isFetchingLoading;
 export const selectUserDetailLoading = (state: RootState) =>
   state.user.isDetailLoading;
+export const selectUserProfileLoading = (state: RootState) =>
+  state.user.isProfileLoading;
 export const selectUserUpdating = (state: RootState) =>
   state.user.isUpdatingLoading;
 export const selectUserDeleting = (state: RootState) =>

@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   User,
   Dumbbell,
+  FolderKanban,
   LayoutDashboard,
   ListCheck,
   UserRoundCog,
@@ -30,13 +31,16 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const isAdmin = roles.includes(UserRole.Admin);
   const isTrainer = roles.includes(UserRole.Trainer);
   const isStudent = roles.includes(UserRole.Student);
+  const showExercisesSection = false;
 
-  const canSeeDashboard = isAdmin;
-  const canSeeUsers = isAdmin;
+  const canSeeDashboard = isAdmin || isTrainer;
+  const canSeeUsers = isAdmin || isTrainer;
   const canSeePayments = isTrainer;
   const canSeeProfile = isAdmin || isTrainer || isStudent;
-  const canSeeExercises = isAdmin || isTrainer || isStudent;
+  const canSeeExercises =
+    showExercisesSection && (isAdmin || isTrainer || isStudent);
   const canSeeRoutines = isAdmin || isTrainer || isStudent;
+  const canSeeVideoteca = isAdmin || isTrainer || isStudent;
 
   const GymLogo = () => (
     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
@@ -60,7 +64,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       {
         name: "AgustinTurriEDF",
         logo: GymLogo,
-        plan: "High-Performance Coaching",
+        plan: "Entrenador de fuerza",
       },
     ],
     navMain: [
@@ -109,6 +113,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             },
           ]
         : []),
+      ...(canSeeVideoteca
+        ? [
+            {
+              title: "Videoteca",
+              url: "/Videoteca",
+              icon: FolderKanban,
+            },
+          ]
+        : []),
     ],
 
     projects: canSeeProfile
@@ -138,3 +151,4 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+

@@ -1,6 +1,11 @@
 import { check } from "express-validator";
 import validateResults from "../../middlewares/handleValidator";
 import { Request, Response, NextFunction } from "express";
+import {
+  ARGENTINA_PHONE_EXAMPLE,
+  isValidArgentinaPhone,
+  normalizeArgentinaPhone,
+} from "../../utils/phoneAr";
 
 const UpdateUserValidator = [
   check("name")
@@ -25,8 +30,18 @@ const UpdateUserValidator = [
     .isString()
     .withMessage("phone must be a string")
     .bail()
-    .isLength({ min: 6, max: 20 })
-    .withMessage("phone must be between 6 and 20 characters"),
+    .custom((value) => isValidArgentinaPhone(String(value)))
+    .withMessage(
+      `phone must be a valid Argentinian mobile number, for example ${ARGENTINA_PHONE_EXAMPLE}`,
+    )
+    .bail()
+    .customSanitizer((value) => normalizeArgentinaPhone(String(value)) ?? value),
+
+  check("weight")
+    .optional({ nullable: true, checkFalsy: true })
+    .isFloat({ min: 20, max: 150 })
+    .withMessage("weight must be between 20 and 150 kg")
+    .toFloat(),
 
   (req: Request, res: Response, next: NextFunction) => {
     validateResults(req, res, next);

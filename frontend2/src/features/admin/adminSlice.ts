@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import adminService from "./adminService";
 import axios from "axios";
+import type { CreateManagedUserPayload } from "./adminService";
 
 interface DashboardStats {
   totalStudents: number;
@@ -24,6 +25,8 @@ interface AdminState {
 
   // Audit Logs
   auditLogs: IAuditLog[];
+  isCreatingUser: boolean;
+  isCreateUserSuccess: boolean;
 }
 
 interface ChartDataPoint {
@@ -53,6 +56,8 @@ const initialState: AdminState = {
 
   // Audit Logs
   auditLogs: [],
+  isCreatingUser: false,
+  isCreateUserSuccess: false,
 };
 
 export const getDashboardStats = createAsyncThunk(
@@ -116,6 +121,26 @@ export const getAuditLogs = createAsyncThunk(
   },
 );
 
+export const createManagedUser = createAsyncThunk(
+  "admin/createManagedUser",
+  async (payload: CreateManagedUserPayload, thunkAPI) => {
+    try {
+      const data = await adminService.createManagedUser(payload);
+      return data.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return thunkAPI.rejectWithValue(
+          error.response?.data?.message || error.message,
+        );
+      }
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+      return thunkAPI.rejectWithValue("Error al crear el usuario");
+    }
+  },
+);
+
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
@@ -123,6 +148,7 @@ export const adminSlice = createSlice({
     resetAdminState: (state) => {
       state.isError = false;
       state.message = "";
+      state.isCreateUserSuccess = false;
     },
   },
   extraReducers: (builder) => {
@@ -153,6 +179,22 @@ export const adminSlice = createSlice({
     builder.addCase(getAuditLogs.fulfilled, (state, action) => {
       state.auditLogs = action.payload;
     });
+    builder
+      .addCase(createManagedUser.pending, (state) => {
+        state.isCreatingUser = true;
+        state.isError = false;
+        state.message = "";
+        state.isCreateUserSuccess = false;
+      })
+      .addCase(createManagedUser.fulfilled, (state) => {
+        state.isCreatingUser = false;
+        state.isCreateUserSuccess = true;
+      })
+      .addCase(createManagedUser.rejected, (state, action) => {
+        state.isCreatingUser = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      });
   },
 });
 

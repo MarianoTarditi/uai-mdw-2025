@@ -186,7 +186,7 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
                 <div className="grid gap-1.5">
                   <Label className="text-xs">Género</Label>
                   <div className="p-2 border rounded-md bg-muted/10 text-sm capitalize">
-                    {detailedUser?.gender || "N/A"}
+                    {detailedUser?.gender || "No especificado"}
                   </div>
                 </div>
                 <div className="grid gap-1.5">
@@ -201,23 +201,20 @@ export function DetailUser({ user, isOpen, setIsOpen }: DetailUserProps) {
                 <div className="grid gap-1.5">
                   <Label className="text-xs">Altura (cm)</Label>
                   <div className="p-2 border rounded-md bg-muted/10 text-sm">
-                    {detailedUser?.height ? `${detailedUser.height} cm` : "N/A"}
+                    {detailedUser?.height ? `${detailedUser.height} cm` : "No especificada"}
                   </div>
                 </div>
                 <div className="grid gap-1.5">
                   <Label className="text-xs">Peso (kg)</Label>
                   <div className="p-2 border rounded-md bg-muted/10 text-sm">
-                    {detailedUser?.weight ? `${detailedUser.weight} kg` : "N/A"}
+                    {detailedUser?.weight ? `${detailedUser.weight} kg` : "No especificado"}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground mt-2 bg-muted/20 p-2 rounded">
-              <p>
-                <strong>ID:</strong>{" "}
-                <span className="font-mono">{detailedUser?._id}</span>
-              </p>
+    
               <p>
                 <strong>Creado:</strong> {formatDate(detailedUser?.createdAt)}
               </p>

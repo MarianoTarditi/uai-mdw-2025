@@ -16,13 +16,14 @@ const userSchema = new Schema(
       default: [UserRole.Student],
     },
 
-    birthDate: { type: Date, default: null }, 
+    birthDate: { type: Date, default: null },
     gender: { type: String, enum: ["male", "female", "other"], default: null },
     height: { type: Number, default: null },
     weight: { type: Number, default: null },
     profileImage: { type: String, default: null },
     payment: {
       startDate: { type: Date, default: null },
+      dueDate: { type: Date, default: null },
       amount: { type: Number, default: null },
       paymentDate: { type: Date, default: null },
       isPaid: { type: Boolean, default: false },
@@ -43,7 +44,6 @@ const userSchema = new Schema(
 );
 
 userSchema.plugin(auditPlugin);
-
 
 type UserType = InferSchemaType<typeof userSchema>;
 const User = model<UserType>("User", userSchema);

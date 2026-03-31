@@ -3,6 +3,7 @@ import {
   IconPlayerPlay,
   IconBarbell,
   IconTrendingUp,
+  IconArrowDown,
 } from "@tabler/icons-react";
 import {
   Badge,
@@ -16,7 +17,6 @@ import {
 import classes from "./CardFeature.module.css";
 import { Baner } from "../baner/Baner";
 import { Titles } from "../title/Titles";
-import { siteConfig } from "../config/siteConfig";
 
 const mockdata = [
   {
@@ -43,12 +43,6 @@ const mockdata = [
   },
 ];
 
-const goToWhatsApp = () => {
-  const message =
-    "Hola Agustin! Quiero solicitar información sobre los planes de entrenamiento.";
-  const url = `https://wa.me/${siteConfig.social.whatsapp}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
-};
 
 export function CardFeature() {
   const features = mockdata.map((feature, index) => (
@@ -115,8 +109,14 @@ export function CardFeature() {
             variant="filled"
             size="md"
             radius="xl"
+            rightSection={<IconArrowDown size={20} />}
             className={classes.button}
-            onClick={goToWhatsApp}
+            onClick={() => {
+              const contactSection = document.getElementById("contact");
+              if (contactSection) {
+                contactSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
             Solicitar plan
           </Button>

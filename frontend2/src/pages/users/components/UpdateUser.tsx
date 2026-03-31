@@ -32,11 +32,19 @@ import { reset, updateUserProfile } from "@/features/users/userSlice";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import type { IUserProfile } from "@/features/users/userSlice";
 import { updateUserSchema } from "../../../zodValidations/updateUserSchema";
+import {
+  ARGENTINA_PHONE_PLACEHOLDER,
+  MANAGED_USER_WEIGHT_MAX,
+  MANAGED_USER_WEIGHT_MIN,
+  getArgentinaPhoneInputValue,
+  normalizeArgentinaPhone,
+  sanitizeArgentinaPhoneInput,
+} from "@/utils/phoneAr";
 
 const formatIsoToDDMMYYYY = (date?: string | null): string => {
   if (!date) return "";
   const d = new Date(date);
-  if (isNaN(d.getTime())) return "";
+  if (Number.isNaN(d.getTime())) return "";
 
   const day = d.getUTCDate().toString().padStart(2, "0");
   const month = (d.getUTCMonth() + 1).toString().padStart(2, "0");
@@ -52,12 +60,13 @@ const parseDDMMYYYYToISO = (value?: string | null): string | null => {
   if (!day || !month || !year) return null;
 
   const isoDate = new Date(`${year}-${month}-${day}`);
-  if (isNaN(isoDate.getTime())) return null;
+  if (Number.isNaN(isoDate.getTime())) return null;
 
   return isoDate.toISOString().split("T")[0];
 };
 
 type UserFormData = z.infer<typeof updateUserSchema>;
+type UserFormInput = z.input<typeof updateUserSchema>;
 
 interface UpdateUserProps {
   user: IUserProfile | null;
@@ -80,12 +89,12 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
     control,
     reset: resetForm,
     formState: { errors },
-  } = useForm({
+  } = useForm<UserFormInput, unknown, UserFormData>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       name: "",
       lastName: "",
-      phone: "",
+      phone: null,
       birthDate: "",
       gender: undefined,
       height: null,
@@ -99,7 +108,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
       resetForm({
         name: user.name ?? "",
         lastName: user.lastName ?? "",
-        phone: user.phone ?? "",
+        phone: getArgentinaPhoneInputValue(user.phone),
         birthDate: formatIsoToDDMMYYYY(user.birthDate),
         gender: user.gender ?? undefined,
         height: user.height ?? null,
@@ -130,9 +139,11 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
     if (!user?._id) return;
 
     const formData = new FormData();
+    const normalizedPhone = data.phone ? normalizeArgentinaPhone(data.phone) : null;
+
     formData.append("name", data.name);
     formData.append("lastName", data.lastName);
-    formData.append("phone", data.phone?.trim() ? data.phone.trim() : "");
+    formData.append("phone", normalizedPhone ?? "");
 
     if (data.height != null) formData.append("height", data.height.toString());
     if (data.weight != null) formData.append("weight", data.weight.toString());
@@ -160,7 +171,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
               Editar Usuario
             </DialogTitle>
             <DialogDescription>
-              Modifica la información personal del usuario.
+              Modifica la informacion personal del usuario.
             </DialogDescription>
           </DialogHeader>
 
@@ -187,12 +198,21 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
+              <Label htmlFor="phone">Celular (WhatsApp)</Label>
               <Input
                 id="phone"
-                placeholder="+5491122334455"
-                {...register("phone")}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder={ARGENTINA_PHONE_PLACEHOLDER}
+                {...register("phone", {
+                  onChange: (event) => {
+                    event.target.value = sanitizeArgentinaPhoneInput(
+                      event.target.value,
+                    );
+                  },
+                })}
               />
+        
               {errors.phone && (
                 <p className="text-xs text-red-500">
                   {errors.phone.message as string}
@@ -201,7 +221,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
             </div>
 
             <div className="grid gap-2">
-              <Label>Género</Label>
+              <Label>Genero</Label>
               <Controller
                 name="gender"
                 control={control}
@@ -211,7 +231,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
                     value={field.value ?? undefined}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar género" />
+                      <SelectValue placeholder="Seleccionar genero" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">Masculino</SelectItem>
@@ -244,7 +264,10 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
                 <Input
                   id="weight"
                   type="number"
-                  step="0.01"
+                  min={MANAGED_USER_WEIGHT_MIN}
+                  max={MANAGED_USER_WEIGHT_MAX}
+                  step="0.1"
+                  placeholder={`${MANAGED_USER_WEIGHT_MIN}-${MANAGED_USER_WEIGHT_MAX}`}
                   {...register("weight")}
                 />
                 {errors.weight && (
@@ -292,8 +315,8 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
                     type="file"
                     className="hidden"
                     accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
                       if (file) {
                         setImageFile(file);
                         setFileName(file.name);
@@ -303,7 +326,7 @@ export function UpdateUser({ user, isOpen, setIsOpen }: UpdateUserProps) {
                 </label>
               </div>
               {fileName ? (
-                <div className="flex items-center gap-2 mt-1 text-sm text-green-600 bg-green-50 p-2 rounded border border-green-200">
+                <div className="flex items-center gap-2 mt-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2 text-sm text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
                   <ImageIcon className="h-4 w-4" />
                   <span className="truncate max-w-[300px]">{fileName}</span>
                 </div>

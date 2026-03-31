@@ -41,6 +41,9 @@ export function UserActionsCell({ user }: UserActionsProps) {
 
   const { profile } = useAppSelector((state) => state.user);
   const isAdmin = profile?.roles.includes(UserRole.Admin);
+  const isTrainer = profile?.roles.includes(UserRole.Trainer);
+  const canManageUsers = Boolean(isAdmin || isTrainer);
+
 
   const isOwnProfile = profile?._id === user._id;
 
@@ -69,7 +72,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            disabled={!user.isActive || (!isAdmin && !isOwnProfile)}
+            disabled={!user.isActive || (!canManageUsers && !isOwnProfile)}
             onSelect={(e) => {
               e.preventDefault();
               setIsEditOpen(true);
@@ -82,7 +85,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            disabled={!user.isActive || !isAdmin || isOwnProfile}
+            disabled={!user.isActive || !canManageUsers || isOwnProfile}
             onSelect={(e) => {
               e.preventDefault();
               SetIsRoleOpen(true);
@@ -94,7 +97,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
 
           {user.isActive ? (
             <DropdownMenuItem
-              disabled={!isAdmin || isOwnProfile} 
+              disabled={!canManageUsers || isOwnProfile} 
               onSelect={(e) => {
                 e.preventDefault();
                 setIsDeleteOpen(true);
@@ -106,7 +109,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
-              disabled={!isAdmin} 
+              disabled={!canManageUsers} 
               onSelect={(e) => {
                 e.preventDefault();
                 setIsActivateOpen(true);

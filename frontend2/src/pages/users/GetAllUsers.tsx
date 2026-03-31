@@ -1,18 +1,21 @@
 import { useAppSelector, useAppDispatch } from "@/app/reduxHooks";
 import { getAllUsers, selectAllUsers } from "@/features/users/userSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SpinnerButton } from "@/components/private/spinner/Spinner";
 import { useUserTable } from "./Table/useUserTable";
 import { UserTable } from "./Table/UserTable";
 import { DataTableViewOptions } from "../../components/private/table/DataTableViewOptions";
-import { Activity, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
+import { Activity, ShieldCheck, UserCheck, UserPlus, UsersRound } from "lucide-react";
 import { PageHero } from "@/components/private/premium/PageHero";
 import { MetricStrip } from "@/components/private/premium/MetricStrip";
 import { PremiumTableShell } from "@/components/private/premium/PremiumTableShell";
 import { PremiumErrorState } from "@/components/private/premium/PremiumErrorState";
+import { Button } from "@/components/ui/button";
+import { CreateManagedUser } from "./components/CreateManagedUser";
 
 export const GetAllUsers = () => {
   const dispatch = useAppDispatch();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const users = useAppSelector(selectAllUsers);
   const { isFetchingLoading, isError } = useAppSelector((state) => state.user);
@@ -82,10 +85,20 @@ export const GetAllUsers = () => {
         searchPlaceholder="Filtrar por nombre o email..."
         searchValue={(table.getState().globalFilter as string) ?? ""}
         onSearchChange={(value) => table.setGlobalFilter(value)}
-        actions={<DataTableViewOptions table={table} />}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Crear alumno
+            </Button>
+            <DataTableViewOptions table={table} />
+          </div>
+        }
       >
         <UserTable table={table} />
       </PremiumTableShell>
+
+      <CreateManagedUser isOpen={isCreateOpen} setIsOpen={setIsCreateOpen} />
     </div>
   );
 };

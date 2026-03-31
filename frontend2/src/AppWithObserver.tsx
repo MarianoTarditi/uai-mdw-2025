@@ -23,11 +23,6 @@ const Login = lazy(() =>
     default: module.Login,
   })),
 );
-const SignUp = lazy(() =>
-  import("./pages/auth/signUp/SignUp").then((module) => ({
-    default: module.SignUp,
-  })),
-);
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const GetAllExercises = lazy(() =>
   import("./pages/exercises/GetAllExercises").then((module) => ({
@@ -50,6 +45,8 @@ const RoutineTemplates = lazy(() =>
     default: module.RoutineTemplates,
   })),
 );
+const Videoteca = lazy(() => import("./pages/videoteca/Videoteca"));
+const FolderDetail = lazy(() => import("./pages/videoteca/FolderDetail"));
 const GetAllPayments = lazy(() =>
   import("./pages/Payments/GetAllPayments").then((module) => ({
     default: module.GetAllPayments,
@@ -71,13 +68,15 @@ const withSuspense = (Component: ComponentType) => (
 const hasRole = (roles: string[] | undefined, allowed: UserRole[]) =>
   Boolean(roles?.some((role) => allowed.includes(role as UserRole)));
 
+const showExercisesSection = false;
+
 const getDefaultPrivatePath = (roles: string[] | undefined): string => {
   if (hasRole(roles, [UserRole.Admin])) {
     return "/Dashboard";
   }
 
   if (hasRole(roles, [UserRole.Trainer])) {
-    return "/Exercises";
+    return "/Dashboard";
   }
 
   if (hasRole(roles, [UserRole.Student])) {
@@ -94,9 +93,9 @@ const RoleRoute = ({
   allowedRoles: UserRole[];
   children: ReactElement;
 }) => {
-  const { profile, isDetailLoading } = useAppSelector((state) => state.user);
+  const { profile, isProfileLoading } = useAppSelector((state) => state.user);
 
-  if (isDetailLoading) {
+  if (isProfileLoading) {
     return <LoadingScreen />;
   }
 
@@ -109,12 +108,12 @@ const RoleRoute = ({
 };
 
 const HomeOrRedirect = () => {
-  const { profile, isDetailLoading } = useAppSelector((state) => state.user);
+  const { profile, isProfileLoading } = useAppSelector((state) => state.user);
   const { isCheckingAuth, user: authUser } = useAppSelector(
     (state) => state.auth,
   );
 
-  if (isCheckingAuth || isDetailLoading) {
+  if (isCheckingAuth || isProfileLoading) {
     return <LoadingScreen />;
   }
 
@@ -139,7 +138,6 @@ const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       { path: "/login", element: withSuspense(Login) },
-      { path: "/signUp", element: withSuspense(SignUp) },
       { path: "/forgotPassword", element: withSuspense(ForgotPassword) },
     ],
   },
@@ -153,17 +151,21 @@ const router = createBrowserRouter([
       {
         path: "/Dashboard",
         element: (
-          <RoleRoute allowedRoles={[UserRole.Admin]}>
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer]}>
             {withSuspense(Dashboard)}
           </RoleRoute>
         ),
       },
       {
         path: "/Exercises",
-        element: (
-          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+        element: showExercisesSection ? (
+          <RoleRoute
+            allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}
+          >
             {withSuspense(GetAllExercises)}
           </RoleRoute>
+        ) : (
+          <Navigate to="/" replace />
         ),
       },
       {
@@ -177,7 +179,7 @@ const router = createBrowserRouter([
       {
         path: "/GetAllUsers",
         element: (
-          <RoleRoute allowedRoles={[UserRole.Admin]}>
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer]}>
             {withSuspense(GetAllUsers)}
           </RoleRoute>
         ),
@@ -195,6 +197,22 @@ const router = createBrowserRouter([
         element: (
           <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer]}>
             {withSuspense(RoutineTemplates)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/Videoteca",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+            {withSuspense(Videoteca)}
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "/Videoteca/:folderId",
+        element: (
+          <RoleRoute allowedRoles={[UserRole.Admin, UserRole.Trainer, UserRole.Student]}>
+            {withSuspense(FolderDetail)}
           </RoleRoute>
         ),
       },
@@ -219,3 +237,4 @@ export const AppWithObserver = () => {
 
   return <RouterProvider router={router} />;
 };
+

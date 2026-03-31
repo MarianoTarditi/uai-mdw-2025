@@ -1,9 +1,16 @@
 import { Request, Response } from "express";
-import User from "../../models/User";
-import handleHttpError from "../../utils/handleError";
-import { UserRole } from "../../types";
 import Routine from "../../models/Routine";
-import { calculatePaymentStatus } from "../../utils/paymentStatus";
+import User from "../../models/User";
+import { UserRole } from "../../types";
+import handleHttpError from "../../utils/handleError";
+import {
+  enrichStudentsWithPaymentBridge,
+  getLatestPaymentForStudent,
+  normalizePaymentSource,
+  resolveStudentPaymentSource,
+  saveStudentPaymentSource,
+  syncUserPaymentBridge,
+} from "../../utils/paymentBridge";
 
 const sanitizeUser = (user: any) => {
   if (!user) return null;
@@ -16,13 +23,64 @@ const sanitizeUser = (user: any) => {
   };
 };
 
-const enrichStudentPayment = (student: any) => {
-  const paymentStatus = calculatePaymentStatus(student.payment);
+const sanitizeSensitiveUserData = (user: any) => {
+  if (!user) return null;
 
-  return {
-    ...student,
-    paymentStatus,
-  };
+  const plainUser =
+    typeof user?.toObject === "function" ? user.toObject() : { ...user };
+
+  delete plainUser.auth;
+
+  return plainUser;
+};
+
+const getAuthorizedStudent = async (
+  requester: any,
+  studentId: string,
+  forbiddenMessage: string,
+  notStudentMessage: string,
+) => {
+  const student = await User.findById(studentId);
+  if (!student) {
+    return { error: { message: "User not found", code: 404 } };
+  }
+
+  const isAdmin = requester.roles.includes(UserRole.Admin);
+
+  if (!isAdmin) {
+    const trainerStudentRelation = await Routine.exists({
+      trainerId: requester._id,
+      studentId: student._id,
+    });
+
+    if (!trainerStudentRelation) {
+      return {
+        error: {
+          message: forbiddenMessage,
+          code: 403,
+        },
+      };
+    }
+  }
+
+  if (!student.roles?.includes(UserRole.Student)) {
+    return {
+      error: {
+        message: notStudentMessage,
+        code: 400,
+      },
+    };
+  }
+
+  return { student };
+};
+
+const hydrateSingleStudentPayment = async (student: any) => {
+  const [enrichedStudent] = await enrichStudentsWithPaymentBridge([
+    sanitizeSensitiveUserData(student),
+  ]);
+
+  return enrichedStudent ?? null;
 };
 
 const getAllUsers = async (req: Request, res: Response) => {
@@ -40,7 +98,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 
     res.status(200).json({
       userRequesting: requestingUser,
-      data: users,
+      data: users.map(sanitizeSensitiveUserData),
     });
   } catch (error) {
     handleHttpError(res, "Error getting users", 500, error);
@@ -62,7 +120,7 @@ const getUserById = async (req: Request, res: Response) => {
 
     res.status(200).json({
       userRequesting: sanitizeUser(req.user),
-      data: user,
+      data: sanitizeSensitiveUserData(user),
     });
   } catch (error) {
     handleHttpError(res, "Error getting user", 500, error);
@@ -82,7 +140,7 @@ const getProfile = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-      data: user,
+      data: sanitizeSensitiveUserData(user),
     });
   } catch (error) {
     console.error("getProfile error:", error);
@@ -150,7 +208,7 @@ const updateUser = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "User updated successfully",
-      data: updatedUser,
+      data: sanitizeSensitiveUserData(updatedUser),
     });
   } catch (error) {
     handleHttpError(res, "Error updating user", 500, error);
@@ -177,7 +235,7 @@ const softDeleteUser = async (req: Request, res: Response) => {
     res.status(200).json({
       userRequesting: sanitizeUser(req.user),
       message: "User deactivated successfully",
-      data: user,
+      data: sanitizeSensitiveUserData(user),
     });
   } catch (error) {
     handleHttpError(res, "Error soft-deleting user", 500, error);
@@ -207,7 +265,7 @@ const activateUser = async (req: Request, res: Response) => {
     res.status(200).json({
       userRequesting: sanitizeUser(req.user),
       message: "User activated successfully",
-      data: user,
+      data: sanitizeSensitiveUserData(user),
     });
   } catch (error) {
     handleHttpError(res, "Error activating user", 500, error);
@@ -239,7 +297,7 @@ const setUserRole = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Roles updated successfully",
-      data: updatedUser,
+      data: sanitizeSensitiveUserData(updatedUser),
     });
   } catch (error) {
     handleHttpError(res, "Error updating user roles", 500, error);
@@ -259,7 +317,7 @@ const getStudentsPayments = async (req: Request, res: Response) => {
 
     const isAdmin = requester.roles.includes(UserRole.Admin);
 
-    let studentFilter: any = { roles: { $in: [UserRole.Student] } };
+    const studentFilter: any = { roles: { $in: [UserRole.Student] } };
 
     if (!isAdmin) {
       const routines = await Routine.find({ trainerId: requester._id })
@@ -280,7 +338,9 @@ const getStudentsPayments = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    const enrichedStudents = students.map(enrichStudentPayment);
+    const enrichedStudents = await enrichStudentsWithPaymentBridge(
+      students.map((student) => sanitizeSensitiveUserData(student)),
+    );
 
     res.status(200).json({
       userRequesting: sanitizeUser(req.user),
@@ -304,7 +364,7 @@ const getPaymentsSummary = async (req: Request, res: Response) => {
 
     const isAdmin = requester.roles.includes(UserRole.Admin);
 
-    let studentFilter: any = { roles: { $in: [UserRole.Student] } };
+    const studentFilter: any = { roles: { $in: [UserRole.Student] } };
 
     if (!isAdmin) {
       const routines = await Routine.find({ trainerId: requester._id })
@@ -322,10 +382,7 @@ const getPaymentsSummary = async (req: Request, res: Response) => {
       .select("_id payment")
       .lean();
 
-    const enriched = students.map((student) => ({
-      ...student,
-      paymentStatus: calculatePaymentStatus(student.payment),
-    }));
+    const enriched = await enrichStudentsWithPaymentBridge(students);
 
     const totalStudents = enriched.length;
     const paidStudents = enriched.filter(
@@ -372,7 +429,7 @@ const updateStudentPayment = async (req: Request, res: Response) => {
       return handleHttpError(res, "User not authenticated", 401);
     }
 
-    const { id } = req.params;
+    const studentId = String(req.params.id);
     const { startDate, amount, paymentDate, isPaid, billingCycleDays } = req.body;
 
     const requester = (req as any).dbUser || null;
@@ -380,87 +437,77 @@ const updateStudentPayment = async (req: Request, res: Response) => {
       return handleHttpError(res, "User not found in database", 404);
     }
 
-    const student = await User.findById(id);
-    if (!student) {
-      return handleHttpError(res, "User not found", 404);
-    }
+    const authorizedStudent = await getAuthorizedStudent(
+      requester,
+      studentId,
+      "You can only update payments for your own students",
+      "Payments can only be updated for student users",
+    );
 
-    const isAdmin = requester.roles.includes(UserRole.Admin);
-
-    if (!isAdmin) {
-      const trainerStudentRelation = await Routine.exists({
-        trainerId: requester._id,
-        studentId: student._id,
-      });
-
-      if (!trainerStudentRelation) {
-        return handleHttpError(
-          res,
-          "You can only update payments for your own students",
-          403,
-        );
-      }
-    }
-
-    const isStudent = student.roles?.includes(UserRole.Student);
-    if (!isStudent) {
+    if (authorizedStudent.error) {
       return handleHttpError(
         res,
-        "Payments can only be updated for student users",
-        400,
+        authorizedStudent.error.message,
+        authorizedStudent.error.code,
       );
     }
 
-    const nextPayment = {
-      startDate: student.payment?.startDate ?? null,
-      amount: student.payment?.amount ?? null,
-      paymentDate: student.payment?.paymentDate ?? null,
-      isPaid: student.payment?.isPaid ?? false,
-      billingCycleDays: student.payment?.billingCycleDays ?? 30,
-      reminderCount: student.payment?.reminderCount ?? 0,
-      lastReminderAt: student.payment?.lastReminderAt ?? null,
-      lastReminderChannel: student.payment?.lastReminderChannel ?? null,
-    };
-
-    if (startDate !== undefined) {
-      nextPayment.startDate =
-        startDate === null || startDate === "" ? null : new Date(startDate);
-    }
-
-    if (amount !== undefined) {
-      nextPayment.amount = amount === null || amount === "" ? null : Number(amount);
-    }
-
-    if (paymentDate !== undefined) {
-      nextPayment.paymentDate =
-        paymentDate === null || paymentDate === ""
-          ? null
-          : new Date(paymentDate);
-    }
+    const student = authorizedStudent.student!;
+    const latestPayment = await getLatestPaymentForStudent(student._id);
+    const currentPayment = resolveStudentPaymentSource(
+      student.toObject(),
+      latestPayment,
+    );
+    const nextPayment = normalizePaymentSource(
+      {
+        startDate:
+          startDate !== undefined
+            ? startDate === null || startDate === ""
+              ? null
+              : new Date(startDate)
+            : undefined,
+        amount:
+          amount !== undefined
+            ? amount === null || amount === ""
+              ? null
+              : Number(amount)
+            : undefined,
+        paymentDate:
+          paymentDate !== undefined
+            ? paymentDate === null || paymentDate === ""
+              ? null
+              : new Date(paymentDate)
+            : undefined,
+        billingCycleDays:
+          billingCycleDays !== undefined
+            ? billingCycleDays === null || billingCycleDays === ""
+              ? undefined
+              : Number(billingCycleDays)
+            : undefined,
+        isPaid:
+          typeof isPaid === "boolean"
+            ? isPaid
+            : paymentDate !== undefined
+              ? paymentDate !== null && paymentDate !== ""
+              : undefined,
+      },
+      currentPayment,
+    );
 
     if (typeof isPaid === "boolean") {
       nextPayment.isPaid = isPaid;
-      if (isPaid && !nextPayment.paymentDate) {
-        nextPayment.paymentDate = new Date();
-      }
+      nextPayment.paymentDate = isPaid
+        ? nextPayment.paymentDate ?? new Date()
+        : null;
     }
 
-    if (billingCycleDays !== undefined) {
-      nextPayment.billingCycleDays =
-        billingCycleDays === null || billingCycleDays === ""
-          ? 30
-          : Number(billingCycleDays);
-    }
+    const savedPayment = await saveStudentPaymentSource(student._id, nextPayment);
+    await syncUserPaymentBridge(student._id, savedPayment);
 
-    student.payment = nextPayment;
-
-    await student.save();
-
-    const studentObject = student.toObject();
-    const enrichedStudent = {
-      ...studentObject,
-      paymentStatus: calculatePaymentStatus(studentObject.payment),
-    };
+    const refreshedStudent = await User.findById(student._id).lean();
+    const enrichedStudent = refreshedStudent
+      ? await hydrateSingleStudentPayment(refreshedStudent)
+      : null;
 
     res.status(200).json({
       message: "Student payment updated successfully",
@@ -477,7 +524,7 @@ const sendPaymentReminder = async (req: Request, res: Response) => {
       return handleHttpError(res, "User not authenticated", 401);
     }
 
-    const { id } = req.params;
+    const studentId = String(req.params.id);
     const { channel } = req.body as { channel?: "email" | "whatsapp" };
 
     if (channel !== "email" && channel !== "whatsapp") {
@@ -489,46 +536,45 @@ const sendPaymentReminder = async (req: Request, res: Response) => {
       return handleHttpError(res, "User not found in database", 404);
     }
 
-    const student = await User.findById(id);
-    if (!student) {
-      return handleHttpError(res, "User not found", 404);
+    const authorizedStudent = await getAuthorizedStudent(
+      requester,
+      studentId,
+      "You can only send reminders to your own students",
+      "Reminders can only target students",
+    );
+
+    if (authorizedStudent.error) {
+      return handleHttpError(
+        res,
+        authorizedStudent.error.message,
+        authorizedStudent.error.code,
+      );
     }
 
-    const isAdmin = requester.roles.includes(UserRole.Admin);
+    const student = authorizedStudent.student!;
+    const latestPayment = await getLatestPaymentForStudent(student._id);
+    const currentPayment = resolveStudentPaymentSource(
+      student.toObject(),
+      latestPayment,
+    );
+    const nextPayment = normalizePaymentSource(
+      {
+        reminderCount: currentPayment.reminderCount + 1,
+        lastReminderAt: new Date(),
+        lastReminderChannel: channel,
+      },
+      currentPayment,
+    );
 
-    if (!isAdmin) {
-      const trainerStudentRelation = await Routine.exists({
-        trainerId: requester._id,
-        studentId: student._id,
-      });
+    const savedPayment = await saveStudentPaymentSource(student._id, nextPayment, {
+      mode: "replace_latest",
+    });
+    await syncUserPaymentBridge(student._id, savedPayment);
 
-      if (!trainerStudentRelation) {
-        return handleHttpError(
-          res,
-          "You can only send reminders to your own students",
-          403,
-        );
-      }
-    }
-
-    const isStudent = student.roles?.includes(UserRole.Student);
-    if (!isStudent) {
-      return handleHttpError(res, "Reminders can only target students", 400);
-    }
-
-    const payment = student.payment || ({} as any);
-    payment.reminderCount = Number(payment.reminderCount || 0) + 1;
-    payment.lastReminderAt = new Date();
-    payment.lastReminderChannel = channel;
-    student.payment = payment;
-
-    await student.save();
-
-    const studentObject = student.toObject();
-    const enrichedStudent = {
-      ...studentObject,
-      paymentStatus: calculatePaymentStatus(studentObject.payment),
-    };
+    const refreshedStudent = await User.findById(student._id).lean();
+    const enrichedStudent = refreshedStudent
+      ? await hydrateSingleStudentPayment(refreshedStudent)
+      : null;
 
     res.status(200).json({
       message: "Reminder tracked successfully",

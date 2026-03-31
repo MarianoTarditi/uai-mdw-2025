@@ -56,7 +56,7 @@ router.patch(
   "/soft/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  checkRol([UserRole.Admin]),
+  checkRol([UserRole.Admin, UserRole.Trainer]),
   controllers.softDeleteUser,
 );
 
@@ -64,7 +64,7 @@ router.patch(
   "/activate/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  checkRol([UserRole.Admin]),
+  checkRol([UserRole.Admin, UserRole.Trainer]),
   controllers.activateUser,
 );
 
@@ -72,7 +72,7 @@ router.patch(
   "/setUserRole/:id",
   authenticateFirebase,
   validator.getUserValidator,
-  checkRol([UserRole.Admin]),
+  checkRol([UserRole.Admin, UserRole.Trainer]),
   controllers.setUserRole,
 );
 
@@ -95,3 +95,4 @@ router.post(
 );
 
 export default router;
+

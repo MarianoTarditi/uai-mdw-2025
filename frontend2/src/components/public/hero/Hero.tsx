@@ -1,15 +1,15 @@
 import { Container, Overlay, Text, Button, Group } from "@mantine/core";
-import { IconArrowDown } from "@tabler/icons-react";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { siteConfig } from "../config/siteConfig";
 import classes from "./Hero.module.css";
 import type { CSSProperties } from "react";
-import fuerza from "../../../assets/Fuerza.jpeg";
 
 export function Hero() {
   return (
     <div
       className={classes.hero}
       role="banner"
-      style={{ "--hero-bg-image": `url(${fuerza})` } as CSSProperties}
+      style={{ "--hero-bg-image": 'url("/images/espacio1.jpeg")' } as CSSProperties}
     >
       <Overlay
         gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 50%, #000000 100%)"
@@ -51,23 +51,23 @@ export function Hero() {
               }}
               className={classes.button}
             >
-              Comenzar Ahora
+              iniciar Sesión
             </Button>
             <Button
               size="md"
               radius="xl"
               variant="outline"
-              rightSection={<IconArrowDown size={20} />}
+              rightSection={<IconBrandWhatsapp size={20} />}
               className={classes.controlSecondary}
               onClick={() => {
-                const contactSection = document.getElementById("contact");
-                if (contactSection) {
-                  contactSection.scrollIntoView({ behavior: "smooth" });
-                }
+                const message =
+                  "Hola Agustin! Quiero solicitar información sobre los planes de entrenamiento.";
+                const url = `https://wa.me/${siteConfig.social.whatsapp}?text=${encodeURIComponent(message)}`;
+                window.open(url, "_blank");
               }}
-              aria-label="Ver planes de entrenamiento"
+              aria-label="Contactar por WhatsApp"
             >
-              Solicitar Plan
+              Contáctame 
             </Button>
           </Group>
         </div>

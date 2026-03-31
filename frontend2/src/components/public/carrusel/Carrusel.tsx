@@ -101,14 +101,14 @@ export function Carrusel({ media }: CarruselProps) {
 
   return (
     <div
-      style={{ maxWidth: 350, height: 600, margin: "0 auto", width: "100%" }}
+      style={{ maxWidth: 500, margin: "0 auto", width: "100%" }}
     >
       <Carousel
         getEmblaApi={setEmbla}
         onSlideChange={(index) => setCurrentSlide(index)}
         emblaOptions={{ loop: true }}
         withIndicators
-        height="100%"
+        height={700}
         styles={{
           root: {
             position: "relative",

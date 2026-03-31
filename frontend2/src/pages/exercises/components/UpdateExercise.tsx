@@ -316,7 +316,7 @@ export function UpdateExercise({
                     </label>
                   </div>
                   {fileName && (
-                    <div className="flex items-center gap-2 mt-2 text-sm text-green-600 bg-green-50 p-2 rounded">
+                    <div className="flex items-center gap-2 mt-2 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2 text-sm text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
                       <FileVideo className="h-4 w-4" />
                       <span>{fileName}</span>
                     </div>

@@ -4,6 +4,12 @@
   padding: 0.75rem 0.25rem;
 }
 
+.containerLogin {
+  width: 100%;
+  max-width: 760px;
+  padding: 0.75rem 0.25rem;
+}
+
 .containerWide {
   width: 100%;
   max-width: 780px;
@@ -95,15 +101,19 @@
     padding: 1rem 0.5rem;
   }
 
+  .containerLogin {
+    padding: 1.1rem 0.75rem;
+  }
+
   .containerWide {
     padding: 1.1rem 0.5rem;
   }
 
   .cardHeader {
-    padding: 1.45rem 1.55rem 1rem;
+    padding: 1.55rem 2rem 1rem;
   }
 
   .cardContent {
-    padding: 0 1.55rem 1.55rem;
+    padding: 0 2rem 1.75rem;
   }
 }

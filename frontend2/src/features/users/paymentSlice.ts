@@ -1,57 +1,35 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import paymentService, {
+  type PaymentsSummaryContract,
   type PaymentPayload,
+  type PaymentStatusContract,
+  type PaymentTrafficStatus,
+  type PaymentContract,
   type ReminderChannel,
+  type StudentPaymentContract,
 } from "./paymentService";
 
-export interface IPaymentInfo {
-  startDate: string | null;
-  amount: number | null;
-  paymentDate: string | null;
-  isPaid: boolean;
-  billingCycleDays?: number | null;
-  reminderCount?: number;
-  lastReminderAt?: string | null;
-  lastReminderChannel?: ReminderChannel | null;
-}
+export type IPaymentInfo = PaymentContract;
 
-export interface IPaymentStatus {
-  status: "al_dia" | "vence" | "vencido" | "sin_configurar";
-  nextDueDate: string | null;
-  daysUntilDue: number | null;
-  isCurrentCyclePaid: boolean;
-}
+export type IPaymentStatus = PaymentStatusContract;
 
-export interface IStudentPayment {
-  _id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  phone?: string | null;
-  roles?: string[];
-  isActive: boolean;
-  profileImage: string | null;
-  payment: IPaymentInfo;
-  paymentStatus?: IPaymentStatus;
-  createdAt?: string;
-  updatedAt?: string;
-  progressSummary?: {
-    totalEntries: number;
-    lastEntryDate: string | null;
-  };
-}
+export type IStudentPayment = StudentPaymentContract;
 
-export interface IPaymentsSummary {
-  totalStudents: number;
-  paidStudents: number;
-  pendingStudents: number;
-  dueSoonStudents: number;
-  overdueStudents: number;
-  totalAmount: number;
-  collectedAmount: number;
-  pendingAmount: number;
-}
+export type IPaymentsSummary = PaymentsSummaryContract;
+
+export const getPaymentStatusLabel = (status: PaymentTrafficStatus) => {
+  switch (status) {
+    case "al_dia":
+      return "Pagado";
+    case "vence":
+      return "Próximo a vencer";
+    case "vencido":
+      return "Vencido";
+    default:
+      return "Sin configurar";
+  }
+};
 
 interface PaymentState {
   students: IStudentPayment[];

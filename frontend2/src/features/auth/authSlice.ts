@@ -1,27 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import {
-  signInWithEmailAndPassword,
   onAuthStateChanged,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signOut,
   type User,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import type { AppDispatch, RootState } from "@/app/store";
 import { FirebaseError } from "firebase/app";
-import {
-  getFirebaseLoginErrorMessage,
-  getFirebaseRegisterError,
-} from "../../firebase/firebaseErrors";
-import { fetchUserProfile } from "../users/userSlice";
-import { clearProfile } from "../users/userSlice";
-import type { IRegisterUserData } from "@/types/auth";
+import { getFirebaseLoginErrorMessage } from "../../firebase/firebaseErrors";
+import { fetchUserProfile, clearProfile } from "../users/userSlice";
 import axiosPrivate from "../../config/axios";
 import { toast } from "sonner";
 import type { IUserProfile } from "@/features/users/userSlice";
-import axios from "axios";
 
 interface IAuthUser {
   uid: string;
@@ -49,82 +42,25 @@ const initialState: IAuthState = {
   profile: null,
 };
 
-export const registerUser = createAsyncThunk<
-  IAuthUser,
-  IRegisterUserData,
-  { rejectValue: string }
->("auth/saveUser", async (formData, { rejectWithValue }) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      formData.email,
-      formData.password,
-    );
-
-    const user = userCredential.user;
-    const firebaseToken = await user.getIdToken();
-
-    const dbPayload = {
-      firebaseUid: user.uid,
-      email: formData.email,
-      name: formData.name,
-      lastName: formData.lastName,
-      phone: formData.phone,
-      gender: formData.gender,
-      birthDate: formData.birthDate,
-      weight: formData.weight,
-      height: formData.height,
-    };
-
-    await axiosPrivate.post("/auth/saveUser", dbPayload);
-
-    return {
-      uid: user.uid,
-      email: user.email,
-      token: firebaseToken,
-    };
-  } catch (error: unknown) {
-    console.log("Error en registerUser thunk:", error);
-
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || error.message;
-      return rejectWithValue(errorMessage);
-    }
-
-    const firebaseErrorMessage = getFirebaseRegisterError(error);
-
-    const fallbackMessage =
-      error instanceof Error
-        ? error.message
-        : "Error inesperado al registrar usuario";
-
-    return rejectWithValue(firebaseErrorMessage || fallbackMessage);
-  }
-});
-
 export const loginUser = createAsyncThunk<
   IAuthUser,
   { email: string; password: string },
   { rejectValue: string }
 >("auth/login", async ({ email, password }, { rejectWithValue }) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     const token = await user.getIdToken();
 
     try {
       const response = await axiosPrivate.get("/user/profile");
-
       const userProfile = response.data.data;
 
       if (userProfile.isActive === false) {
         await signOut(auth);
-        return rejectWithValue("Tu cuenta está inactiva. Contacta al soporte.");
+        return rejectWithValue(
+          "Tu cuenta est? inactiva. Contacta al administrador.",
+        );
       }
     } catch (backendError) {
       await signOut(auth);
@@ -141,9 +77,6 @@ export const loginUser = createAsyncThunk<
       token,
     };
   } catch (error: unknown) {
-    if (typeof error === "string") {
-      return rejectWithValue(error);
-    }
     return rejectWithValue(getFirebaseLoginErrorMessage(error));
   }
 });
@@ -231,21 +164,6 @@ export const authSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.isError = false;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.errorMessage = action.payload as string;
-        state.user = null;
-      })
-
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -278,12 +196,10 @@ export const authSlice = createSlice({
         state.errorMessage = "";
         state.isSuccess = false;
       })
-
       .addCase(resetPassword.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
       })
-
       .addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;

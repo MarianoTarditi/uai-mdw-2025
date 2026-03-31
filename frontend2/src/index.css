@@ -218,3 +218,13 @@
   background: var(--action-navy-active) !important;
   border-color: var(--action-navy-active) !important;
 }
+
+.dark [data-slot="input"] {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: color-mix(in srgb, #ffffff 18%, transparent) !important;
+}
+
+.dark [data-slot="input"]::placeholder {
+  color: rgb(255 255 255 / 60%) !important;
+}

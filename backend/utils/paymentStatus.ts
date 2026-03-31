@@ -4,8 +4,9 @@ export type PaymentTrafficStatus =
   | "vencido"
   | "sin_configurar";
 
-type PaymentInput = {
+export type PaymentInput = {
   startDate?: Date | string | null;
+  dueDate?: Date | string | null;
   paymentDate?: Date | string | null;
   isPaid?: boolean | null;
   billingCycleDays?: number | null;
@@ -20,7 +21,7 @@ export type PaymentStatusResult = {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const DEFAULT_BILLING_DAYS = 30;
-const DUE_SOON_WINDOW_DAYS = 3;
+const WARNING_WINDOW_DAYS = 3;
 
 const toDate = (value?: Date | string | null) => {
   if (!value) return null;
@@ -36,7 +37,9 @@ export const calculatePaymentStatus = (
   now = new Date(),
 ): PaymentStatusResult => {
   const startDate = toDate(payment?.startDate);
-  if (!startDate) {
+  const explicitDueDate = toDate(payment?.dueDate);
+
+  if (!startDate && !explicitDueDate) {
     return {
       status: "sin_configurar",
       nextDueDate: null,
@@ -51,33 +54,32 @@ export const calculatePaymentStatus = (
       : DEFAULT_BILLING_DAYS;
 
   const today = normalizeStartOfDay(now);
-  const anchor = normalizeStartOfDay(startDate);
   const paymentDate = toDate(payment?.paymentDate);
-  const hasPaidFlag = Boolean(payment?.isPaid);
+  const hasPaidFlag = Boolean(payment?.isPaid) || Boolean(paymentDate);
 
-  const cyclesSinceAnchor = Math.max(
-    0,
-    Math.floor((today.getTime() - anchor.getTime()) / (billingCycleDays * MS_PER_DAY)),
-  );
+  const nextDueDate = explicitDueDate
+    ? normalizeStartOfDay(explicitDueDate)
+    : startDate
+      ? new Date(
+          normalizeStartOfDay(startDate).getTime() +
+            billingCycleDays * MS_PER_DAY,
+        )
+      : null;
 
-  const currentCycleStart = new Date(
-    anchor.getTime() + cyclesSinceAnchor * billingCycleDays * MS_PER_DAY,
-  );
-  const nextDueDate = new Date(
-    currentCycleStart.getTime() + billingCycleDays * MS_PER_DAY,
-  );
-
-  const isCurrentCyclePaid =
-    hasPaidFlag &&
-    Boolean(paymentDate) &&
-    paymentDate!.getTime() >= currentCycleStart.getTime() &&
-    paymentDate!.getTime() < nextDueDate.getTime();
+  if (!nextDueDate) {
+    return {
+      status: "sin_configurar",
+      nextDueDate: null,
+      daysUntilDue: null,
+      isCurrentCyclePaid: false,
+    };
+  }
 
   const daysUntilDue = Math.ceil(
     (nextDueDate.getTime() - today.getTime()) / MS_PER_DAY,
   );
 
-  if (isCurrentCyclePaid) {
+  if (hasPaidFlag) {
     return {
       status: "al_dia",
       nextDueDate,
@@ -86,7 +88,7 @@ export const calculatePaymentStatus = (
     };
   }
 
-  if (daysUntilDue <= 0) {
+  if (daysUntilDue < 0) {
     return {
       status: "vencido",
       nextDueDate,
@@ -95,7 +97,7 @@ export const calculatePaymentStatus = (
     };
   }
 
-  if (daysUntilDue <= DUE_SOON_WINDOW_DAYS) {
+  if (daysUntilDue <= WARNING_WINDOW_DAYS) {
     return {
       status: "vence",
       nextDueDate,
@@ -105,10 +107,10 @@ export const calculatePaymentStatus = (
   }
 
   return {
-    status: "al_dia",
+    // Neutral fallback until the frontend adds a dedicated "pending but not due-soon" label.
+    status: "sin_configurar",
     nextDueDate,
     daysUntilDue,
     isCurrentCyclePaid: false,
   };
 };
-

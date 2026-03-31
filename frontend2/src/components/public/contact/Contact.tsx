@@ -174,7 +174,7 @@ export function Contact() {
             >
               <div className={classes.mapContainer}>
                 <iframe
-                  src="https://www.google.com/maps?q=Sarmiento+Marmol+Rojas,Argentina&output=embed"
+                  src="https://www.google.com/maps?q=Hilario+Lagos+474,+Rojas,Argentina&output=embed"
                   width="100%"
                   height="100%"
                   style={{
@@ -184,7 +184,7 @@ export function Contact() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Ubicación del gimnasio - Sarmiento y Marmol, Rojas"
+                  title="Ubicación del gimnasio - Hilario Lagos 474, Rojas"
                   className={classes.map}
                 />
               </div>
@@ -196,7 +196,7 @@ export function Contact() {
                     className={classes.mapIcon}
                   />
                   <Text fw={600} size="sm" ta="center">
-                    Sarmiento y Marmol, Rojas - Buenos Aires
+                    Hilario Lagos 474, Rojas - Buenos Aires
                   </Text>
                 </Stack>
               </div>

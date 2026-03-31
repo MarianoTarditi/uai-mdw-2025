@@ -41,14 +41,12 @@ export function Login() {
   };
 
   return (
-    <section className={`${classes.container} auth-premium-main`}>
+    <section className={`${classes.containerLogin} auth-premium-main`}>
       <Card className={`${classes.card} auth-premium-card border-0 py-0`}>
         <CardHeader className={classes.cardHeader}>
           <p className={classes.eyebrow}>Acceso privado</p>
-          <CardTitle className={classes.title}>Inicia sesion</CardTitle>
-          <p className={classes.subtitle}>
-            Bienvenido de nuevo. Usa tu email y tu clave para continuar.
-          </p>
+          <CardTitle className={classes.title}>Inicia sesión</CardTitle>
+      
         </CardHeader>
         <CardContent className={classes.cardContent}>
           <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
@@ -82,10 +80,7 @@ export function Login() {
 
             <div className={classes.hintRow}>
               <Link to="/forgotPassword" className={classes.switch}>
-                Olvidaste tu contraseña?
-              </Link>
-              <Link to="/signUp" className={classes.switch}>
-                No tienes cuenta? Registrate
+                ¿Olvidaste tu contraseña?
               </Link>
             </div>
 
@@ -94,7 +89,7 @@ export function Login() {
               className={`${classes.submit} w-full`}
               disabled={isLoading}
             >
-              {isLoading ? "Ingresando..." : "Iniciar sesion"}
+              {isLoading ? "Ingresando..." : "Iniciar sesión"}
             </Button>
           </form>
         </CardContent>

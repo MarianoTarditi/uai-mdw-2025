@@ -108,7 +108,7 @@
 .fit-premium [data-slot="textarea"],
 .fit-premium [data-slot="select-trigger"] {
   border-color: color-mix(in srgb, var(--premium-line) 54%, transparent);
-  background: color-mix(in srgb, var(--premium-panel) 64%, transparent);
+  background: color-mix(in srgb, var(--premium-panel) 66%, transparent);
   box-shadow: none;
 }
 
@@ -257,7 +257,8 @@
 .fit-premium.auth-premium-layout .auth-premium-card {
   border: 1px solid color-mix(in srgb, var(--premium-line) 62%, transparent);
   background:
-    radial-gradient(1000px 280px at 130% -20%, color-mix(in srgb, var(--premium-accent) 16%, transparent), transparent 60%),
-    linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 96%, transparent), color-mix(in srgb, var(--premium-panel-soft) 95%, transparent));
+    radial-gradient(900px 220px at 115% -10%, color-mix(in srgb, var(--premium-accent) 12%, transparent), transparent 58%),
+    linear-gradient(175deg, color-mix(in srgb, var(--premium-panel) 95%, transparent), color-mix(in srgb, var(--premium-panel-soft) 96%, transparent));
   box-shadow: none;
+  padding: 40px;
 }

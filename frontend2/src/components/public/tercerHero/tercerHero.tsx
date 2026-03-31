@@ -160,34 +160,27 @@ export function TercerHero() {
         />
 
         {shouldLoadMedia ? (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
             <Carrusel
               media={[
-                { src: "/images/Video1.mp4", alt: "Video 1" },
-                { src: "/images/Video2.mp4", alt: "Video 2" },
-                { src: "/images/Video3.mp4", alt: "Video 3" },
-                { src: "/images/Lugar1.jpeg", alt: "Video 3" },
+                { src: "/images/espacio1.jpeg", alt: "Espacio" },
+                { src: "/images/videoGenereal.mp4", alt: "Video Adriano" },
+                { src: "/images/VideoTeisa.mp4", alt: "Video Teisa" },
+                { src: "/images/VideoGeneral2.mp4", alt: "Video Adriano" },
               ]}
             />
             <Carrusel
               media={[
-                { src: "/images/Recopilacion.mp4", alt: "Video 4" },
-                { src: "/images/Planificando.mp4", alt: "Video 5" },
-                { src: "/images/Lugar2.jpeg", alt: "Video 3" },
-              ]}
-            />
-            <Carrusel
-              media={[
-                { src: "/images/Video4.mp4", alt: "Video 7" },
-                { src: "/images/Lugar4.jpeg", alt: "Foto del lugar" },
-                { src: "/images/Tecla.mp4", alt: "Video 9" },
-                { src: "/images/Lugar3.jpeg", alt: "Video 3" },
+                { src: "/images/espacio2.jpeg", alt: "Espacio 2" },
+                { src: "/images/VideoAdriano.mp4", alt: "Video Adriano" },
+                { src: "/images/espacio5.jpeg", alt: "Espacio 5" },
+                { src: "/images/VideoGeneral3.mp4", alt: "Video Adriano" },
               ]}
             />
           </SimpleGrid>
         ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-            {[1, 2, 3].map((item) => (
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+            {[1, 2].map((item) => (
               <div
                 key={item}
                 style={{

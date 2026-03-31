@@ -5,6 +5,7 @@ import userReducer from "../features/users/userSlice";
 import routineReducer from "../features/routines/routineSlice";
 import adminReducer from "../features/admin/adminSlice";
 import paymentReducer from "../features/users/paymentSlice";
+import videotecaReducer from "../features/videoteca/videotecaSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     routine: routineReducer,
     admin: adminReducer,
     payment: paymentReducer,
+    videoteca: videotecaReducer,
   },
 });
 

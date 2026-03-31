@@ -65,9 +65,13 @@ export default function UserProfile() {
             <p className="text-sm text-muted-foreground">{profile.email}</p>
 
             {profile.isActive ? (
-              <Badge className="bg-green-500 text-white">Activo</Badge>
+              <Badge className="border border-emerald-400/30 bg-emerald-600 text-white shadow-sm shadow-emerald-950/10 hover:bg-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 dark:hover:bg-emerald-500/30">
+                Activo
+              </Badge>
             ) : (
-              <Badge className="bg-red-500 text-white">Inactivo</Badge>
+              <Badge className="border border-rose-400/30 bg-rose-600 text-white shadow-sm shadow-rose-950/10 hover:bg-rose-700 dark:bg-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/30">
+                Inactivo
+              </Badge>
             )}
           </CardHeader>
 

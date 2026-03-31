@@ -1,7 +1,6 @@
 import { Box, Group } from "@mantine/core";
 import { useEffect, useState } from "react";
 import classes from "./Header.module.css";
-import { DarkMode } from "../darkMode/DarkMode";
 import { Link } from "react-router-dom";
 
 export function AuthHeader() {
@@ -50,9 +49,7 @@ export function AuthHeader() {
               </Link>
             </div>
 
-            <Group visibleFrom="sm">
-              <DarkMode />
-            </Group>
+       
           </Group>
         </nav>
       </header>

@@ -46,7 +46,8 @@ export const auditPlugin = (schema: Schema) => {
         entityId: doc._id,
         performedBy: user._id,
         details: resourceName,
-        affectedUser: modelName === "User" ? doc._id : (doc.studentId || null),
+        affectedUser:
+          modelName === "User" ? doc._id : (doc.userId || doc.studentId || null),
       });
     } catch (err) {
       console.error("Error auditoría save:", err);
@@ -78,7 +79,8 @@ export const auditPlugin = (schema: Schema) => {
         entityId: doc._id,
         performedBy: user._id,
         details: resourceName,
-        affectedUser: modelName === "User" ? doc._id : (doc.studentId || null),
+        affectedUser:
+          modelName === "User" ? doc._id : (doc.userId || doc.studentId || null),
       });
     } catch (err) {
       console.error("Error auditoría update:", err);
@@ -103,7 +105,8 @@ export const auditPlugin = (schema: Schema) => {
         entityId: doc._id,
         performedBy: user._id,
         details: resourceName,
-        affectedUser: modelName === "User" ? doc._id : (doc.studentId || null), 
+        affectedUser:
+          modelName === "User" ? doc._id : (doc.userId || doc.studentId || null),
       });
     } catch (err) {
       console.error("Error auditoría delete:", err);

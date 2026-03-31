@@ -84,15 +84,19 @@ export const columns: ColumnDef<IUserProfile>[] = [
       );
     },
   },
- {
+  {
     accessorKey: "isActive",
     header: "Estado",
     cell: ({ row }) => {
       const active = row.getValue("isActive");
       return (
         <Badge
-          className={active ? "bg-green-500 hover:bg-green-600" : ""} 
-          variant={active ? "default" : "destructive"}
+          className={
+            active
+              ? "border border-emerald-400/30 bg-emerald-600 text-white shadow-sm shadow-emerald-950/10 hover:bg-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 dark:hover:bg-emerald-500/30"
+              : "border border-rose-400/30 bg-rose-600 text-white shadow-sm shadow-rose-950/10 hover:bg-rose-700 dark:bg-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/30"
+          }
+          variant="default"
         >
           {active ? "Activo" : "Inactivo"}
         </Badge>

@@ -6,6 +6,7 @@ import {
   fetchStudentPayments,
   fetchPaymentsSummary,
   fetchStudentsProgressSummary,
+  getPaymentStatusLabel,
   sendPaymentReminder,
   updateStudentPayment,
   type IStudentPayment,
@@ -80,16 +81,32 @@ const toDateInputValue = (value: string | null | undefined) => {
   return new Date(value).toISOString().split("T")[0];
 };
 
+const resolveDueDate = (student: IStudentPayment) =>
+  student.payment?.dueDate ?? student.paymentStatus?.nextDueDate ?? null;
+
 const paymentStatusMap: Record<
   "al_dia" | "vence" | "vencido" | "sin_configurar",
-  { label: string; className: string }
+  { className: string; indicatorClassName: string }
 > = {
-  al_dia: { label: "Al día", className: "bg-green-600 hover:bg-green-700" },
-  vence: { label: "Vence pronto", className: "bg-amber-500 hover:bg-amber-600" },
-  vencido: { label: "Vencido", className: "bg-red-600 hover:bg-red-700" },
+  al_dia: {
+    className:
+      "border border-emerald-500/30 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20",
+    indicatorClassName: "bg-emerald-400",
+  },
+  vence: {
+    className:
+      "border border-amber-500/30 bg-amber-500/15 text-amber-300 hover:bg-amber-500/20",
+    indicatorClassName: "bg-amber-400",
+  },
+  vencido: {
+    className:
+      "border border-rose-500/30 bg-rose-500/15 text-rose-300 hover:bg-rose-500/20",
+    indicatorClassName: "bg-rose-400",
+  },
   sin_configurar: {
-    label: "Sin configurar",
-    className: "bg-slate-500 hover:bg-slate-600",
+    className:
+      "border border-slate-500/30 bg-slate-500/15 text-slate-300 hover:bg-slate-500/20",
+    indicatorClassName: "bg-slate-400",
   },
 };
 
@@ -100,8 +117,9 @@ const buildReminderMessage = (student: IStudentPayment) => {
       ? currencyFormatter.format(student.payment.amount)
       : "el monto pendiente";
 
-  const dueDateText = student.paymentStatus?.nextDueDate
-    ? dateFormatter.format(new Date(student.paymentStatus.nextDueDate))
+  const dueDate = resolveDueDate(student);
+  const dueDateText = dueDate
+    ? dateFormatter.format(new Date(dueDate))
     : "la fecha pactada";
 
   return `Hola ${fullName}, te recuerdo el pago de ${amountText}. Próximo vencimiento: ${dueDateText}.`;
@@ -387,7 +405,7 @@ export const GetAllPayments = () => {
       {
         id: "nextDueDate",
         header: "Próximo vencimiento",
-        cell: ({ row }) => formatDate(row.original.paymentStatus?.nextDueDate),
+        cell: ({ row }) => formatDate(resolveDueDate(row.original)),
       },
       {
         id: "progressEntries",
@@ -407,7 +425,13 @@ export const GetAllPayments = () => {
           const status = row.original.paymentStatus?.status ?? "sin_configurar";
           const data = paymentStatusMap[status];
           return (
-            <Badge className={data.className}>{data.label}</Badge>
+            <Badge className={`inline-flex items-center gap-2 ${data.className}`}>
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${data.indicatorClassName}`}
+                aria-hidden="true"
+              />
+              {getPaymentStatusLabel(status)}
+            </Badge>
           );
         },
       },
@@ -594,3 +618,4 @@ export const GetAllPayments = () => {
     </div>
   );
 };
+

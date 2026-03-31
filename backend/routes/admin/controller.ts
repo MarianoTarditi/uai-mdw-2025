@@ -1,14 +1,67 @@
 import { Request, Response } from "express";
-import User from "../../models/User";
-import Routine from "../../models/Routine";
+import { Types } from "mongoose";
+import admin from "../../utils/firebase";
+import AuditLog from "../../models/AuditLog";
 import Exercise from "../../models/Exercise";
+import Payment from "../../models/Payment";
+import Progress from "../../models/Progress";
+import Routine from "../../models/Routine";
+import User from "../../models/User";
 import { UserRole } from "../../types";
 import handleHttpError from "../../utils/handleError";
-import AuditLog from "../../models/AuditLog";
-import Progress from "../../models/Progress";
-import { Types } from "mongoose";
+import { normalizeArgentinaPhone } from "../../utils/phoneAr";
+import {
+  buildLegacyPaymentBridge,
+  createInitialPaidPaymentSource,
+  enrichStudentsWithPaymentBridge,
+  syncUserPaymentBridge,
+} from "../../utils/paymentBridge";
 
 const getRequestingUser = (req: Request) => (req as any).dbUser;
+const DEFAULT_STUDENT_PASSWORD = "123456789";
+
+const sanitizeUserResponse = (user: any) => {
+  if (!user) {
+    return null;
+  }
+
+  const plainUser =
+    typeof user.toObject === "function" ? user.toObject() : { ...user };
+
+  return plainUser;
+};
+
+const parseBirthDate = (value?: string | null) => {
+  if (!value) {
+    return null;
+  }
+
+  const [day, month, year] = String(value).split("/");
+  if (!day || !month || !year) {
+    return null;
+  }
+
+  const parsedDate = new Date(`${year}-${month}-${day}`);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
+
+const parseOptionalNumber = (value?: string | number | null) => {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  const parsedValue = Number(value);
+  return Number.isNaN(parsedValue) ? null : parsedValue;
+};
+
+const parseIsoDate = (value?: string | Date | null) => {
+  if (!value) {
+    return null;
+  }
+
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
 
 const getDashboardStats = async (req: Request, res: Response) => {
   try {
@@ -54,7 +107,7 @@ const getDashboardStats = async (req: Request, res: Response) => {
       totalRoutines,
       totalExercises,
       progressEntriesThisMonth,
-      studentsWithPendingPayments,
+      studentsForPayments,
     ] = await Promise.all([
       User.countDocuments(studentFilter),
       User.countDocuments({ ...studentFilter, isActive: true }),
@@ -65,11 +118,12 @@ const getDashboardStats = async (req: Request, res: Response) => {
         ...progressFilter,
         date: { $gte: currentMonthStart, $lt: nextMonthStart },
       }),
-      User.countDocuments({
-        ...studentFilter,
-        $or: [{ "payment.isPaid": false }, { payment: { $exists: false } }],
-      }),
+      User.find(studentFilter).select("_id payment").lean(),
     ]);
+
+    const studentsWithPendingPayments = (
+      await enrichStudentsWithPaymentBridge(studentsForPayments)
+    ).filter((student) => student.paymentStatus.status !== "al_dia").length;
 
     res.status(200).json({
       data: {
@@ -96,7 +150,7 @@ const getChartData = async (req: Request, res: Response) => {
     }
 
     const isAdmin = requestingUser.roles?.includes(UserRole.Admin);
-    const { type } = req.query; 
+    const { type } = req.query;
     let Model: any;
     let matchStage: any = {};
 
@@ -157,7 +211,7 @@ const getChartData = async (req: Request, res: Response) => {
           count: { $sum: 1 },
         },
       },
-      { $sort: { _id: 1 } }, 
+      { $sort: { _id: 1 } },
     );
 
     const data = await Model.aggregate(pipeline);
@@ -182,7 +236,9 @@ export const getAuditLogs = async (req: Request, res: Response) => {
     }
 
     const isAdmin = requestingUser.roles?.includes(UserRole.Admin);
-    const logs = await AuditLog.find(isAdmin ? {} : { performedBy: requestingUser._id })
+    const logs = await AuditLog.find(
+      isAdmin ? {} : { performedBy: requestingUser._id },
+    )
       .populate("performedBy", "name lastName email")
       .populate("affectedUser", "name lastName email")
       .sort({ createdAt: -1 })
@@ -194,4 +250,111 @@ export const getAuditLogs = async (req: Request, res: Response) => {
   }
 };
 
-export default { getDashboardStats, getChartData, getAuditLogs };
+const createManagedUser = async (req: Request, res: Response) => {
+  let firebaseUser: admin.auth.UserRecord | null = null;
+
+  try {
+    const requester = getRequestingUser(req);
+    if (!requester) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const {
+      name,
+      lastName,
+      email: rawEmail,
+      phone,
+      gender,
+      birthDate,
+      weight,
+      height,
+      paymentAmount,
+      paymentBillingCycleDays,
+      paymentStartDate,
+      paymentDate,
+    } = req.body;
+
+    const email = String(rawEmail).trim().toLowerCase();
+    const normalizedPhone = normalizeArgentinaPhone(phone);
+
+    const existingUser = await User.findOne({ email }).lean();
+    if (existingUser) {
+      return handleHttpError(res, "Ya existe un usuario con ese email", 409);
+    }
+
+    firebaseUser = await admin.auth().createUser({
+      email,
+      password: DEFAULT_STUDENT_PASSWORD,
+      displayName: `${name} ${lastName}`.trim(),
+      disabled: false,
+    });
+
+    const createdUser = new User({
+      name,
+      lastName,
+      email,
+      phone: normalizedPhone,
+      firebaseUid: firebaseUser.uid,
+      roles: [UserRole.Student],
+      gender: gender || null,
+      birthDate: parseBirthDate(birthDate),
+      weight: parseOptionalNumber(weight),
+      height: parseOptionalNumber(height),
+    });
+
+    await createdUser.save();
+
+    const initialPayment = createInitialPaidPaymentSource({
+      studentId: createdUser._id,
+      amount: parseOptionalNumber(paymentAmount),
+      billingCycleDays: parseOptionalNumber(paymentBillingCycleDays),
+      startDate: parseIsoDate(paymentStartDate),
+      paymentDate: parseIsoDate(paymentDate),
+    });
+
+    const createdPayment = await Payment.create(initialPayment);
+    await syncUserPaymentBridge(createdUser._id, createdPayment.toObject());
+    createdUser.payment = buildLegacyPaymentBridge(createdPayment.toObject());
+
+    return res.status(201).json({
+      message: "Alumno creado correctamente con contraseÃ±a inicial 123456789",
+      data: sanitizeUserResponse(createdUser),
+    });
+  } catch (error: any) {
+    if (firebaseUser?.uid) {
+      try {
+        const persistedUser = await User.findOne({ firebaseUid: firebaseUser.uid });
+
+        if (persistedUser) {
+          await Payment.deleteMany({
+            $or: [{ userId: persistedUser._id }, { studentId: persistedUser._id }],
+          });
+          await User.deleteOne({ _id: persistedUser._id });
+        }
+      } catch (cleanupDbError) {
+        console.error("Database cleanup error:", cleanupDbError);
+      }
+    }
+
+    if (firebaseUser?.uid) {
+      try {
+        await admin.auth().deleteUser(firebaseUser.uid);
+      } catch (cleanupError) {
+        console.error("Firebase cleanup error:", cleanupError);
+      }
+    }
+
+    if (error?.code === "auth/email-already-exists") {
+      return handleHttpError(res, "Ya existe un usuario con ese email", 409);
+    }
+
+    return handleHttpError(res, "Error creating managed user", 500, error);
+  }
+};
+
+export default {
+  getDashboardStats,
+  getChartData,
+  getAuditLogs,
+  createManagedUser,
+};

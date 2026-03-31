@@ -1,6 +1,33 @@
-import { z } from "zod"
+import { z } from "zod";
 
-const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/
+import {
+  ARGENTINA_PHONE_PREFIX,
+  ARGENTINA_PHONE_PLACEHOLDER,
+  MANAGED_USER_WEIGHT_MAX,
+  MANAGED_USER_WEIGHT_MIN,
+  isEmptyArgentinaPhoneInput,
+  normalizeArgentinaPhone,
+} from "@/utils/phoneAr";
+
+const onlyLettersRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/;
+
+const optionalNumberFromInput = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return null;
+    }
+
+    const parsedValue = Number(trimmedValue);
+    return Number.isFinite(parsedValue) ? parsedValue : value;
+  }
+
+  return value;
+};
 
 export const updateUserSchema = z.object({
   name: z
@@ -22,57 +49,70 @@ export const updateUserSchema = z.object({
     .trim()
     .nullable()
     .optional()
-    .refine((value) => {
-      if (!value) return true;
-      const normalized = value.replace(/[^\d+]/g, "");
-      return normalized.length >= 6 && normalized.length <= 20;
-    }, "Ingresá un teléfono válido (con código de país)"),
+    .refine(
+      (value) =>
+        value == null ||
+        isEmptyArgentinaPhoneInput(value) ||
+        Boolean(normalizeArgentinaPhone(value)),
+      `Ingresá un celular argentino válido, por ejemplo ${ARGENTINA_PHONE_PLACEHOLDER}`,
+    )
+    .transform((value) => {
+      if (value == null || isEmptyArgentinaPhoneInput(value)) {
+        return null;
+      }
 
-  height: z.coerce
-    .number()
-    .nullable()
-    .optional()
-    .refine((val) => {
-      if (val === null || val === undefined) return true
-      
-      return val === 0 || (val >= 50 && val <= 250)
-    }, {
-      message: "La altura debe ser 0 (sin definir) o estar entre 50 y 250 cm",
+      return normalizeArgentinaPhone(value) ?? ARGENTINA_PHONE_PREFIX;
     }),
 
-  weight: z.coerce
-    .number()
-    .nullable()
-    .optional()
-    .refine((val) => {
-      if (val === null || val === undefined) return true
-      
-      return val === 0 || (val >= 20 && val <= 200)
-    }, {
-      message: "El peso debe ser 0 (sin definir) o estar entre 20 y 200 kg",
-    }),
+  height: z.preprocess(
+    optionalNumberFromInput,
+    z
+      .number()
+      .nullable()
+      .optional()
+      .refine((value) => value == null || (value >= 50 && value <= 250), {
+        message: "La altura debe estar entre 50 y 250 cm",
+      }),
+  ),
+
+  weight: z.preprocess(
+    optionalNumberFromInput,
+    z
+      .number()
+      .nullable()
+      .optional()
+      .refine(
+        (value) =>
+          value == null ||
+          (value >= MANAGED_USER_WEIGHT_MIN &&
+            value <= MANAGED_USER_WEIGHT_MAX),
+        {
+          message: `El peso debe estar entre ${MANAGED_USER_WEIGHT_MIN} y ${MANAGED_USER_WEIGHT_MAX} kg`,
+        },
+      ),
+  ),
 
   birthDate: z
     .string()
     .nullable()
     .optional()
     .refine((value) => {
-      if (!value) return true
-      const date = new Date(value)
-      return !isNaN(date.getTime())
-    }, "Fecha de nacimiento inválida")
+      if (!value) return true;
+      const date = new Date(value);
+      return !Number.isNaN(date.getTime());
+    }, "Fecha de nacimiento invalida")
     .refine((value) => {
-      if (!value) return true
-      const date = new Date(value)
-      return date <= new Date()
+      if (!value) return true;
+      const date = new Date(value);
+      return date <= new Date();
     }, "La fecha de nacimiento no puede ser futura")
     .refine((value) => {
-      if (!value) return true
-      const date = new Date(value)
-      const today = new Date()
-      const age = today.getFullYear() - date.getFullYear()
-      return age >= 13
+      if (!value) return true;
+      const date = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - date.getFullYear();
+      return age >= 13;
     }, "El usuario debe tener al menos 13 años"),
 
   gender: z.enum(["male", "female", "other"]).nullable().optional(),
-})
+});
