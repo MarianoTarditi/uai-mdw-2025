@@ -46,6 +46,8 @@ export function RoutineTemplates() {
   const dispatch = useAppDispatch();
   const { templates, isTemplatesLoading, isTemplateUploading, isTemplateDeleting } =
     useAppSelector((state) => state.routine);
+  const { profile } = useAppSelector((state) => state.user);
+  const isStudent = profile?.roles?.includes("student");
   const staticUrl = import.meta.env.VITE_STATIC_URL;
 
   const [title, setTitle] = useState("");
@@ -159,28 +161,30 @@ export function RoutineTemplates() {
         </CardContent>
       </Card>
 
-      <Card className="py-4">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Subir nueva plantilla</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Título de la plantilla (opcional)"
-          />
-          <Input
-            type="file"
-            accept=".pdf,.xls,.xlsx,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-          />
-          <p className="text-xs text-muted-foreground">{acceptedInfo}</p>
-          <Button onClick={handleUpload} disabled={isTemplateUploading}>
-            <Upload className="mr-2 h-4 w-4" />
-            {isTemplateUploading ? "Subiendo..." : "Subir plantilla"}
-          </Button>
-        </CardContent>
-      </Card>
+      {!isStudent && (
+        <Card className="py-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Subir nueva plantilla</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Título de la plantilla (opcional)"
+            />
+            <Input
+              type="file"
+              accept=".pdf,.xls,.xlsx,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+            <p className="text-xs text-muted-foreground">{acceptedInfo}</p>
+            <Button onClick={handleUpload} disabled={isTemplateUploading}>
+              <Upload className="mr-2 h-4 w-4" />
+              {isTemplateUploading ? "Subiendo..." : "Subir plantilla"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="py-4">
         <CardHeader className="pb-2">
@@ -291,7 +295,7 @@ export function RoutineTemplates() {
                         </Button>
                       )}
 
-                      {!isEditing && (
+                      {!isStudent && !isEditing && (
                         <Button
                           size="sm"
                           variant="ghost"
@@ -301,15 +305,17 @@ export function RoutineTemplates() {
                         </Button>
                       )}
 
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        disabled={isTemplateDeleting}
-                        onClick={() => handleDelete(template._id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {!isStudent && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isTemplateDeleting}
+                          onClick={() => handleDelete(template._id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );

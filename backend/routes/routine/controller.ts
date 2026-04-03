@@ -287,8 +287,10 @@ const getRoutineTemplates = async (req: Request, res: Response) => {
     }
 
     const isAdmin = requester.roles.includes(UserRole.Admin);
+    const isStudent = requester.roles.includes(UserRole.Student);
 
-    const filter = isAdmin ? {} : { uploadedBy: requester._id };
+    // Students see ALL templates; non-admin trainers see only their own; admins see all
+    const filter = isAdmin || isStudent ? {} : { uploadedBy: requester._id };
 
     const templates = await RoutineTemplate.find(filter)
       .populate("uploadedBy", "name lastName email")

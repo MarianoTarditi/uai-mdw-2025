@@ -1,4 +1,4 @@
-import { IconArrowLeft } from "@tabler/icons-react";
+﻿import { IconArrowLeft } from "@tabler/icons-react";
 import {
   Anchor,
   Box,
@@ -51,21 +51,15 @@ export function ForgotPassword() {
     }
   };
 
-return (
-
-    <Container size={460} style={{ width: '100%' }}>
-      <Paper withBorder shadow="md" p={40} radius="md"> 
-        <Title className={classes.title} ta="center" order={2}>
+  return (
+    <Container size={460} style={{ width: "100%" }}>
+      <Paper withBorder shadow="md" p={40} radius="md">
+        <Title className={classes.title} ta="center">
           ¿Olvidaste tu contraseña?
         </Title>
-        
-        <Divider
-          label="Ingresa tu email para obtener el enlace"
-          labelPosition="center"
-          my="lg"
-        />
+        <Divider label="Ingresa tu email para obtener el enlace" labelPosition="center" my="lg" />
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
             label="Tu email"
             placeholder="tucorreo@gmail.com"
@@ -75,19 +69,16 @@ return (
             error={errors.email?.message}
           />
 
-          <Group justify="space-between" mt="xl">
-            <Anchor c="dimmed" size="sm" component="div">
+          <Group justify="space-between" mt="xl" className={classes.controls}>
+            <Anchor c="dimmed" size="sm" className={classes.control}>
               <Center inline>
-                <IconArrowLeft size={16} stroke={1.5} />
+                <IconArrowLeft size={12} stroke={1.5} />
                 <Box ml={5}>
-                  <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    Volver al login
-                  </Link>
+                  <Link to="/login">Volver al login</Link>
                 </Box>
               </Center>
             </Anchor>
-
-            <Button type="submit"  radius="xl" loading={isSubmitting}>
+            <Button type="submit" className={classes.control} loading={isSubmitting}>
               Restablecer
             </Button>
           </Group>

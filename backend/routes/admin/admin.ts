@@ -33,4 +33,11 @@ router.post(
   controller.createManagedUser,
 );
 
+router.delete(
+  "/users/:id",
+  authenticateFirebase,
+  checkRole([UserRole.Admin, UserRole.Trainer]),
+  controller.permanentDeleteUser,
+);
+
 export default router;

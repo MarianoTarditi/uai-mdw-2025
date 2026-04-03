@@ -1,15 +1,30 @@
 .scroll-animation {
+  --scroll-animation-duration: var(--motion-emphasis);
+  --scroll-animation-delay: 0s;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--motion-standard);
+  will-change: opacity, transform;
 }
 
 .scroll-animation-visible {
   opacity: 1;
 }
 
+.scroll-animation-fadeIn,
+.scroll-animation-fadeInUp,
+.scroll-animation-fadeInDown,
+.scroll-animation-fadeInLeft,
+.scroll-animation-fadeInRight,
+.scroll-animation-slideUp,
+.scroll-animation-scaleIn {
+  animation-duration: var(--scroll-animation-duration);
+  animation-delay: var(--scroll-animation-delay);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
 .scroll-animation-fadeIn {
   animation-name: fadeIn;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeIn {
@@ -23,13 +38,12 @@
 
 .scroll-animation-fadeInUp {
   animation-name: fadeInUp;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(34px);
   }
   to {
     opacity: 1;
@@ -39,7 +53,6 @@
 
 .scroll-animation-fadeInDown {
   animation-name: fadeInDown;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeInDown {
@@ -55,7 +68,6 @@
 
 .scroll-animation-fadeInLeft {
   animation-name: fadeInLeft;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeInLeft {
@@ -71,7 +83,6 @@
 
 .scroll-animation-fadeInRight {
   animation-name: fadeInRight;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeInRight {
@@ -87,13 +98,12 @@
 
 .scroll-animation-slideUp {
   animation-name: slideUp;
-  animation-fill-mode: both;
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(46px);
   }
   to {
     opacity: 1;
@@ -103,17 +113,23 @@
 
 .scroll-animation-scaleIn {
   animation-name: scaleIn;
-  animation-fill-mode: both;
 }
 
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.94);
   }
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@media (max-width: 64em) {
+  .scroll-animation-fadeInUp,
+  .scroll-animation-slideUp {
+    animation-duration: calc(var(--scroll-animation-duration) - 0.08s);
   }
 }
 

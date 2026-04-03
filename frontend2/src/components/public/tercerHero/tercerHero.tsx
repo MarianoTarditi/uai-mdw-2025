@@ -1,17 +1,34 @@
 import {
-  Container,
-  Overlay,
-  Title,
-  Text,
   Badge,
+  Container,
   Group,
+  Overlay,
   SimpleGrid,
+  Text,
+  Title,
 } from "@mantine/core";
-import { IconUsers, IconClock, IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconClock, IconUsers } from "@tabler/icons-react";
 import classes from "./TercerHero.module.css";
-import { Titles } from "./title/Titles";
 import { Carrusel } from "../carrusel/Carrusel";
 import { useEffect, useRef, useState } from "react";
+
+const facilityHighlights = [
+  {
+    title: "1 Profesor",
+    detail: "Cada 5 alumnos",
+    icon: IconUsers,
+  },
+  {
+    title: "Horarios",
+    detail: "Fijos",
+    icon: IconClock,
+  },
+  {
+    title: "Cupo",
+    detail: "Limitado",
+    icon: IconCheck,
+  },
+];
 
 export function TercerHero() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -42,158 +59,136 @@ export function TercerHero() {
       className={classes.hero}
       aria-labelledby="instalaciones-title"
     >
-      {shouldLoadMedia && (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          className={classes.videoBackground}
-          aria-hidden="true"
-        >
-          <source src="/images/Video5.mp4" type="video/mp4" />
-        </video>
-      )}
-
       <Overlay
-        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)"
-        opacity={0.85}
+        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.4712) 0%, rgba(0, 0, 0, 0.38) 40%, rgba(0, 0, 0, 0.3192) 72%, rgba(0, 0, 0, 0.2736) 100%)"
+        opacity={1}
         zIndex={1}
       />
 
       <Container className={classes.contentContainer} size="xl">
-        <div className={classes.contentWrapper}>
-          <Badge
-            size="lg"
-            variant="light"
-            color="blue"
-            mb="md"
-            className={classes.badge}
-          >
-            Entrenamientos personalizados
-          </Badge>
+        <div className={classes.heroShell}>
+          <div className={classes.headerShell}>
+            <Badge size="lg" variant="filled" className={classes.badge}>
+              Entrenamientos personalizados
+            </Badge>
 
-          <Title
-            id="instalaciones-title"
-            order={2}
-            className={classes.title}
-            ta="center"
-          >
-            Instalaciones
-          </Title>
+            <Title
+              id="instalaciones-title"
+              order={2}
+              className={classes.title}
+              ta="center"
+            >
+              Instalaciones
+            </Title>
 
-          <div
-            style={{
-              width: "60px",
-              height: "3px",
-              backgroundColor: "var(--mantine-color-blue-5)",
-              margin: "0 auto 30px auto",
-              borderRadius: "2px",
-            }}
-          />
+            <div className={classes.divider} />
 
-          <Text className={classes.description} ta="center" mt="md">
-            El entrenamiento es personalizado, con grupos reducidos para
-            asegurar que cada alumno reciba atención individualizada.
-          </Text>
+            <Text className={classes.description} ta="center">
+              Un espacio pensado para entrenar con foco, seguimiento real y una
+              din�mica de trabajo que prioriza la atenci�n individual.
+            </Text>
 
-          <Group justify="center" gap="xl" mt="xl" className={classes.features}>
-            <div className={classes.featureItem}>
-              <IconUsers size={24} stroke={2} className={classes.featureIcon} />
-              <Text size="sm" fw={600} c="white">
-                1 Profesor
+            <Group justify="center" gap="lg" className={classes.features}>
+              {facilityHighlights.map((feature) => (
+                <div key={feature.title} className={classes.featureItem}>
+                  <div className={classes.featureIconShell}>
+                    <feature.icon
+                      size={24}
+                      stroke={2}
+                      className={classes.featureIcon}
+                    />
+                  </div>
+                  <Text size="sm" fw={700} className={classes.featureTitle}>
+                    {feature.title}
+                  </Text>
+                  <Text size="xs" className={classes.featureDetail}>
+                    {feature.detail}
+                  </Text>
+                </div>
+              ))}
+            </Group>
+          </div>
+
+          <div className={classes.copyShell}>
+            <div className={classes.copyContent}>
+              <Text className={classes.copyParagraph}>
+                 - Un profesor cada 5 alumnos, adaptando el plan de entrenamiento a
+                los objetivos específicos de cada persona.
               </Text>
-              <Text size="xs" c="dimmed">
-                Cada 5 alumnos
+              <Text className={classes.copyParagraphSecondary}>
+                - Horarios fijos y cupo limitado, para garantizar una atención
+                verdaderamente personalizada.
               </Text>
             </div>
-            <div className={classes.featureDivider} />
-            <div className={classes.featureItem}>
-              <IconClock size={24} stroke={2} className={classes.featureIcon} />
-              <Text size="sm" fw={600} c="white">
-                Horarios
-              </Text>
-              <Text size="xs" c="dimmed">
-                Fijos
-              </Text>
-            </div>
-            <div className={classes.featureDivider} />
-            <div className={classes.featureItem}>
-              <IconCheck size={24} stroke={2} className={classes.featureIcon} />
-              <Text size="sm" fw={600} c="white">
-                Cupo
-              </Text>
-              <Text size="xs" c="dimmed">
-                Limitado
-              </Text>
-            </div>
-          </Group>
+          </div>
         </div>
 
-        <Titles description="Un profesor cada 5 alumnos, adaptando el plan de entrenamiento a los objetivos específicos de cada persona. Horarios fijos y cupo limitado, para garantizar una atención verdaderamente personalizada." />
+        <div className={classes.mediaShell}>
+          <div className={classes.mediaHeader}>
+            <Text className={classes.mediaEyebrow}>Entrenamiento en acci�n</Text>
 
-        <Title
-          order={3}
-          ta="center"
-          c="white"
-          mt={60}
-          mb={10}
-          style={{
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "1px",
-            fontSize: "clamp(1.5rem, 3vw, 2rem)",
-          }}
-        >
-          Entrenamiento en acción
-        </Title>
+            <div className={classes.divider} />
+          </div>
 
-        <div
-          style={{
-            width: "60px",
-            height: "3px",
-            backgroundColor: "var(--mantine-color-blue-5)",
-            margin: "0 auto 30px auto",
-            borderRadius: "2px",
-          }}
-        />
-
-        {shouldLoadMedia ? (
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            <Carrusel
-              media={[
-                { src: "/images/espacio1.jpeg", alt: "Espacio" },
-                { src: "/images/videoGenereal.mp4", alt: "Video Adriano" },
-                { src: "/images/VideoTeisa.mp4", alt: "Video Teisa" },
-                { src: "/images/VideoGeneral2.mp4", alt: "Video Adriano" },
-              ]}
-            />
-            <Carrusel
-              media={[
-                { src: "/images/espacio2.jpeg", alt: "Espacio 2" },
-                { src: "/images/VideoAdriano.mp4", alt: "Video Adriano" },
-                { src: "/images/espacio5.jpeg", alt: "Espacio 5" },
-                { src: "/images/VideoGeneral3.mp4", alt: "Video Adriano" },
-              ]}
-            />
-          </SimpleGrid>
-        ) : (
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            {[1, 2].map((item) => (
-              <div
-                key={item}
-                style={{
-                  height: 600,
-                  borderRadius: 20,
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  background:
-                    "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-                }}
+          {shouldLoadMedia ? (
+            <SimpleGrid
+              cols={{ base: 1, sm: 2 }}
+              spacing="sm"
+              className={classes.mediaGrid}
+            >
+              <Carrusel
+                media={[
+                  {
+                    src: "/images/VideoLugar1.mp4",
+                    alt: "Clase en movimiento",
+                  },
+                  {
+                    src: "/images/espacio1.jpeg",
+                    alt: "Zona principal de trabajo",
+                  },
+                  {
+                    src: "/images/videoGenereal.mp4",
+                    alt: "Entrenamiento guiado",
+                  },
+                  {
+                    src: "/images/VideoGeneral2.mp4",
+                    alt: "Seguimiento t�cnico",
+                  },
+                ]}
               />
-            ))}
-          </SimpleGrid>
-        )}
+              <Carrusel
+                media={[
+                  {
+                    src: "/images/espacio2.jpeg",
+                    alt: "Area de entrenamiento",
+                  },
+                  {
+                    src: "/images/VideoAdriano.mp4",
+                    alt: "Correcci�n de ejercicios",
+                  },
+                  {
+                    src: "/images/espacio5.jpeg",
+                    alt: "Sector de equipamiento",
+                  },
+                  {
+                    src: "/images/CampeonDelmundo.mp4",
+                    alt: "Trabajo en acci�n",
+                  },
+                ]}
+              />
+            </SimpleGrid>
+          ) : (
+            <SimpleGrid
+              cols={{ base: 1, sm: 2 }}
+              spacing="sm"
+              className={classes.mediaGrid}
+            >
+              {[1, 2].map((item) => (
+                <div key={item} className={classes.mediaPlaceholder} />
+              ))}
+            </SimpleGrid>
+          )}
+        </div>
       </Container>
     </section>
   );

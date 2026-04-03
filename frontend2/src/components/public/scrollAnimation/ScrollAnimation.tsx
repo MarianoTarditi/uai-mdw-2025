@@ -20,13 +20,19 @@ export function ScrollAnimation({
   children,
   animation = "fadeInUp",
   delay = 0,
-  duration = 0.6,
+  duration = 0.72,
   threshold = 0.1,
 }: ScrollAnimationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const node = elementRef.current;
+
+    if (!node) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -36,18 +42,14 @@ export function ScrollAnimation({
       },
       {
         threshold,
-        rootMargin: "0px 0px -50px 0px", 
+        rootMargin: "0px 0px -50px 0px",
       },
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
+    observer.observe(node);
 
     return () => {
-      if (elementRef.current) {
-        observer.unobserve(elementRef.current);
-      }
+      observer.unobserve(node);
     };
   }, [threshold]);
 
@@ -56,8 +58,8 @@ export function ScrollAnimation({
       ref={elementRef}
       className={`${classes["scroll-animation"]} ${classes[`scroll-animation-${animation}`]} ${isVisible ? classes["scroll-animation-visible"] : ""}`}
       style={{
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
+        ["--scroll-animation-delay" as string]: `${delay}s`,
+        ["--scroll-animation-duration" as string]: `${duration}s`,
       }}
     >
       {children}

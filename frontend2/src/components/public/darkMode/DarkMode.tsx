@@ -1,13 +1,14 @@
 import {
   ActionIcon,
-  useMantineColorScheme,
   useComputedColorScheme,
+  useMantineColorScheme,
 } from "@mantine/core";
-import { IconSun, IconMoon } from "@tabler/icons-react";
+import { IconMoon, IconSun } from "@tabler/icons-react";
+import classes from "./DarkMode.module.css";
 
 export function DarkMode() {
   const { setColorScheme } = useMantineColorScheme();
-  
+
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -21,12 +22,15 @@ export function DarkMode() {
         setColorScheme(computedColorScheme === "light" ? "dark" : "light")
       }
       aria-label="Cambiar tema de color"
+      className={classes.toggle}
     >
-      {computedColorScheme === "light" ? (
-        <IconMoon stroke={1.5} />
-      ) : (
-        <IconSun stroke={1.5} />
-      )}
+      <span className={classes.iconShell}>
+        {computedColorScheme === "light" ? (
+          <IconMoon stroke={1.7} className={classes.icon} />
+        ) : (
+          <IconSun stroke={1.7} className={classes.icon} />
+        )}
+      </span>
     </ActionIcon>
   );
 }

@@ -62,6 +62,11 @@
   --action-navy-hover: #133055;
   --action-navy-active: #09172c;
   --action-navy-text: #f7fbff;
+  --motion-quick: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-standard: 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-emphasis: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  --lift-soft: translateY(-3px) scale(1.01);
+  --lift-surface: translateY(-5px) scale(1.01);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -100,6 +105,11 @@
   --action-navy-hover: #133055;
   --action-navy-active: #09172c;
   --action-navy-text: #f7fbff;
+  --motion-quick: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-standard: 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-emphasis: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  --lift-soft: translateY(-3px) scale(1.01);
+  --lift-surface: translateY(-5px) scale(1.01);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -228,3 +238,4 @@
 .dark [data-slot="input"]::placeholder {
   color: rgb(255 255 255 / 60%) !important;
 }
+

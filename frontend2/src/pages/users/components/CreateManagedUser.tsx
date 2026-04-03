@@ -329,11 +329,7 @@ export function CreateManagedUser({
           <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold">Primer pago</h3>
-              <p className="text-xs text-muted-foreground">
-                Este alumno se crea con el primer pago marcado como pagado.
-                Solo definis monto y ciclo; el ciclo vence por defecto a 30
-                dias.
-              </p>
+  
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-4">

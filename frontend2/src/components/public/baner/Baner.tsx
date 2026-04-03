@@ -1,28 +1,35 @@
 import { Marquee } from "@gfazioli/mantine-marquee";
 import {
-  IconBarbell, 
-  IconRun, 
-  IconBottle, 
-  IconHeartRateMonitor, 
-  IconScale, 
-  IconShoe, 
-  IconTrophy, 
-  IconStopwatch, 
-  IconActivity, 
+  IconActivity,
+  IconBarbell,
+  IconBottle,
+  IconHeartRateMonitor,
+  IconRun,
+  IconScale,
+  IconShoe,
+  IconStopwatch,
+  IconTrophy,
 } from "@tabler/icons-react";
 import "@gfazioli/mantine-marquee/styles.css";
 import "@gfazioli/mantine-marquee/styles.layer.css";
 import { ThemeIcon, useMantineColorScheme } from "@mantine/core";
-import { type ReactNode, type ComponentPropsWithoutRef } from "react";
+import { type ComponentPropsWithoutRef, type ReactNode } from "react";
+import classes from "./Baner.module.css";
 
-export function Baner() {
+interface BanerProps {
+  tone?: "auto" | "light" | "dark";
+}
+
+export function Baner({ tone = "auto" }: BanerProps) {
   const { colorScheme } = useMantineColorScheme();
+
+  const resolvedTone = tone === "auto" ? colorScheme : tone;
 
   const iconStyle = {
     width: "50%",
     height: "50%",
     color:
-      colorScheme === "dark"
+      resolvedTone === "dark"
         ? "var(--mantine-color-gray-0)"
         : "var(--mantine-color-gray-9)",
   };
@@ -51,23 +58,14 @@ export function Baner() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        margin: "0 auto",
-        marginTop: 40,
-        marginBottom: 40,
-        background: "transparent",
-      }}
-    >
-      <Marquee w={792} pauseOnHover fadeEdges>
-        {iconsGym.map((icon, index) => (
-          <BoxComponent key={index}>{icon}</BoxComponent>
-        ))}
-      </Marquee>
+    <div className={classes.wrapper}>
+      <div className={classes.shell}>
+        <Marquee w={792} pauseOnHover fadeEdges>
+          {iconsGym.map((icon, index) => (
+            <BoxComponent key={index}>{icon}</BoxComponent>
+          ))}
+        </Marquee>
+      </div>
     </div>
   );
 }

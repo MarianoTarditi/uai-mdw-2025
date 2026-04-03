@@ -5,6 +5,14 @@ import classes from "./Header.module.css";
 import { DarkMode } from "../darkMode/DarkMode";
 import { Link } from "react-router-dom";
 
+const navItems = [
+  { label: "Inicio", target: "inicio" },
+  { label: "Planes", target: "planes" },
+  { label: "Instalaciones", target: "instalaciones" },
+  { label: "FAQ", target: "faq" },
+  { label: "Contacto", target: "contact" },
+];
+
 export function Header() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
@@ -26,138 +34,77 @@ export function Header() {
     });
   };
 
+  const scrollToSection = (target: string) => {
+    document.getElementById(target)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <Box>
       <header
         className={`${classes.header} ${scrolled ? classes.scrolled : ""}`}
         role="banner"
       >
-        <nav
-          aria-label="NavegaciÃ³n principal"
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Group
-            justify="space-between"
-            h="100%"
-            style={{ width: "100%", height: "100%" }}
-          >
-            <div className={classes.logoContainer}>
-              <Link
-                to="/"
-                className="linkResetLogo"
-                aria-label="Ir al inicio - Turri Gym"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToTop();
-                }}
-              >
-                <img
-                  src="/Logo.png"
-                  alt="Turri Gym - Logo"
-                  className={classes.logoImage}
-                />
-              </Link>
-            </div>
+        <div className={classes.innerShell}>
+          <nav className={classes.nav} aria-label="Navegación principal">
+            <Group justify="space-between" h="100%" className={classes.navGroup}>
+              <div className={classes.logoContainer}>
+                <Link
+                  to="/"
+                  className={classes.logoLink}
+                  aria-label="Ir al inicio - Turri Gym"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToTop();
+                  }}
+                >
+                  <img
+                    src="/Logo.png"
+                    alt="Turri Gym - Logo"
+                    className={classes.logoImage}
+                  />
+                </Link>
+              </div>
 
-            <Group
-              h="100%"
-              gap={0}
-              visibleFrom="sm"
-              className={classes.navCenter}
-              role="list"
-            >
-              <a
-                href="#inicio"
-                className={classes.link}
-                role="listitem"
-                aria-label="Ir a la secciÃ³n de inicio"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById("inicio")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
+              <Group
+                h="100%"
+                gap={6}
+                visibleFrom="sm"
+                className={classes.navCenter}
+                role="list"
               >
-                Inicio
-              </a>
-              <a
-                href="#planes"
-                className={classes.link}
-                role="listitem"
-                aria-label="Ir a la secciÃ³n de planes"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById("planes")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                Planes
-              </a>
-              <a
-                href="#instalaciones"
-                className={classes.link}
-                role="listitem"
-                aria-label="Ir a la secciÃ³n de instalaciones"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById("instalaciones")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                Instalaciones
-              </a>
-              <a
-                href="#faq"
-                className={classes.link}
-                role="listitem"
-                aria-label="Ir a la secciÃ³n de preguntas frecuentes"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById("faq")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                FAQ
-              </a>
-              <a
-                href="#contact"
-                className={classes.link}
-                role="listitem"
-                aria-label="Ir a la secciÃ³n de contacto"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById("contact")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                Contacto
-              </a>
+                {navItems.map((item) => (
+                  <a
+                    key={item.target}
+                    href={`#${item.target}`}
+                    className={classes.link}
+                    role="listitem"
+                    aria-label={`Ir a la sección de ${item.label.toLowerCase()}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.target);
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </Group>
+
+              <Group visibleFrom="sm" className={classes.actionsGroup}>
+                <DarkMode />
+              </Group>
+
+              <Burger
+                opened={drawerOpened}
+                onClick={toggleDrawer}
+                hiddenFrom="sm"
+                className={classes.burger}
+                size="md"
+                aria-label="Abrir menú de navegación"
+                aria-expanded={drawerOpened}
+              />
             </Group>
-
-            <Group visibleFrom="sm">
-              <DarkMode />
-            </Group>
-
-            <Burger
-              opened={drawerOpened}
-              onClick={toggleDrawer}
-              hiddenFrom="sm"
-              color="white"
-              size="md"
-              aria-label="Abrir menÃº de navegaciÃ³n"
-              aria-expanded={drawerOpened}
-            />
-          </Group>
-        </nav>
+          </nav>
+        </div>
       </header>
 
       <Drawer
@@ -165,91 +112,38 @@ export function Header() {
         onClose={closeDrawer}
         size="100%"
         padding="md"
-        title="MenÃº de navegaciÃ³n"
+        title="Menú de navegación"
         hiddenFrom="sm"
         zIndex={1000000}
-        aria-label="MenÃº de navegaciÃ³n mÃ³vil"
+        aria-label="Menú de navegación móvil"
+        classNames={{
+          content: classes.drawerContent,
+          header: classes.drawerHeader,
+          title: classes.drawerTitle,
+          body: classes.drawerBody,
+        }}
       >
         <ScrollArea h={`calc(100vh - ${80}px)`} mx="-md">
-          <Divider my="sm" />
+          <Divider my="sm" className={classes.drawerDivider} />
 
-          <a
-            href="#inicio"
-            className={classes.link}
-            onClick={(e) => {
-              e.preventDefault();
-              closeDrawer();
-              setTimeout(() => {
-                document
-                  .getElementById("inicio")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
-            }}
-          >
-            Inicio
-          </a>
-          <a
-            href="#planes"
-            className={classes.link}
-            onClick={(e) => {
-              e.preventDefault();
-              closeDrawer();
-              setTimeout(() => {
-                document
-                  .getElementById("planes")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
-            }}
-          >
-            Planes
-          </a>
-          <a
-            href="#instalaciones"
-            className={classes.link}
-            onClick={(e) => {
-              e.preventDefault();
-              closeDrawer();
-              setTimeout(() => {
-                document
-                  .getElementById("instalaciones")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
-            }}
-          >
-            Instalaciones
-          </a>
-          <a
-            href="#faq"
-            className={classes.link}
-            onClick={(e) => {
-              e.preventDefault();
-              closeDrawer();
-              setTimeout(() => {
-                document
-                  .getElementById("faq")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
-            }}
-          >
-            FAQ
-          </a>
-          <a
-            href="#contact"
-            className={classes.link}
-            onClick={(e) => {
-              e.preventDefault();
-              closeDrawer();
-              setTimeout(() => {
-                document
-                  .getElementById("contact")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
-            }}
-          >
-            Contacto
-          </a>
+          {navItems.map((item) => (
+            <a
+              key={item.target}
+              href={`#${item.target}`}
+              className={`${classes.link} ${classes.mobileLink}`}
+              onClick={(e) => {
+                e.preventDefault();
+                closeDrawer();
+                setTimeout(() => {
+                  scrollToSection(item.target);
+                }, 100);
+              }}
+            >
+              {item.label}
+            </a>
+          ))}
 
-          <Divider my="sm" />
+          <Divider my="sm" className={classes.drawerDivider} />
 
           <Group
             justify="center"

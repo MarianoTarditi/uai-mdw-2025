@@ -24,6 +24,7 @@ export function GetAllRoutines() {
   const { profile } = useAppSelector((state) => state.user);
   const canManageTemplates =
     profile?.roles?.includes("trainer") || profile?.roles?.includes("admin");
+  const isStudent = profile?.roles?.includes("student");
 
   useEffect(() => {
     if (routines.length > 0) return;
@@ -73,7 +74,7 @@ export function GetAllRoutines() {
         onSearchChange={(value) => table.getColumn("name")?.setFilterValue(value)}
         actions={
           <>
-            {canManageTemplates && (
+            {(canManageTemplates || isStudent) && (
               <Button
                 asChild
                 variant="outline"
@@ -83,7 +84,7 @@ export function GetAllRoutines() {
                 <Link to="/RoutineTemplates">Plantillas Excel/PDF</Link>
               </Button>
             )}
-            <RoutineButton />
+            {canManageTemplates && <RoutineButton />}
             <DataTableViewOptions table={table} />
           </>
         }

@@ -79,6 +79,7 @@ export function AssetCard({
   const [draftDescription, setDraftDescription] = useState(asset.description ?? "");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileUrl = resolveMediaUrl(asset.fileUrl, false);
+  const isImageAsset = asset.type === "image";
 
   useEffect(() => {
     setDraftName(asset.name);
@@ -106,18 +107,14 @@ export function AssetCard({
     <Card className="overflow-hidden border-border/70 py-0 shadow-sm">
       <CardContent className="p-0">
         <div className="relative aspect-video overflow-hidden bg-muted">
-          {asset.type === "image" ? (
+          {isImageAsset ? (
             <button
               type="button"
               className="h-full w-full"
               onClick={() => setIsPreviewOpen(true)}
               aria-label={`Abrir ${asset.name} en pantalla completa`}
             >
-              <img
-                src={fileUrl ?? ""}
-                alt={asset.name}
-                className="h-full w-full object-cover"
-              />
+              <img src={fileUrl ?? ""} alt={asset.name} className="h-full w-full object-cover" />
             </button>
           ) : (
             <button
@@ -311,13 +308,31 @@ export function AssetCard({
       </CardContent>
 
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="h-[95vh] w-[95vw] max-w-none overflow-hidden p-0">
-          <DialogHeader className="border-b px-5 py-3">
+        <DialogContent
+          className={
+            isImageAsset
+              ? "relative h-[100dvh] w-[100vw] max-w-none overflow-hidden rounded-none border-0 bg-black p-0"
+              : "h-[95vh] w-[95vw] max-w-none overflow-hidden p-0"
+          }
+        >
+          <DialogHeader
+            className={
+              isImageAsset
+                ? "absolute left-0 top-0 z-10 w-full border-b border-white/10 bg-black/55 px-5 py-3 text-white backdrop-blur-sm"
+                : "border-b px-5 py-3"
+            }
+          >
             <DialogTitle className="truncate text-base">{asset.name}</DialogTitle>
           </DialogHeader>
 
-          <div className="flex h-full w-full items-center justify-center bg-background p-3">
-            {asset.type === "image" ? (
+          <div
+            className={
+              isImageAsset
+                ? "flex h-full w-full items-center justify-center bg-black p-4 pt-16"
+                : "flex h-full w-full items-center justify-center bg-background p-3"
+            }
+          >
+            {isImageAsset ? (
               <img
                 src={fileUrl ?? ""}
                 alt={asset.name}

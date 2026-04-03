@@ -22,6 +22,7 @@ import {
 import { type IUserProfile } from "@/features/users/userSlice";
 import { DetailUser } from "@/pages/users/components/DetailUser";
 import { DeleteUser } from "@/pages/users/components/DeleteUser";
+import { PermanentDeleteUser } from "@/pages/users/components/PermanentDeleteUser";
 import { UpdateUser } from "@/pages/users/components/UpdateUser";
 import { ActivateUser } from "@/pages/users/components/ActivateUser";
 import { SetUserRole } from "@/pages/users/components/SetUserRole";
@@ -38,6 +39,7 @@ export function UserActionsCell({ user }: UserActionsProps) {
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isActivateOpen, setIsActivateOpen] = React.useState(false);
   const [isRoleOpen, SetIsRoleOpen] = React.useState(false);
+  const [isPermanentDeleteOpen, setIsPermanentDeleteOpen] = React.useState(false);
 
   const { profile } = useAppSelector((state) => state.user);
   const isAdmin = profile?.roles.includes(UserRole.Admin);
@@ -108,17 +110,31 @@ export function UserActionsCell({ user }: UserActionsProps) {
               Desactivar
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem
-              disabled={!canManageUsers} 
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsActivateOpen(true);
-              }}
-              className="text-green-600 focus:text-green-600"
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Activar
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem
+                disabled={!canManageUsers}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsActivateOpen(true);
+                }}
+                className="text-green-600 focus:text-green-600"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Activar
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                disabled={!canManageUsers}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsPermanentDeleteOpen(true);
+                }}
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Eliminar permanentemente
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -150,6 +166,14 @@ export function UserActionsCell({ user }: UserActionsProps) {
         <SetUserRole
           isOpen={isRoleOpen}
           setIsOpen={SetIsRoleOpen}
+          user={user}
+        />
+      )}
+
+      {isPermanentDeleteOpen && user && (
+        <PermanentDeleteUser
+          isOpen={isPermanentDeleteOpen}
+          setIsOpen={setIsPermanentDeleteOpen}
           user={user}
         />
       )}

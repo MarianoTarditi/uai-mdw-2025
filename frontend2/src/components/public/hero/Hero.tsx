@@ -2,20 +2,15 @@ import { Container, Overlay, Text, Button, Group } from "@mantine/core";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { siteConfig } from "../config/siteConfig";
 import classes from "./Hero.module.css";
-import type { CSSProperties } from "react";
 
 export function Hero() {
   return (
-    <div
-      className={classes.hero}
-      role="banner"
-      style={{ "--hero-bg-image": 'url("/images/espacio1.jpeg")' } as CSSProperties}
-    >
+    <div className={classes.hero} role="banner">
       <Overlay
-        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 50%, #000000 100%)"
-        opacity={0.85}
+        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.4712) 0%, rgba(0, 0, 0, 0.38) 40%, rgba(0, 0, 0, 0.3192) 72%, rgba(0, 0, 0, 0.2736) 100%)"
+        opacity={1}
         zIndex={0}
-        blur={3}
+        blur={2}
       />
       <Container className={classes.container} size="lg">
         <div className={classes.logoSection}>

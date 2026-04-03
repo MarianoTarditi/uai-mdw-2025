@@ -1,8 +1,9 @@
 import { Carousel } from "@mantine/carousel";
 import "@mantine/carousel/styles.css";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Image } from "@mantine/core";
+import { Image, Text } from "@mantine/core";
 import type { EmblaCarouselType } from "embla-carousel";
+import classes from "./Carrusel.module.css";
 
 interface MediaItem {
   src: string;
@@ -28,12 +29,10 @@ const CarouselVideo = ({
   useEffect(() => {
     if (videoRef.current) {
       if (isActive) {
-        videoRef.current.currentTime = 0; 
-        videoRef.current
-          .play()
-          .catch((e) => console.log("Autoplay prevenido", e));
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch((e) => console.log("Autoplay prevenido", e));
       } else {
-        videoRef.current.pause(); 
+        videoRef.current.pause();
       }
     }
   }, [isActive]);
@@ -46,11 +45,7 @@ const CarouselVideo = ({
       muted
       playsInline
       onEnded={onEnded}
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-      }}
+      className={classes.media}
     />
   );
 };
@@ -62,9 +57,7 @@ export function Carrusel({ media }: CarruselProps) {
   const imageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isVideo = (src: string) => {
-    return (
-      src.toLowerCase().endsWith(".mp4") || src.toLowerCase().endsWith(".webm")
-    );
+    return src.toLowerCase().endsWith(".mp4") || src.toLowerCase().endsWith(".webm");
   };
 
   const goToNextSlide = useCallback(() => {
@@ -81,8 +74,7 @@ export function Carrusel({ media }: CarruselProps) {
     if (!embla || media.length === 0) return;
 
     const currentMedia = media[currentSlide];
-    const isCurrentVideo =
-      currentMedia.type === "video" || isVideo(currentMedia.src);
+    const isCurrentVideo = currentMedia.type === "video" || isVideo(currentMedia.src);
 
     if (imageTimerRef.current) {
       clearTimeout(imageTimerRef.current);
@@ -100,51 +92,42 @@ export function Carrusel({ media }: CarruselProps) {
   }, [currentSlide, embla, goToNextSlide, media]);
 
   return (
-    <div
-      style={{ maxWidth: 500, margin: "0 auto", width: "100%" }}
-    >
+    <div className={classes.carouselShell}>
       <Carousel
         getEmblaApi={setEmbla}
         onSlideChange={(index) => setCurrentSlide(index)}
         emblaOptions={{ loop: true }}
         withIndicators
         height={700}
-        styles={{
-          root: {
-            position: "relative",
-            borderRadius: "20px",
-            overflow: "hidden",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-          },
-          control: {
-            color: "black",
-            backgroundColor: "white",
-            top: "50%",
-          },
+        classNames={{
+          root: classes.carousel,
+          controls: classes.controls,
+          control: classes.control,
+          indicators: classes.indicators,
+          indicator: classes.indicator,
+          viewport: classes.viewport,
+          slide: classes.slide,
         }}
       >
         {media.map((item, index) => {
           const isItemVideo = item.type === "video" || isVideo(item.src);
 
           return (
-            <Carousel.Slide key={index}>
-              {isItemVideo ? (
-                <CarouselVideo
-                  src={item.src}
-                  isActive={currentSlide === index}
-                  onEnded={goToNextSlide}
-                />
-              ) : (
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              )}
+            <Carousel.Slide key={`${item.src}-${index}`}>
+              <div className={classes.mediaFrame}>
+                {isItemVideo ? (
+                  <CarouselVideo
+                    src={item.src}
+                    isActive={currentSlide === index}
+                    onEnded={goToNextSlide}
+                  />
+                ) : (
+                  <Image src={item.src} alt={item.alt} className={classes.mediaImage} />
+                )}
+                <div className={classes.mediaOverlay}>
+                  <Text className={classes.mediaCounter}>{`${index + 1}/${media.length}`}</Text>
+                </div>
+              </div>
             </Carousel.Slide>
           );
         })}

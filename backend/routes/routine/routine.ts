@@ -17,7 +17,7 @@ router.get(
 router.get(
   "/templates",
   authenticateFirebase,
-  checkRole([UserRole.Trainer, UserRole.Admin]),
+  checkRole([UserRole.Trainer, UserRole.Admin, UserRole.Student]),
   controllers.getRoutineTemplates,
 );
 

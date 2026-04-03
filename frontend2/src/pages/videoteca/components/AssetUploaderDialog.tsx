@@ -124,7 +124,6 @@ export function AssetUploaderDialog({
               id="asset-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Ej: Rotación interna de cadera"
               maxLength={120}
             />
           </div>
@@ -163,7 +162,6 @@ export function AssetUploaderDialog({
               id="asset-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Ej: movilidad suave para mejorar la rotación sin compensar con la lumbar."
               maxLength={240}
               className="min-h-24"
             />

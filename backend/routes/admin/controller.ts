@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import admin from "../../utils/firebase";
 import AuditLog from "../../models/AuditLog";
 import Exercise from "../../models/Exercise";
@@ -61,6 +61,104 @@ const parseIsoDate = (value?: string | Date | null) => {
 
   const parsedDate = new Date(value);
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
+
+const TRANSACTION_UNAVAILABLE_PATTERNS = [
+  /Transaction numbers are only allowed on a replica set member or mongos/i,
+  /Transaction support is not available/i,
+  /Current topology does not support sessions/i,
+  /Standalone servers do not support transactions/i,
+];
+
+const isTransactionUnavailableError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  const codeName =
+    typeof error === "object" && error !== null && "codeName" in error
+      ? String((error as { codeName?: unknown }).codeName ?? "")
+      : "";
+
+  return (
+    TRANSACTION_UNAVAILABLE_PATTERNS.some((pattern) => pattern.test(message)) ||
+    codeName === "IllegalOperation"
+  );
+};
+
+const persistManagedStudentWithInitialPayment = async ({
+  userDraft,
+  paymentAmount,
+  paymentBillingCycleDays,
+  paymentStartDate,
+  paymentDate,
+}: {
+  userDraft: Record<string, unknown>;
+  paymentAmount: number | null;
+  paymentBillingCycleDays: number | null;
+  paymentStartDate: Date | null;
+  paymentDate: Date | null;
+}) => {
+  const persistWithoutTransaction = async () => {
+    const createdUser = new User(userDraft);
+    await createdUser.save();
+
+    const initialPayment = createInitialPaidPaymentSource({
+      studentId: createdUser._id,
+      amount: paymentAmount,
+      billingCycleDays: paymentBillingCycleDays,
+      startDate: paymentStartDate,
+      paymentDate,
+    });
+
+    const createdPayment = new Payment(initialPayment);
+    await createdPayment.save();
+    await syncUserPaymentBridge(createdUser._id, createdPayment.toObject());
+
+    createdUser.payment = buildLegacyPaymentBridge(createdPayment.toObject());
+
+    return createdUser;
+  };
+
+  let session: mongoose.ClientSession | null = null;
+
+  try {
+    session = await mongoose.startSession();
+
+    let createdUser: InstanceType<typeof User> | null = null;
+
+    await session.withTransaction(async () => {
+      createdUser = new User(userDraft);
+      await createdUser.save({ session });
+
+      const initialPayment = createInitialPaidPaymentSource({
+        studentId: createdUser._id,
+        amount: paymentAmount,
+        billingCycleDays: paymentBillingCycleDays,
+        startDate: paymentStartDate,
+        paymentDate,
+      });
+
+      const createdPayment = new Payment(initialPayment);
+      await createdPayment.save({ session });
+      await syncUserPaymentBridge(createdUser._id, createdPayment.toObject(), {
+        session,
+      });
+
+      createdUser.payment = buildLegacyPaymentBridge(createdPayment.toObject());
+    });
+
+    if (!createdUser) {
+      throw new Error("Managed student transaction finished without creating a user");
+    }
+
+    return createdUser;
+  } catch (error) {
+    if (isTransactionUnavailableError(error)) {
+      return persistWithoutTransaction();
+    }
+
+    throw error;
+  } finally {
+    await session?.endSession();
+  }
 };
 
 const getDashboardStats = async (req: Request, res: Response) => {
@@ -289,32 +387,24 @@ const createManagedUser = async (req: Request, res: Response) => {
       disabled: false,
     });
 
-    const createdUser = new User({
-      name,
-      lastName,
-      email,
-      phone: normalizedPhone,
-      firebaseUid: firebaseUser.uid,
-      roles: [UserRole.Student],
-      gender: gender || null,
-      birthDate: parseBirthDate(birthDate),
-      weight: parseOptionalNumber(weight),
-      height: parseOptionalNumber(height),
-    });
-
-    await createdUser.save();
-
-    const initialPayment = createInitialPaidPaymentSource({
-      studentId: createdUser._id,
-      amount: parseOptionalNumber(paymentAmount),
-      billingCycleDays: parseOptionalNumber(paymentBillingCycleDays),
-      startDate: parseIsoDate(paymentStartDate),
-      paymentDate: parseIsoDate(paymentDate),
-    });
-
-    const createdPayment = await Payment.create(initialPayment);
-    await syncUserPaymentBridge(createdUser._id, createdPayment.toObject());
-    createdUser.payment = buildLegacyPaymentBridge(createdPayment.toObject());
+      const createdUser = await persistManagedStudentWithInitialPayment({
+        userDraft: {
+          name,
+          lastName,
+          email,
+          phone: normalizedPhone,
+          firebaseUid: firebaseUser.uid,
+          roles: [UserRole.Student],
+          gender: gender || null,
+          birthDate: parseBirthDate(birthDate),
+          weight: parseOptionalNumber(weight),
+          height: parseOptionalNumber(height),
+        },
+        paymentAmount: parseOptionalNumber(paymentAmount),
+        paymentBillingCycleDays: parseOptionalNumber(paymentBillingCycleDays),
+        paymentStartDate: parseIsoDate(paymentStartDate),
+        paymentDate: parseIsoDate(paymentDate),
+      });
 
     return res.status(201).json({
       message: "Alumno creado correctamente con contraseÃ±a inicial 123456789",
@@ -352,9 +442,61 @@ const createManagedUser = async (req: Request, res: Response) => {
   }
 };
 
+const permanentDeleteUser = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return handleHttpError(res, "User not authenticated", 401);
+    }
+
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return handleHttpError(res, "User not found", 404);
+    }
+
+    if (user.isActive) {
+      return handleHttpError(
+        res,
+        "No se puede eliminar permanentemente un usuario activo. Desactívalo primero.",
+        400,
+      );
+    }
+
+    // Delete associated data
+    await Payment.deleteMany({
+      $or: [{ userId: user._id }, { studentId: user._id }],
+    });
+    await Progress.deleteMany({ userId: user._id });
+    await Routine.deleteMany({
+      $or: [{ studentId: user._id }, { trainerId: user._id }],
+    });
+
+    // Delete from Firebase Auth
+    if (user.firebaseUid) {
+      try {
+        await admin.auth().deleteUser(user.firebaseUid);
+      } catch (firebaseError) {
+        console.error("Firebase delete error:", firebaseError);
+      }
+    }
+
+    // Delete the user document
+    await User.deleteOne({ _id: user._id });
+
+    res.status(200).json({
+      message: "Usuario eliminado permanentemente",
+      data: { _id: user._id },
+    });
+  } catch (error) {
+    handleHttpError(res, "Error eliminando usuario permanentemente", 500, error);
+  }
+};
+
 export default {
   getDashboardStats,
   getChartData,
   getAuditLogs,
   createManagedUser,
+  permanentDeleteUser,
 };

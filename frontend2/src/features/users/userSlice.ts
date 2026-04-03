@@ -158,6 +158,25 @@ export const deleteUser = createAsyncThunk<
   }
 });
 
+export const permanentDeleteUser = createAsyncThunk<
+  { _id: string },
+  string,
+  { rejectValue: string }
+>("user/permanentDelete", async (id, { rejectWithValue }) => {
+  try {
+    const res = await axiosPrivate.delete(`/admin/users/${id}`);
+    return res.data.data;
+  } catch (error) {
+    let message = "Error al eliminar usuario permanentemente";
+
+    if (isAxiosError(error)) {
+      message = error.response?.data?.message ?? error.message;
+    }
+
+    return rejectWithValue(message);
+  }
+});
+
 export const activateUser = createAsyncThunk<
   IUserProfile,
   string,
@@ -321,7 +340,28 @@ const userSlice = createSlice({
         state.isDeletingLoading = false;
         state.isError = true;
         state.message = action.payload as string;
+      })
+
+      // PERMANENT DELETE USER
+      .addCase(permanentDeleteUser.pending, (state) => {
+        state.isDeletingLoading = true;
+        state.isError = false;
+      })
+      .addCase(permanentDeleteUser.fulfilled, (state, action) => {
+        state.isDeletingLoading = false;
+        const deletedId = action.payload._id;
+
+        state.users = state.users.filter((u) => u._id !== deletedId);
+
+        if (state.profile?._id === deletedId) state.profile = null;
+        if (state.selectedUser?._id === deletedId) state.selectedUser = null;
+      })
+      .addCase(permanentDeleteUser.rejected, (state, action) => {
+        state.isDeletingLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
       });
+
     builder
       .addCase(activateUser.fulfilled, (state, action) => {
         const updatedUser = action.payload;

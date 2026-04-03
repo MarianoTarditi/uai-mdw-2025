@@ -1,90 +1,97 @@
 .section {
-  background: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-9)
-  );
-  padding: calc(var(--mantine-spacing-xl) * 2) 0;
   position: relative;
   overflow: hidden;
-  padding-bottom: 110px;
-  padding-top: 110px;
+  padding: 110px 0;
+  background: transparent;
+  --surface-transition: var(--motion-standard);
 }
 
-.section::after {
-  content: "";
+.overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4712) 0%, rgba(0, 0, 0, 0.38) 40%, rgba(0, 0, 0, 0.3192) 72%, rgba(0, 0, 0, 0.2736) 100%);
   z-index: 1;
 }
 
-.section::before {
-  content: "";
+.glowTop,
+.glowBottom {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(
-      circle at 20% 50%,
-      light-dark(rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1)) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 50%,
-      light-dark(rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.1)) 0%,
-      transparent 50%
-    );
+  width: 30rem;
+  height: 30rem;
+  border-radius: 999px;
+  filter: blur(90px);
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
+}
+
+.glowTop {
+  top: -14rem;
+  right: -8rem;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.glowBottom {
+  bottom: -16rem;
+  left: -10rem;
+  background: rgba(14, 165, 233, 0.1);
 }
 
 .wrapper {
   position: relative;
-  z-index: 1;
-  padding-top: calc(var(--mantine-spacing-xl) * 1.5);
-  padding-bottom: calc(var(--mantine-spacing-xl) * 1.5);
-  min-height: 650px;
+  z-index: 2;
+}
+
+.headerShell {
+  padding: clamp(1.75rem, 4vw, 3rem);
+  border-radius: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.32));
+  box-shadow: 0 24px 80px rgba(2, 6, 23, 0.34);
+  backdrop-filter: blur(16px);
 }
 
 .header {
-  margin-bottom: calc(var(--mantine-spacing-xl) * 1.5);
+  margin-bottom: calc(var(--mantine-spacing-xl) * 1.25);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
+.badge {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(14, 165, 233, 0.92));
+  color: var(--mantine-color-white);
+  border: 1px solid rgba(191, 219, 254, 0.18);
+  box-shadow: 0 12px 32px rgba(30, 64, 175, 0.28);
+}
+
 .title {
-  color: light-dark(
-    var(--mantine-color-gray-9),
-    var(--mantine-color-gray-0)
-  ) !important;
-  font-size: 42px;
+  color: #f8fafc !important;
+  font-size: clamp(2rem, 5vw, 2.7rem);
   font-weight: 800 !important;
   width: 100%;
   text-align: center;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   line-height: 1.2;
+}
 
-  @media (max-width: $mantine-breakpoint-sm) {
-    font-size: 32px;
-    letter-spacing: 1px;
-  }
+.divider {
+  width: 72px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.6), rgba(59, 130, 246, 1));
+  margin: 0 auto 24px;
+  border-radius: 999px;
 }
 
 .subtitle {
-  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-4));
-  font-size: 16px;
-  max-width: 600px;
+  color: rgba(226, 232, 240, 0.82);
+  font-size: 1rem;
+  max-width: 620px;
   margin: 0 auto;
   text-align: center;
   width: 100%;
+  line-height: 1.7;
 }
 
 .accordion {
@@ -94,51 +101,119 @@
 
 .item {
   margin-bottom: var(--mantine-spacing-md);
-
-  background: light-dark(
-    var(--mantine-color-white),
-    var(--mantine-color-dark-8)
-  );
-  transition: all 0.3s ease;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.32));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.24);
+  transition:
+    transform var(--surface-transition),
+    border-color var(--surface-transition),
+    box-shadow var(--surface-transition),
+    background var(--surface-transition);
   overflow: hidden;
   position: relative;
 
-  &:hover {
-    border-color: light-dark(
-      var(--mantine-color-blue-4),
-      var(--mantine-color-blue-7)
-    );
-
-    &::before {
-      opacity: 1;
-    }
-  }
-}
-
-.item[data-active] {
-  border-color: var(--mantine-color-blue-5);
-
   &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.08), transparent 44%);
+    opacity: 0;
+    transition: opacity var(--surface-transition);
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.005);
+    border-color: rgba(96, 165, 250, 0.34);
+    box-shadow: 0 22px 48px rgba(2, 6, 23, 0.32);
+  }
+
+  &:hover::before,
+  &[data-active]::before {
     opacity: 1;
   }
 }
 
+.item[data-active] {
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 24px 52px rgba(2, 6, 23, 0.34);
+}
+
 .item :global(.mantine-Accordion-control) {
   font-weight: 800 !important;
-  color: light-dark(
-    var(--mantine-color-gray-9),
-    var(--mantine-color-gray-0)
-  ) !important;
+  color: #f8fafc !important;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: color 0.2s ease;
+  transition:
+    color var(--surface-transition),
+    transform var(--surface-transition),
+    background-color var(--surface-transition);
 
   &:hover {
-    color: var(--mantine-color-blue-6);
+    color: #93c5fd !important;
   }
 }
 
-.item[data-active] :global(.mantine-Accordion-control) {
-  color: var(--mantine-color-blue-7) !important;
-  font-weight: 800 !important;
+.item:hover :global(.mantine-Accordion-control) {
+  transform: translateX(2px);
 }
+
+.item :global(.mantine-Accordion-chevron) {
+  color: rgba(191, 219, 254, 0.9);
+  transition: transform var(--surface-transition), color var(--surface-transition);
+}
+
+.item[data-active] :global(.mantine-Accordion-chevron) {
+  color: #bfdbfe;
+}
+
+.item :global(.mantine-Accordion-panel) {
+  color: rgba(226, 232, 240, 0.8);
+  line-height: 1.75;
+}
+
+@media (max-width: 48em) {
+  .section {
+    padding: 76px 0;
+  }
+
+  .glowTop,
+  .glowBottom {
+    width: 20rem;
+    height: 20rem;
+    filter: blur(70px);
+  }
+
+  .headerShell {
+    padding: 1.35rem 1rem;
+    border-radius: 24px;
+  }
+
+  .header {
+    margin-bottom: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .item:hover {
+    transform: translateY(-2px);
+  }
+
+  .item :global(.mantine-Accordion-control) {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .item:hover :global(.mantine-Accordion-control) {
+    transform: translateX(0);
+  }
+
+  .item :global(.mantine-Accordion-content) {
+    padding-inline: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+

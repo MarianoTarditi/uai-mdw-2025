@@ -1,24 +1,61 @@
+.toggle {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  color: #f8fafc !important;
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.18);
+  backdrop-filter: blur(12px);
+  transition:
+    transform var(--motion-standard),
+    border-color var(--motion-standard),
+    box-shadow var(--motion-standard),
+    background var(--motion-standard),
+    color var(--motion-standard);
+
+  &:hover {
+    transform: var(--lift-soft);
+    border-color: rgba(191, 219, 254, 0.28);
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.24);
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.14), rgba(255, 255, 255, 0.04));
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.995);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(191, 219, 254, 0.72);
+    outline-offset: 3px;
+  }
+}
+
+.iconShell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
 .icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+  transition:
+    transform var(--motion-standard),
+    color var(--motion-standard),
+    filter var(--motion-standard);
 }
 
-.dark {
-  @mixin dark {
-    display: none;
-  }
-
-  @mixin light {
-    display: block;
-  }
+.toggle:hover .icon {
+  transform: rotate(-8deg) scale(1.04);
+  filter: drop-shadow(0 10px 16px rgba(191, 219, 254, 0.18));
 }
 
-.light {
-  @mixin light {
-    display: none;
-  }
-
-  @mixin dark {
-    display: block;
+@media (max-width: 48em) {
+  .toggle {
+    width: 42px;
+    height: 42px;
   }
 }

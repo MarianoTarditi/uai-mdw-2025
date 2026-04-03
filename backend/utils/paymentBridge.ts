@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import Payment from "../models/Payment";
 import User from "../models/User";
 import { calculatePaymentStatus } from "./paymentStatus";
@@ -403,9 +403,11 @@ export const saveStudentPaymentSource = async (
 export const syncUserPaymentBridge = async (
   studentId: Types.ObjectId | string,
   payment: PaymentSourceInput | NormalizedPaymentSource,
+  options: { session?: ClientSession | null } = {},
 ) => {
   await User.updateOne(
     { _id: studentId },
     { $set: { payment: buildLegacyPaymentBridge(payment) } },
+    options.session ? { session: options.session } : undefined,
   );
 };
